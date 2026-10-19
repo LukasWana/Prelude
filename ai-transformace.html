@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>AI transformace v praxi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Úzká hrdla (Doc/vedeni/): hlavička s ořezovými značkami, karty, rozbalovací části.
+   Rozvržení: jeden sloupec textu, souhrnné dlaždice nahoře, u každého tvrzení značka, kolikrát je ověřené;
+   doslovné citace zdrojů dole (porovnává je scripts/ai_transformace_kontrola.py). */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e4edf9;
+  --good: #006300;
+  --good-wash: #e3f1e3;
+  --bad: #b3261e;
+  --bad-wash: #f9e5e3;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d;
+    --good: #2fbf4a; --good-wash: #16291a; --bad: #f07b72; --bad-wash: #331b19;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d;
+  --good: #2fbf4a; --good-wash: #16291a; --bad: #f07b72; --bad-wash: #331b19;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); overflow-wrap: anywhere; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 17px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+ul, ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; max-width: 76ch; }
+li { color: var(--ink-2); }
+li b, p b { color: var(--ink); }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.uvod { font-size: 18px; color: var(--ink-2); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); font-size: 18px; }
+.pozor { color: var(--ink-2); font-size: 15px; }
+.pozor b { color: var(--bad); font-weight: 600; }
+
+/* značka ověření: ✓✓ = dva a víc nezávislých zdrojů, ✓1 = jeden. Neověřené (∅) a sporné (✗) údaje na stránku nepatří
+   (rozhodnutí uživatele 19. 10. 2026), třídy s0/sx hlásí kontrola jako nález. */
+.st { display: inline-block; font: 500 12px/1 var(--font-mono); padding: 3px 6px; border-radius: 4px; white-space: nowrap; vertical-align: 1px; }
+.st.s2 { background: var(--good-wash); color: var(--good); }
+.st.s1 { background: var(--accent-wash); color: var(--accent); }
+.st.s0 { background: var(--chip); color: var(--ink-2); }
+.st.sx { background: var(--bad-wash); color: var(--bad); }
+.legenda-st { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--ink-2); }
+.legenda-st span.st { margin-right: 6px; }
+
+.soucet { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.dlazdice { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; background: var(--surface); align-content: start; }
+.dlazdice b { font: 800 clamp(30px, 4vw, 42px)/1 var(--font-display); font-stretch: 80%; }
+.dlazdice small { font-size: 14px; color: var(--ink-2); }
+@media (max-width: 860px) { .soucet { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .soucet { grid-template-columns: 1fr; } }
+
+.kroky { counter-reset: k; list-style: none; padding: 0; display: grid; gap: 12px; }
+.kroky > li { counter-increment: k; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 4px 12px; }
+.kroky > li::before { content: counter(k); grid-row: span 2; font: 800 24px/1 var(--font-display); font-stretch: 80%; color: var(--accent); }
+.kroky > li > b { color: var(--ink); }
+
+.tab { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-variant-numeric: tabular-nums; }
+td { color: var(--ink-2); }
+th { font: 500 12px var(--font-mono); color: var(--muted); vertical-align: bottom; }
+td:first-child { color: var(--ink); font-weight: 600; }
+.legenda { font-size: 13px; color: var(--muted); max-width: 90ch; }
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+
+footer { display: grid; gap: 12px; font-size: 14px; color: var(--ink-2); }
+footer code { font: 13px var(--font-mono); }
+.zdroje { list-style: none; padding: 0; gap: 14px; max-width: none; }
+.zdroje > li { display: grid; gap: 4px; min-width: 0; }
+.zdroje .kdo { color: var(--ink); font-weight: 600; }
+.cit { margin: 0; padding-left: 12px; border-left: 2px solid var(--axis); font-style: italic; color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · podklad k zavádění AI do firmy</div>
+    <h1>AI transformace v praxi</h1>
+    <div class="meta"><span>ověřeno 19. 10. 2026</span><span>jen ověřené údaje z aktuálních zdrojů</span><span>14 přečtených zdrojů</span></div>
+  </header>
+
+  <p class="uvod">Co o zavádění umělé inteligence do firmy jde doložit. Výchozí byly čtyři podklady ze složky Doc/Trans, ty ale napsala AI, a tak samy jako zdroj neplatí. Na stránce zůstalo jen to, co stojí v aktuálním zdroji. Co se ověřit nepodařilo nebo co nahradil novější údaj, tu není.</p>
+
+  <div class="legenda-st">
+    <div><span class="st s2">✓✓ 2×+</span>dva a víc nezávislých zdrojů</div>
+    <div><span class="st s1">✓1</span>jen jeden zdroj, samo o sobě na rozhodnutí nestačí</div>
+  </div>
+
+  <div class="soucet">
+    <div class="dlazdice"><span class="eyebrow">Direct pojišťovna</span><b class="num">15 → 2 min</b><small>zpracování škody na autosklu <span class="st s2">✓✓ 2×</span></small></div>
+    <div class="dlazdice"><span class="eyebrow">Direct, červenec 2026</span><b class="num">60 %</b><small>škod na autosklech vyřeší systém sám <span class="st s1">✓1</span></small></div>
+    <div class="dlazdice"><span class="eyebrow">Carebot</span><b class="num">384 000</b><small>rentgenových snímků plic ve 30 nemocnicích <span class="st s1">✓1</span></small></div>
+    <div class="dlazdice"><span class="eyebrow">Letiště Praha</span><b class="num">až 2 h</b><small>týdně ušetřil personál s Copilotem <span class="st s1">✓1</span></small></div>
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Data</span><h2>Před napojením AI projít oprávnění</h2></div>
+    <div class="card">
+      <ul>
+        <li>Asistent Microsoft Copilot vidí to, k čemu má přístup přihlášený člověk. Podle manuálu ČAUI „vidí a dělá jen to, k čemu byste se dostali i vy sami“ <span class="st s1">✓1</span>.</li>
+        <li>Proto je potřeba nejdřív najít staré složky, které omylem vidí každý (zapomenutá sdílení). Asistent by z nich mohl vytáhnout informaci do odpovědi <span class="st s1">✓1</span>.</li>
+        <li>Co je důvěrné, asistent sám nepozná. Manuál ČAUI: „nemá rozlišovací schopnost důvěrnosti informací. Co mu řeknete, to zpracuje.“ <span class="st s1">✓1</span></li>
+      </ul>
+      <p class="zaver">Asistent dodrží oprávnění, obsah dokumentu ale nehodnotí. Ochrana stojí na správně nastavených přístupech.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Lidé a pravidla</span><h2>Za výstup odpovídá člověk, zákon to ale nevyžaduje vždy</h2></div>
+    <div class="card">
+      <ul>
+        <li>Manuál ČAUI: výstup AI kontroluje a autorizuje člověk, úředník „zůstává v roli finálního rozhodčího“ <span class="st s1">✓1</span>.</li>
+        <li>Evropský AI Act (článek 14) vyžaduje lidský dohled jen u <b>vysoce rizikových</b> systémů AI <span class="st s1">✓1</span>. U ostatních je kontrola člověkem firemní pravidlo, ne zákonná povinnost.</li>
+        <li>Pravidla pro vysoce rizikové použití v citlivých oblastech (příloha III) se podle Evropské komise posunula na 2. 12. 2027 <span class="st s1">✓1</span>.</li>
+        <li>Povinnost zajistit znalosti AI u lidí, kteří s ní pracují (AI gramotnost), platí od 2. 2. 2025 <span class="st s1">✓1</span>.</li>
+      </ul>
+      <h3>Oficiální nástroj místo neschválených</h3>
+      <ul>
+        <li>Letiště Praha zavedlo Copilot oficiálně. Lidé už AI stejně hledali a vedení usoudilo, že je lepší dát jim zabezpečené řešení, jinak by si našli vlastní, potenciálně nebezpečné cesty <span class="st s1">✓1</span>.</li>
+        <li>Podle manuálu ČAUI Copilot neukládá dotazy ani data pro trénování cizích modelů <span class="st s1">✓1</span>. Je to údaj o Copilotu, ne o jiných nástrojích.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Příklady z praxe</span><h2>Čísla z případovek platí k datu a rozsahu</h2></div>
+    <div class="card">
+      <h3>Direct pojišťovna: škody na autosklech</h3>
+      <div class="tab"><table>
+        <thead><tr><th>Údaj</th><th>Jaro 2026<br>magazín ČAUI</th><th>Červenec 2026<br>Microsoft</th><th>Ověřeno</th></tr></thead>
+        <tbody>
+          <tr><td>Doba zpracování</td><td>15 → 2 minuty, úspora 87 %</td><td>15 → asi 2 minuty, 87 %</td><td><span class="st s2">✓✓ 2×</span></td></tr>
+          <tr><td>Vyřeší systém sám</td><td>jednoduché případy</td><td>60 % škod na autosklech</td><td><span class="st s1">✓1</span> číslo</td></tr>
+          <tr><td>Cíl</td><td>neuvádí</td><td>70 % všech škod za 2–3 roky</td><td><span class="st s1">✓1</span></td></tr>
+          <tr><td>Práce lidí</td><td>likvidátoři řeší složitější případy</td><td>lidem zůstanou nejsložitější případy</td><td><span class="st s2">✓✓ 2×</span></td></tr>
+        </tbody>
+      </table></div>
+      <p class="legenda">Oba zdroje přebírají údaje Directu a jeho dodavatelů (Microsoft, BigHub). Nezávislý audit není.</p>
+      <ul>
+        <li>Začali úzce, škodami na autosklech <span class="st s2">✓✓ 2×</span>. Implementace trvala devět měsíců <span class="st s1">✓1</span>. Z pilotu vznikl „AI Lab se čtyřmi týmy“ <span class="st s1">✓1</span>.</li>
+        <li>Člověk zůstal v procesu: „Human-in-the-loop was an essential component“ <span class="st s1">✓1</span>.</li>
+      </ul>
+      <p class="pozor"><b>Pozor:</b> 60 % platí jen pro škody na autosklech a k červenci 2026. Číslo vždy psát s datem a rozsahem.</p>
+
+      <h3>Carebot: pomocník v radiologii</h3>
+      <ul>
+        <li>Ve 30 nemocnicích ve čtyřech zemích EU analyzoval Carebot přes <b>384 000</b> snímků plic a jako podezřelé označil méně než 1 % <span class="st s1">✓1</span>. Zdrojem je anotace přednášky na konferenci ČAUI 14. 10. 2026.</li>
+        <li>Certifikaci MDR třídy IIa s označením CE mají <b>vybrané moduly</b>, ne všechny <span class="st s1">✓1</span>.</li>
+      </ul>
+
+      <h3>Letiště Praha: Copilot pro zaměstnance</h3>
+      <ul>
+        <li>Podle ředitele IT ušetřil personál díky Copilotu „až dvě hodiny týdně“ <span class="st s1">✓1</span> (případovka v magazínu ČAUI). Jak se to měřilo, zdroj neříká.</li>
+      </ul>
+
+      <h3>QIK: AI pro projektovou dokumentaci staveb</h3>
+      <ul>
+        <li>Pomáhá s technickými zprávami podle vyhlášky č. 131/2024 Sb. Před odevzdáním na úřad dokumentaci vždy schvaluje odpovědná osoba <span class="st s1">✓1</span>. Vyvinula ho firma JTC spolu s QIK a.s. <span class="st s1">✓1</span>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Rady</span><h2>Sedm rad, které mají oporu ve zdroji</h2></div>
+    <div class="card">
+      <ul>
+        <li><b>Před napojením AI projít oprávnění.</b> AI vidí, k čemu má přístup uživatel, zapomenutá sdílení vyčistit předem <span class="st s1">✓1</span>.</li>
+        <li><b>Začít úzkou úlohou.</b> Direct začal škodami na autosklech a teprve pak rozšiřuje <span class="st s2">✓✓ 2×</span>.</li>
+        <li><b>Určit, kdo za výstup odpovídá.</b> Zákonem nutné jen u vysoce rizikových systémů <span class="st s1">✓1</span>, jinde jako firemní pravidlo.</li>
+        <li><b>Certifikaci posuzovat u konkrétního produktu.</b> U Carebotu má certifikaci MDR jen část modulů <span class="st s1">✓1</span>.</li>
+        <li><b>Dát lidem oficiální nástroj.</b> Letiště Praha proto zavedlo Copilot <span class="st s1">✓1</span>.</li>
+        <li><b>Zajistit AI gramotnost.</b> Je povinná od 2. 2. 2025 <span class="st s1">✓1</span>.</li>
+        <li><b>Plánovat novou práci lidí.</b> V Direct se likvidátoři přesouvají ke složitějším případům <span class="st s2">✓✓ 2×</span>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">EmailRator</span><h2>Stejný typ úlohy jako v Direct</h2></div>
+    <div class="card">
+      <p>V Direct šlo hlavně o porozumění dokumentům a vytažení strukturovaných údajů z neuspořádaných podkladů <span class="st s1">✓1</span>. EmailRator dělá totéž s poptávkami z e-mailu. Co je hotové a co chybí, je na stránce <a href="nasazeni.html">Nasazení EmailRatoru</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">ČAUI a její členové</span><h2>Kdo je kdo kolem České asociace umělé inteligence</h2></div>
+    <div class="card">
+      <ul>
+        <li><b>AI manuál pro veřejnou správu</b> vydala ČAUI v listopadu 2025 v rámci iniciativy AI National Skilling Plan <span class="st s1">✓1</span>. Je to návod k Microsoft Copilotu pro úředníky.</li>
+        <li><b>AuditMaster.ai</b> (člen ČAUI) pomáhá zvládnout požadavky směrnice NIS2 <span class="st s1">✓1</span>.</li>
+        <li><b>Etyka Digital</b> je podle vlastního webu člen ČAUI a u projektů dělá klasifikaci rizik podle AI Actu <span class="st s1">✓1</span>.</li>
+        <li><b>Gatum Group</b> je člen ČAUI a radí hlavně veřejnému sektoru <span class="st s1">✓1</span>.</li>
+        <li>Matěj Misař, zakladatel Carebotu, předsedá zdravotnické skupině ČAUI a je členem výboru pro AI na ministerstvu zdravotnictví <span class="st s1">✓1</span>.</li>
+      </ul>
+      <p class="pozor"><b>Pozor:</b> o firmách mluví jejich vlastní weby nebo karty členů ČAUI. Nezávislé ověření to není.</p>
+    </div>
+  </section>
+
+  <footer>
+    <h3>Výhrady k ověřeným údajům</h3>
+    <ul>
+      <li>Čísla z případovek pocházejí od firmy samotné nebo jejího dodavatele. Nezávislý audit žádné z nich nemá.</li>
+      <li>Údaje <span class="st s1">✓1</span> mají jen jeden zdroj. Rozhodnutí na nich stavět až po druhém nezávislém zdroji.</li>
+    </ul>
+    <h3>Zdroje</h3>
+    <p>Přečteno 19. 10. 2026. Aktuální zdroj je živá stránka přečtená ten den, nebo zpráva či článek ne starší než 12 měsíců. Z podkladů vyřazená tvrzení a důvody jsou v <code>Doc/ai-transformace-overeni.md</code>. Citace níže porovnává se živými zdroji <code>scripts/ai_transformace_kontrola.py</code>, kontrolu pustit před každým použitím stránky.</p>
+    <details>
+      <summary>Doslovné citace ze zdrojů</summary>
+      <div>
+        <ul class="zdroje">
+          <li data-url="https://www.microsoft.com/en/customers/story/26862-direct-pojistovna-azure-document-intelligence-in-foundry-tools" data-datum="2026-07-10"><span class="kdo">Microsoft: Direct Pojišťovna automates claims (10. 7. 2026)</span><a href="https://www.microsoft.com/en/customers/story/26862-direct-pojistovna-azure-document-intelligence-in-foundry-tools">microsoft.com/en/customers/story/26862</a>
+            <p class="cit">Per-claim handling fell from 15 minutes to about 2 (an 87% change), with 60% of windshield claims fully automated</p>
+            <p class="cit">Direct is targeting 70% full automation within two to three years</p>
+            <p class="cit">The remaining 30% would be the most complex cases</p>
+            <p class="cit">Human-in-the-loop was an essential component</p>
+            <p class="cit">with an initial focus on windshield insurance</p>
+            <p class="cit">Direct is now extending beyond windshield claims to other claim types</p>
+            <p class="cit">the core problem was document understanding and structured data extraction from semi-structured and unstructured inputs</p></li>
+          <li data-url="https://asociace.ai/wp-content/uploads/2026/03/AI-Ekosystem-1-2026-web.pdf" data-datum="2026-03"><span class="kdo">ČAUI: magazín AI EKOSYSTÉM 3, jaro 2026 (PDF)</span><a href="https://asociace.ai/wp-content/uploads/2026/03/AI-Ekosystem-1-2026-web.pdf">asociace.ai, AI-Ekosystem-1-2026-web.pdf</a>
+            <p class="cit">Doba zpracování jednoho případu se zkrátila z přibližně patnácti minut na dvě minuty, což představuje úsporu zhruba 87 % času</p>
+            <p class="cit">Jednoduché případy jsou vyřízeny plně automaticky bez zásahu likvidátora</p>
+            <p class="cit">Implementace trvala devět měsíců</p>
+            <p class="cit">Likvidátoři se díky tomu mohou věnovat komplexnějším případům místo rutinní administrativy</p>
+            <p class="cit">ušetřil až dvě hodiny týdně díky Microsoft 365 Copilot</p></li>
+          <li data-url="https://enehano.cz/nasazeni-ai-praxi-qest-meetup/" data-datum="2026-07-29"><span class="kdo">Enehano: Nasazení AI v praxi, Qest meetup (29. 7. 2026)</span><a href="https://enehano.cz/nasazeni-ai-praxi-qest-meetup/">enehano.cz</a>
+            <p class="cit">likvidátor škod sám poskládal proces pro likvidaci čelních skel</p>
+            <p class="cit">Z pilotního projektu vznikl AI Lab se čtyřmi týmy</p></li>
+          <li data-url="https://asociace.ai/wp-content/uploads/2025/12/ai-manual-verejna-sprava-caui.pdf" data-datum="2025-11"><span class="kdo">ČAUI: AI manuál pro veřejnou správu (listopad 2025, PDF)</span><a href="https://asociace.ai/wp-content/uploads/2025/12/ai-manual-verejna-sprava-caui.pdf">asociace.ai, ai-manual-verejna-sprava-caui.pdf</a>
+            <p class="cit">Vidí a dělá jen to, k čemu byste se dostali i vy sami.</p>
+            <p class="cit">složku se starými daty, která omylem vidí každý</p>
+            <p class="cit">nemá rozlišovací schopnost důvěrnosti informací. Co mu řeknete, to zpracuje.</p>
+            <p class="cit">úředník zůstává v roli finálního rozhodčího</p>
+            <p class="cit">je lepší poskytnout oficiální, zabezpečené řešení, jinak by si lidé našli vlastní (a potenciálně nebezpečné) cestičky</p>
+            <p class="cit">neukládá vaše dotazy ani data pro trénování cizích modelů</p>
+            <p class="cit">Vydala Česká asociace umělé inteligence v rámci iniciativy AI National Skilling Plan v ČR | listopad 2025</p></li>
+          <li data-url="https://asociace.ai/ai-transformace-zdravotnictvi/" data-datum="živá"><span class="kdo">ČAUI: program konference AI transformace zdravotnictví (14. 10. 2026)</span><a href="https://asociace.ai/ai-transformace-zdravotnictvi/">asociace.ai/ai-transformace-zdravotnictvi</a>
+            <p class="cit">Ve 30 nemocnicích ve čtyřech zemích EU systém Carebot analyzoval více než 384 000 rentgenových snímků plic a označil méně než 1 % z nich jako podezřelé</p>
+            <p class="cit">Program konference 14. října 2026</p></li>
+          <li data-url="https://www.carebot.com/cs/" data-datum="živá"><span class="kdo">Carebot: oficiální web</span><a href="https://www.carebot.com/cs/">carebot.com/cs</a>
+            <p class="cit">Vybrané moduly Carebotu jsou certifikované jako zdravotnický prostředek MDR IIa s CE značkou.</p></li>
+          <li data-url="https://asociace.ai/zdravotnictvi/" data-datum="živá"><span class="kdo">ČAUI: pracovní skupina AI ve zdravotnictví</span><a href="https://asociace.ai/zdravotnictvi/">asociace.ai/zdravotnictvi</a>
+            <p class="cit">Předseda zdravotnické skupiny České asociace umělé inteligence</p>
+            <p class="cit">zakladatel českého healthtech startupu Carebot a člen výboru pro AI na Ministerstvu zdravotnictví ČR</p></li>
+          <li data-url="https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14" data-datum="živá"><span class="kdo">Evropská komise: AI Act, článek 14</span><a href="https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14">ai-act-service-desk.ec.europa.eu</a>
+            <p class="cit">High-risk AI systems shall be designed and developed in such a way, including with appropriate human-machine interface tools, that they can be effectively overseen by natural persons during the period in which they are in use.</p></li>
+          <li data-url="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai" data-datum="živá"><span class="kdo">Evropská komise: regulační rámec pro AI</span><a href="https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai">digital-strategy.ec.europa.eu</a>
+            <p class="cit">prohibited AI practices and AI literacy obligations entered into application from 2 February 2025</p>
+            <p class="cit">have been extended to 2 December 2027</p></li>
+          <li data-url="https://qikstavba.cz/dokumentace/" data-datum="živá"><span class="kdo">QIK Dokumentace: web produktu</span><a href="https://qikstavba.cz/dokumentace/">qikstavba.cz/dokumentace</a>
+            <p class="cit">Před odevzdáním na úřad ale dokumentaci vždy musí schválit odpovědná osoba.</p>
+            <p class="cit">vyhlášky č. 131/2024 Sb., o dokumentaci staveb</p></li>
+          <li data-url="https://jtc-solutions.cz/reference/qik" data-datum="živá"><span class="kdo">JTC Solutions: reference QIK</span><a href="https://jtc-solutions.cz/reference/qik">jtc-solutions.cz/reference/qik</a>
+            <p class="cit">Vyvinuli jsme společně s QIK a.s. aplikaci QIK</p></li>
+          <li data-url="https://asociace.ai/clenove/auditmaster-ai/" data-datum="živá"><span class="kdo">ČAUI: karta člena AuditMaster.ai</span><a href="https://asociace.ai/clenove/auditmaster-ai/">asociace.ai/clenove/auditmaster-ai</a>
+            <p class="cit">zvládnout náročné požadavky směrnice NIS2</p></li>
+          <li data-url="https://etyka.cz/sluzby" data-datum="živá"><span class="kdo">Etyka Digital: služby</span><a href="https://etyka.cz/sluzby">etyka.cz/sluzby</a>
+            <p class="cit">Jako člen České asociace umělé inteligence aktivně sledujeme EU AI Act. U každého projektu provádíme klasifikaci rizik</p></li>
+          <li data-url="https://asociace.ai/clenove/gatum-group/" data-datum="živá"><span class="kdo">ČAUI: karta člena Gatum Group</span><a href="https://asociace.ai/clenove/gatum-group/">asociace.ai/clenove/gatum-group</a>
+            <p class="cit">Gatum Group je členem České asociace umělé inteligence</p>
+            <p class="cit">strategické poradenství pro veřejný sektor</p></li>
+        </ul>
+      </div>
+    </details>
+  </footer>
+</div>
+
+</body>
+</html>

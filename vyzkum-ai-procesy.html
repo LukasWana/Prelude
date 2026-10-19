@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>AI a procesy ve výzkumu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Výtah z rešerše: jeden sloupec, čtyři témata pod sebou, u každého zjištění zdroj; stejné tokeny jako ostatní stránky Doc/vedeni */
+:root {
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #454b55;
+  --muted: #6c717a;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e8f0fb;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #9a9fa8;
+    --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1a2738;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #9a9fa8;
+  --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1a2738;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 17px/1.55 var(--font-body); }
+.wrap {
+  max-width: 760px; margin: 0 auto;
+  padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 44px;
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(34px, 6vw, 54px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(23px, 3.4vw, 29px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 20px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 65ch; }
+ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; max-width: 65ch; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.eyebrow, .stitek { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+header { display: flex; flex-direction: column; gap: 14px; }
+.lead { font-size: 19px; color: var(--ink-2); }
+
+.vzit { background: var(--accent-wash); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.vzit .pozn { font-size: 15px; color: var(--ink-2); }
+
+.osnova { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; max-width: none; }
+
+section.tema { display: flex; flex-direction: column; gap: 22px; padding-top: 26px; border-top: 1px solid var(--line); }
+.tema > p { color: var(--ink-2); }
+.nalez { display: flex; flex-direction: column; gap: 6px; }
+.nalez p { color: var(--ink); }
+.zdroj { font: 13px/1.5 var(--font-mono); color: var(--muted); }
+.zdroj a { color: var(--muted); }
+.zdroj a:hover { color: var(--accent); }
+.pozor { font-size: 15px; color: var(--ink-2); border-left: 3px solid var(--accent); padding-left: 12px; }
+
+.metoda { background: var(--lane); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.metoda ul { color: var(--ink-2); font-size: 16px; }
+footer { font: 13px/1.5 var(--font-mono); color: var(--muted); }
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">EmailRator · výtah z rešerše · ke schůzce 20. 10. 2026</div>
+  <h1>AI a procesy ve výzkumu</h1>
+  <p class="lead">Z rešerše vědeckých studií jsem vybral 18, které se týkají zavádění AI ve firmách a mapování procesů. U každé jsem přečetl abstrakt a závěr. Tady je to nejzajímavější.</p>
+</header>
+
+<aside class="vzit" aria-label="Co si vzít na schůzku">
+  <div class="stitek">Co si vzít na schůzku</div>
+  <ul>
+    <li>AI nejvíc pomáhá s psaním a čtením textu. Pod to spadá i převod e-mailu na zadání. Někde ale chybuje, proto výsledek kontroluje člověk. EmailRator s tím počítá: produkční zadání jen zkontroluje.</li>
+    <li>Malé firmy nebrzdí hlavně peníze. Brzdí je nedůvěra, chybějící znalosti a málo ukázek na skutečných případech. Demo v Gmailu je přesně taková ukázka.</li>
+    <li>Mapa procesu má být jednoduchá: hlavní cesta, málo kroků, jasný začátek a konec. Měřit se vyplatí hlavně průběžnou dobu zakázky, tedy i čekání.</li>
+    <li>Ze záznamů o tom, kdy se zakázka posunula, jde skutečný průběh vyčíst automaticky. Wall2 takové záznamy nemá, drží jen současný stav.</li>
+  </ul>
+  <p class="pozn">Tyhle čtyři body jsou můj výklad pro naši situaci, ne závěry studií.</p>
+</aside>
+
+<nav aria-label="Témata">
+  <ul class="osnova">
+    <li><a href="#prace">AI v kancelářské práci</a></li>
+    <li><a href="#mala-firma">Zavedení v malé firmě</a></li>
+    <li><a href="#lide">Lidé a dovednosti</a></li>
+    <li><a href="#procesy">Mapování procesů</a></li>
+  </ul>
+</nav>
+
+<section class="tema" id="prace">
+  <h2>AI v kancelářské práci</h2>
+
+  <div class="nalez">
+    <h3>S AI se píše rychleji a lépe, nejvíc to pomůže slabším</h3>
+    <p>V pokusu dostalo 444 lidí pracovní úlohy na psaní a polovina mohla používat ChatGPT. Ti s ChatGPT psali rychleji a kvalitněji. Rozdíly mezi lidmi se zmenšily, protože slabším pomohl víc. Práce se posunula od psaní prvního konceptu k nápadům a úpravám. Autoři sami upozorňují, že úlohy byly krátké a nevyžadovaly znalost konkrétní firmy.</p>
+    <div class="zdroj">Noy, Zhang 2023, Science · <a href="https://doi.org/10.1126/science.adh2586" target="_blank" rel="noopener">doi.org/10.1126/science.adh2586</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>AI má „zubatou hranici“: u některých úloh pomáhá, u jiných škodí</h3>
+    <p>Pokus se 758 konzultanty firmy BCG. U úloh, které AI zvládá, s ní lidé udělali víc, rychleji a v lepší kvalitě. U složité úlohy mimo její možnosti dospěli k správnému řešení o 19 % méně často než lidé bez AI. Hranice vede i uvnitř jedné práce a na první pohled ji nepoznáte.</p>
+    <div class="zdroj">Dell'Acqua a kol. 2023, pracovní verze (SSRN) · <a href="https://doi.org/10.2139/ssrn.4573321" target="_blank" rel="noopener">doi.org/10.2139/ssrn.4573321</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Lidé AI už používají, pravidla ve firmách chybí</h3>
+    <p>Průzkum mezi pracujícími v USA. AI používali hlavně na hledání informací a nápadů a na koncepty zpráv. O pravidlech pro používání AI ve své firmě věděla jen asi čtvrtina. Kdo je měl, cítil se při práci s AI jistější. Autoři doporučují tvořit pravidla spolu se zaměstnanci, zvlášť s těmi, kdo AI už zkoušejí.</p>
+    <div class="zdroj">Cardon a kol. 2023, předtisk · <a href="https://doi.org/10.31235/osf.io/b3ezy" target="_blank" rel="noopener">doi.org/10.31235/osf.io/b3ezy</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Firmy s AI mají vyšší produktivitu</h3>
+    <p>Data z německých firem. Používání AI souvisí s vyšší produktivitou. Platí to i pro to, jak intenzivně firma AI ve svých procesech používá.</p>
+    <div class="zdroj">Czarnitzki a kol. 2023, Journal of Economic Behavior &amp; Organization · <a href="https://doi.org/10.1016/j.jebo.2023.05.008" target="_blank" rel="noopener">doi.org/10.1016/j.jebo.2023.05.008</a></div>
+  </div>
+</section>
+
+<section class="tema" id="mala-firma">
+  <h2>Co rozhoduje o zavedení v malé firmě</h2>
+
+  <div class="nalez">
+    <h3>Čtyři bariéry v Česku a Rakousku: důvěra, znalosti, infrastruktura, zdroje</h3>
+    <p>Rozhovory s 22 odborníky z praxe v Česku a Rakousku, otázka zněla, co brzdí malé a střední firmy. Hlavní bariéry jsou nedůvěra k AI, chybějící znalosti, infrastruktura a zdroje. Peníze často nebyly to hlavní. Firmy víc stály o praktickou pomoc a ukázky na skutečných případech. Brzdí i špatná kvalita dat, přechod z pilotu do běžného provozu a odpor lidí zvyklých na starý způsob práce. Mezi českými a rakouskými firmami rozdíl nebyl.</p>
+    <div class="zdroj">Závodná a kol. 2024, Journal of Economics and Management · <a href="https://doi.org/10.22367/jem.2024.46.13" target="_blank" rel="noopener">doi.org/10.22367/jem.2024.46.13</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>AI se musí hodit k tomu, jak firma už pracuje</h3>
+    <p>Přehled 106 studií o AI v malých a středních firmách. Řadí vlivy do osmi oblastí: soulad s prací firmy, infrastruktura, znalosti, zdroje, kultura, konkurence, regulace a okolí firmy. Závěr: úspěch závisí na sladění s tím, jak firma pracuje, a s potřebami zákazníků. Výzkum podle autorů málo řeší právní požadavky.</p>
+    <div class="zdroj">Schwaeke a kol. 2024, Journal of Small Business Management · <a href="https://doi.org/10.1080/00472778.2024.2379999" target="_blank" rel="noopener">doi.org/10.1080/00472778.2024.2379999</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Rozhodují vlastní schopnosti, ne vnější podpora</h3>
+    <p>Studie malých a středních firem v EU. O zavedení AI rozhodují víc vlastní digitální schopnosti firmy než podpora zvenku. Firma, která je slabší v digitálu, to může vyvážit schopností inovovat.</p>
+    <div class="zdroj">Arroyabe a kol. 2024, Technology in Society · <a href="https://doi.org/10.1016/j.techsoc.2024.102733" target="_blank" rel="noopener">doi.org/10.1016/j.techsoc.2024.102733</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Připravenost na AI se posuzuje průběžně a pro konkrétní účel</h3>
+    <p>Rozhovory s 25 odborníky. Faktory připravenosti jsou v pěti oblastech a ke každému jsou ukazatele, podle kterých jde připravenost posoudit. Posuzovat ji je potřeba pořád znovu, během zavádění, a vždy pro určitý účel. Případová studie tří auditorských firem k tomu dodává, že menší firmy bývají připravené hůř.</p>
+    <div class="zdroj">Jöhnk a kol. 2020, Business &amp; Information Systems Engineering · <a href="https://doi.org/10.1007/s12599-020-00676-7" target="_blank" rel="noopener">doi.org/10.1007/s12599-020-00676-7</a><br>Yang a kol. 2024, Technological Forecasting and Social Change · <a href="https://doi.org/10.1016/j.techfore.2024.123251" target="_blank" rel="noopener">doi.org/10.1016/j.techfore.2024.123251</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Bariéry nejsou jen technické</h3>
+    <p>Souhrn 30 přehledových studií. K technickým bariérám, jako jsou dostupnost dat a infrastruktura, patří stejnou měrou i lidské: obava o práci, nedůvěra a chybějící znalosti. Přehledy mimo zdravotnictví podle studie řeší hlavně techniku a ekonomiku, píšou příliš optimisticky a výsledky v praxi často neověřují.</p>
+    <div class="zdroj">Čubrić 2020, Technology in Society · <a href="https://doi.org/10.1016/j.techsoc.2020.101257" target="_blank" rel="noopener">doi.org/10.1016/j.techsoc.2020.101257</a></div>
+  </div>
+</section>
+
+<section class="tema" id="lide">
+  <h2>Lidé a dovednosti</h2>
+
+  <div class="nalez">
+    <h3>Když lidé AI nerozumí, firmě nic nepřinese</h3>
+    <p>Firmy často zavádějí AI bez ohledu na lidi, kteří s ní budou pracovat. Autoři ukazují, že bez porozumění a spolupráce zaměstnanců AI hodnotu nepřinese. Lidé mají obavy o místo, z učení se novému a z nejistoty a AI často nedůvěřují. Často nevědí, proč a jak se má AI používat. Podle autorů pomáhá, když jí lidé lépe rozumí a pracují s ní.</p>
+    <div class="zdroj">Makarius a kol. 2020, Journal of Business Research · <a href="https://doi.org/10.1016/j.jbusres.2020.07.045" target="_blank" rel="noopener">doi.org/10.1016/j.jbusres.2020.07.045</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>České firmy spíš přeškolují, než propouštějí</h3>
+    <p>Studie mezi stovkou největších českých firem. Nejvíc se mění administrativní a nekvalifikované pozice. Firmy na to reagují hlavně školením svých lidí, rušení míst hlásila jen jedna. Za klíčovou dovednost považují komunikaci.</p>
+    <div class="zdroj">Vnoučková 2025, Quality Innovation Prosperity · <a href="https://doi.org/10.12776/qip.v29i2.2165" target="_blank" rel="noopener">doi.org/10.12776/qip.v29i2.2165</a></div>
+  </div>
+</section>
+
+<section class="tema" id="procesy">
+  <h2>Mapování procesů</h2>
+
+  <div class="nalez">
+    <h3>Při změně fungují lehké procesy, ne detailní kontrola</h3>
+    <p>Studie jedné výrobní firmy při digitální transformaci, autoři ji sledovali přes dva roky. Klasické řízení procesů stojí na přesně namodelovaných a kontrolovaných procesech. Při velké změně se ale osvědčily procesy „s lehkou rukou“, pružná technika a lidé, kteří vnímají, co se děje. Autoři doporučují ověřit, jestli zažité předpoklady o procesech ve firmě pořád platí.</p>
+    <div class="zdroj">Baiyere a kol. 2020, European Journal of Information Systems · <a href="https://doi.org/10.1080/0960085x.2020.1718007" target="_blank" rel="noopener">doi.org/10.1080/0960085x.2020.1718007</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Mapa procesu má být srozumitelná, jinak ji nikdo nečte</h3>
+    <p>Mapy procesů mají usnadnit pochopení, v praxi ale bývají těžko srozumitelné. Jedna studie shrnuje, co srozumitelnost ovlivňuje. Druhá dává 50 pravidel pro kreslení map. Patří k nim malý rozsah mapy, rozdělení na podprocesy, zvýraznění hlavní cesty a jasný začátek a konec.</p>
+    <div class="zdroj">Figl 2017, Business &amp; Information Systems Engineering · <a href="https://doi.org/10.1007/s12599-016-0460-2" target="_blank" rel="noopener">doi.org/10.1007/s12599-016-0460-2</a><br>Corradini a kol. 2017, Data &amp; Knowledge Engineering · <a href="https://doi.org/10.1016/j.datak.2017.11.003" target="_blank" rel="noopener">doi.org/10.1016/j.datak.2017.11.003</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Mapa toku hodnoty: hlavní měřítko je průběžná doba</h3>
+    <p>Přehled studií, které ve výrobě použily mapu toku hodnoty (value stream mapping). Jako hlavní měřítko zlepšení většina z nich sledovala zkrácení průběžné doby (lead time), tedy jak dlouho trvá cesta od začátku do konce.</p>
+    <div class="zdroj">Romero, Arce 2017, IFAC-PapersOnLine · <a href="https://doi.org/10.1016/j.ifacol.2017.08.385" target="_blank" rel="noopener">doi.org/10.1016/j.ifacol.2017.08.385</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Skutečný průběh procesu jde vyčíst ze záznamů v systému</h3>
+    <p>Process mining skládá skutečný průběh procesu ze záznamů událostí, které ukládají informační systémy. Ukáže úzká hrdla a odchylky od plánu. Autor doporučuje spojit zjištění s automatizací, jinak se lidé vrátí ke starým zvykům.</p>
+    <div class="zdroj">van der Aalst 2022, kapitola v Lecture Notes in Business Information Processing · <a href="https://doi.org/10.1007/978-3-031-08848-3_1" target="_blank" rel="noopener">doi.org/10.1007/978-3-031-08848-3_1</a></div>
+  </div>
+
+  <div class="nalez">
+    <h3>Jazykové modely v řízení procesů: pomocník ano, autopilot zatím ne</h3>
+    <p>Návrh spojit jazykové modely s pevnými pravidly a daty o procesech. Velký dopad v příštích letech autoři čekají od jazykových modelů jako pomocníků při práci s mapami a modely procesů. Plnou automatizaci řízení procesů považují za rizikovou a zatím neproveditelnou. Autoři mimo univerzity pracují pro firmu, která prodává software pro řízení procesů.</p>
+    <div class="zdroj">Kampik a kol. 2024, Künstliche Intelligenz · <a href="https://doi.org/10.1007/s13218-024-00863-8" target="_blank" rel="noopener">doi.org/10.1007/s13218-024-00863-8</a></div>
+  </div>
+</section>
+
+<aside class="metoda" aria-label="Jak výtah vznikl">
+  <div class="stitek">Jak výtah vznikl</div>
+  <ul>
+    <li>Rešerše 19. 10. 2026: 122 studií z let 2015–2026, plné znění máme u 77. Vybíralo se podle počtu citací, není to úplný přehled oboru.</li>
+    <li>Sem jsem vybral 18 studií, které se nejvíc týkají naší situace. U každé jsem četl abstrakt a závěr, ne celý text.</li>
+    <li>Každé zjištění stojí na jedné studii. Jinými zdroji jsem ho neověřoval.</li>
+  </ul>
+</aside>
+
+<footer>Zdroj: rešerše v projektu GEmailRator, docs/research (katalog a PDF). Stránka: EmailRator Doc/vedeni/vyzkum-ai-procesy.html</footer>
+
+</div>
+
+</body>
+</html>

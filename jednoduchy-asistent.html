@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Nejjednodušší EmailRator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Stopa jedné zakázky (Doc/vedeni/stopa-zakazky.html): hlavička s ořezovými značkami, karty.
+   Graf řádků kreslí skript z pole MODULY (počty ověřuje scripts/jednoduchy_asistent_kontrola.py); barvy jen z tokenů. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eef9;
+  --ok: #1f7a4d;
+  --ok-wash: #e7f4ec;
+  --bad: #b3261e;
+  --bad-wash: #fbeceb;
+  --on-bad: #ffffff;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1a2638; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b; --on-bad: #1a0b0a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1a2638; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b; --on-bad: #1a0b0a;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* hlavička s ořezovými značkami */
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.meta .pozor { color: var(--bad); }
+.teze { font-size: 20px; line-height: 1.45; max-width: 64ch; color: var(--ink-2); }
+.teze b { color: var(--ink); font-weight: 600; }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.sec-head > p { color: var(--ink-2); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.card b { color: var(--ink); font-weight: 600; }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); font-size: 18px; }
+
+/* legenda */
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--ink-2); }
+.legenda span { display: inline-flex; align-items: center; gap: 8px; }
+.st { display: inline-block; flex: none; font: 500 11px/1 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; padding: 4px 7px; border-radius: 3px; white-space: nowrap; }
+.st.zustava { background: var(--accent); color: var(--surface); }
+.st.zuzit { background: var(--accent-wash); color: var(--accent); border: 1px solid var(--accent); padding: 3px 6px; }
+.st.odpada { background: var(--chip); color: var(--ink-2); }
+.st.dopsat { background: var(--ok-wash); color: var(--ok); border: 1px dashed var(--ok); padding: 3px 6px; }
+
+/* trasa e-mailu: dnes × jednoduchá verze */
+.trasa { display: grid; grid-template-columns: minmax(0, 1fr) 132px minmax(0, 1fr); }
+.trasa-hl { font: 750 13px var(--font-display); font-stretch: 85%; letter-spacing: .06em; text-transform: uppercase; padding: 0 12px 10px; border-bottom: 1px solid var(--axis); }
+.trasa-hl.stred { text-align: center; padding-inline: 4px; }
+.krok { position: relative; margin: 8px 12px; padding: 9px 12px; border: 1.5px solid var(--axis); border-radius: 8px; background: var(--surface); display: grid; gap: 3px; min-width: 0; }
+.krok .co { font-size: 15px; line-height: 1.3; color: var(--ink); }
+.krok .jak { font: 400 12.5px/1.35 var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.krok.pryc { border-style: dashed; background: transparent; }
+.krok.pryc .co { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--axis); }
+.krok.nove { border: 1.5px dashed var(--ok); background: var(--ok-wash); }
+.krok.nic { border: 0; background: none; padding-block: 0; display: flex; align-items: center; min-height: 100%; }
+.krok.nic .co { color: var(--muted); font-size: 14px; font-style: italic; }
+.mezi { position: relative; display: flex; align-items: center; justify-content: center; }
+.mezi::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--axis); }
+.mezi .st { position: relative; }
+.trasa .radek { display: contents; }
+.zona { grid-column: 1 / -1; font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 16px 12px 4px; display: flex; gap: 10px; align-items: center; }
+.zona::after { content: ""; flex: 1; height: 1px; background: var(--axis); }
+.kdo { display: none; }
+@media (max-width: 760px) {
+  .trasa { grid-template-columns: minmax(0, 1fr); }
+  .trasa-hl { display: none; }
+  .trasa .radek { display: grid; gap: 0; padding-block: 6px; border-bottom: 1px solid var(--line); }
+  .mezi { justify-content: flex-start; padding: 2px 12px; }
+  .mezi::before { display: none; }
+  .kdo { display: block; font: 500 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .krok.nic { min-height: 0; padding: 4px 0; }
+}
+
+/* dlaždice */
+.soucet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dlazdice { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; min-width: 0; background: var(--surface); }
+.dlazdice.hl { background: var(--accent-wash); border-color: transparent; }
+.dlazdice b { font: 800 clamp(30px, 4vw, 42px)/1 var(--font-display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.dlazdice.hl b { color: var(--accent); }
+.dlazdice small { font-size: 14px; color: var(--ink-2); }
+@media (max-width: 640px) { .soucet { grid-template-columns: 1fr; } }
+
+/* graf řádků po skupinách */
+.graf { display: grid; grid-template-columns: minmax(150px, 230px) minmax(0, 1fr); gap: 10px 16px; align-items: center; }
+.graf .jm { font: 600 15px/1.25 var(--font-body); color: var(--ink); }
+.graf .jm small { display: block; font: 400 12px var(--font-mono); color: var(--muted); margin-top: 2px; }
+.graf .stopa { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.graf .pruh { display: flex; height: 22px; border-radius: 3px; overflow: hidden; background: var(--chip); flex: none; }
+.graf .pruh i { display: block; height: 100%; background: var(--accent); }
+.graf .hod { font: 500 13px var(--font-mono); color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.graf .hod b { color: var(--accent); font-weight: 500; }
+.osa-g { grid-column: 2; display: flex; justify-content: space-between; font: 400 11px var(--font-mono); color: var(--muted); border-top: 1px solid var(--axis); padding-top: 4px; }
+@media (max-width: 640px) {
+  .graf { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .graf .stopa { margin-bottom: 10px; }
+  .osa-g { grid-column: 1; }
+}
+.vz { display: inline-block; width: 22px; height: 12px; border-radius: 2px; flex: none; }
+.vz.zaklad { background: var(--accent); }
+.vz.zbytek { background: var(--chip); }
+
+/* schody: kdy to ještě dává smysl */
+.schody { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: end; gap: 6px; padding-top: 34px; position: relative; }
+.schod { border-radius: 8px 8px 0 0; padding: 10px 10px 12px; display: grid; gap: 6px; align-content: start; min-width: 0; border: 1.5px solid var(--axis); border-bottom-width: 3px; background: var(--surface); }
+.schod .c { font: 500 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.schod .co { font: 700 15px/1.2 var(--font-display); font-stretch: 90%; color: var(--ink); }
+.schod p { font-size: 13.5px; line-height: 1.35; color: var(--ink-2); }
+.schod.pod { background: var(--bad-wash); border-color: transparent; border-bottom-color: var(--bad); }
+.schod.pod .c { color: var(--bad); }
+.schod.min { background: var(--accent-wash); border-color: var(--accent); }
+.schod.min .c { color: var(--accent); }
+.schod.nad { background: var(--lane); border-color: transparent; border-bottom-color: var(--axis); }
+.schod:nth-child(1) { min-height: 140px; } .schod:nth-child(2) { min-height: 175px; } .schod:nth-child(3) { min-height: 210px; }
+.schod:nth-child(4) { min-height: 245px; } .schod:nth-child(5) { min-height: 280px; } .schod:nth-child(6) { min-height: 315px; }
+.hranice { position: absolute; top: 0; left: calc((100% - 30px) / 6 * 2 + 12px - 1px); width: calc((100% - 30px) / 6 * 3 + 12px + 2px); border-top: 2px solid var(--accent); font: 500 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); padding-top: 6px; text-align: center; }
+@media (max-width: 860px) {
+  .schody { grid-template-columns: minmax(0, 1fr); padding-top: 0; gap: 8px; }
+  .schod { min-height: 0 !important; border-radius: 8px; border-bottom-width: 1.5px; border-left-width: 4px; }
+  .schod.pod { border-left-color: var(--bad); border-bottom-color: transparent; }
+  .schod.nad { border-left-color: var(--axis); border-bottom-color: transparent; }
+  .hranice { display: none; }
+  .schod.min .c::after { content: " · minimum"; }
+}
+
+/* tabulky */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td { color: var(--ink-2); }
+th { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
+td:first-child { color: var(--ink); font-weight: 600; width: 30%; }
+td code, p code, li code { font: 13px var(--font-mono); color: var(--ink-2); background: var(--lane); padding: 1px 4px; border-radius: 3px; overflow-wrap: anywhere; }
+
+.dve { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .dve { grid-template-columns: minmax(0, 1fr); } }
+.dve .card h3 { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }
+ul b { color: var(--ink); font-weight: 600; }
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · návrh na zjednodušení</div>
+    <h1>Nejjednodušší EmailRator</h1>
+    <div class="meta"><span>Stav kódu k 5. 10. 2026</span><span>Vychází z dnešního EmailRatoru</span><span class="pozor">Návrh, zatím nepostavený ani nezměřený</span><a href="jednoduchy-asistent-prehled.html">Přehled na jeden pohled</a></div>
+    <p class="teze">Produkční otevře e-mail v Gmailu a klikne na <b>Převést</b>. Vedle e-mailu uvidí vyplněné zadání zakázky, u každé hodnoty <b>doslovnou citaci z e-mailu</b> a pod tím hotový text dotazu na údaje, které v e-mailu chybí.</p>
+  </header>
+
+  <section id="trasa">
+    <div class="sec-head">
+      <div class="eyebrow">Krok po kroku</div>
+      <h2>Co se s e-mailem děje dnes a v jednoduché verzi</h2>
+      <p>Vlevo je dnešní cesta e-mailu podle schématu zpracování. Vpravo je, čím ji jednoduchá verze nahradí. Prostřední sloupec říká, co se s dnešním krokem stane. Zelený rámeček vpravo znamená, že náhradu je potřeba dopsat.</p>
+      <div class="legenda">
+        <span><i class="st zustava">zůstává</i>kód se převezme</span>
+        <span><i class="st zuzit">zúžit</i>převezme se jen část</span>
+        <span><i class="st odpada">odpadá</i>v jednoduché verzi není</span>
+        <span><i class="st dopsat">nové</i>náhrada je malý nový kód</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="trasa" id="trasa-g"></div>
+    </div>
+  </section>
+
+  <section id="hranice">
+    <div class="sec-head">
+      <div class="eyebrow">Kam až se dá ubrat</div>
+      <h2>Kdy to ještě dává smysl</h2>
+      <p>Každý schod přidává jednu věc. Červené schody jsou jen chatbot, kterému se nedá věřit. Modré jsou minimum. Šedý schod je to, co dnešní EmailRator přidává navíc: pohodlí a automatizace, ne jádro.</p>
+    </div>
+    <div class="card">
+      <div class="schody">
+        <div class="hranice">minimum, které dává smysl</div>
+        <div class="schod pod"><span class="c">Pod hranicí</span><span class="co">Model přečte e-mail</span><p>Odpoví volným textem. Totéž umí vložení e-mailu do chatu.</p></div>
+        <div class="schod pod"><span class="c">Pod hranicí</span><span class="co">+ pevná pole</span><p>Odpověď má vždy stejný tvar, ale nevíte, jestli je pravdivá.</p></div>
+        <div class="schod min"><span class="c">Minimum</span><span class="co">+ citace s kontrolou</span><p>Každá hodnota má doslovnou citaci a program ověří, že v e-mailu opravdu je.</p></div>
+        <div class="schod min"><span class="c">Minimum</span><span class="co">+ maskování</span><p>Jména, e-maily a telefony zákazníků neodejdou do cizí služby. Nutné jen u modelu v cloudu.</p></div>
+        <div class="schod min"><span class="c">Minimum</span><span class="co">+ testovací sada</span><p>Pár desítek označených e-mailů. Ukáže, jestli změna promptu nebo modelu něco nerozbila.</p></div>
+        <div class="schod nad"><span class="c">Dnešní EmailRator</span><span class="co">+ automatizace</span><p>Samovolný příjem pošty, třídění, druhý hlas Jev, kanban, brána jistoty.</p></div>
+      </div>
+      <p class="zaver">Bez citací s kontrolou je to chatbot, který si může vymýšlet. Bez testovací sady nepoznáte, jestli funguje. Všechno ostatní se dá ubrat.</p>
+    </div>
+  </section>
+
+  <section id="kod">
+    <div class="sec-head">
+      <div class="eyebrow">Kolik kódu je potřeba</div>
+      <h2>Ze kterých částí jednoduchá verze bere kód</h2>
+      <p>Délka pruhu je počet řádků programu ve skupině. Modrá část jsou moduly, ze kterých jednoduchá verze přebírá kód. Z velkých modulů se převezme jen část, takže skutečný podíl bude menší. Graf počítá jen hlavní program (složka src). Pomocné skripty, webové rozhraní kanbanu a kód samotného panelu (samostatný projekt GEmailRator) v něm nejsou. Skupina „Rozbor zakázek z wall2, číselníky, stránky“ obsahuje moduly, které ze starého systému jen čtou (rozbor zakázek, kalibrace polí, příprava souboru pro převod do nového systému), dále číselníky a generátory stránek pro vedení. Převod e-mailu nic z toho nepotřebuje.</p>
+      <div class="legenda">
+        <span><i class="vz zaklad"></i>moduly, ze kterých se bere</span>
+        <span><i class="vz zbytek"></i>ostatní moduly</span>
+      </div>
+    </div>
+    <div class="soucet" id="soucet"></div>
+    <div class="card">
+      <div class="graf" id="graf"></div>
+      <details>
+        <summary>Které moduly přesně</summary>
+        <div class="tablewrap"><table id="moduly-t"><thead><tr><th>Skupina</th><th>Bere se z</th><th>Odpadá</th></tr></thead><tbody></tbody></table></div>
+      </details>
+    </div>
+  </section>
+
+  <section id="co">
+    <div class="sec-head">
+      <div class="eyebrow">Shrnutí</div>
+      <h2>Co zůstane a co se ztratí</h2>
+    </div>
+    <div class="dve">
+      <div class="card" id="zustane">
+        <h3>Zůstane <span class="st zustava">7 částí</span></h3>
+        <ul>
+          <li><b>Tlačítko Převést</b> v postranním panelu Chromu u otevřeného e-mailu. Panel už existuje (rozšíření GEmailRator). Ruční klik nahradí příjem pošty, třídění i automat.</li>
+          <li><b>Stažení celého vlákna</b> přes Gmail API, jen pro čtení. Zadání se v konverzaci upřesňuje, jedna zpráva nestačí.</li>
+          <li><b>Jedno volání modelu s pevnými poli.</b> Návrh: zúžit na zákazníka, produkt, formát, náklad, papír, barevnost, termín a poznámku.</li>
+          <li><b>Kontrola citací.</b> Citace musí být v e-mailu doslova a musí nést hodnotu, kterou dokládá.</li>
+          <li><b>Maskování</b>, pokud text jde do modelu v cloudu.</li>
+          <li><b>Doplňující dotaz</b> z chybějících polí. Pevné šablony, bez modelu, nic se neodesílá.</li>
+          <li><b>Malá testovací sada s měřením.</b> Pouští se jen při změně, ne v provozu.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Ztratí se <span class="st odpada">s vědomím</span></h3>
+        <ul>
+          <li><b>Samovolný převod nové pošty.</b> Bez kliknutí se nic nestane.</li>
+          <li><b>Hledání poptávek ve staré poště</b> (podobnost textů a třídění).</li>
+          <li><b>Druhá kontrola hodnot</b> od klasifikátoru Jev a brána jistoty. Dnes je automatické přijetí hodnot stejně vypnuté, takže se ztratí málo.</li>
+          <li><b>Přehled všech zakázek</b> na jedné obrazovce (kanban). Stav se uloží k výsledku a ukáže v panelu.</li>
+          <li><b>Zadání poslaná jen v příloze PDF.</b></li>
+          <li><b>Hlídání vnitřních rozporů</b> v hodnotách. Zůstanou jen dvě až tři nejjednodušší kontroly.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="dopsat">
+    <div class="sec-head">
+      <div class="eyebrow">Co je nové</div>
+      <h2>Co by se muselo dopsat</h2>
+      <p>Jednoduchá verze je hlavně o mazání. Nově se píšou jen čtyři malé věci. Tři z nich proto, že dnešní kód počítá s databází.</p>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table>
+        <thead><tr><th>Co</th><th>Proč</th></tr></thead>
+        <tbody>
+          <tr><td>Text vlákna přímo z Gmail API</td><td>Dnešní převod čte vlákno z databáze Postgres, do které ho předtím uloží příjem pošty nebo panel. Jednoduchá verze databázi nemá.</td></tr>
+          <tr><td>Uložení výsledku do souboru</td><td>Jeden soubor na vlákno: pole, citace, stav a oprava od produkčního. Opravy se nesmějí ztratit a slouží i jako nové testovací vzorky.</td></tr>
+          <tr><td>Zúžené schéma polí</td><td>Dnešní schéma má 20 bloků. Méně polí znamená kratší prompt i jednodušší kontrolu. Výběr polí je návrh a musí ho potvrdit produkční.</td></tr>
+          <tr><td>Měření nad soubory výsledků</td><td>Dnešní měření přesnosti čte převody z databáze. V jednoduché verzi je bude číst ze souborů výsledků.</td></tr>
+        </tbody>
+      </table></div>
+      <details>
+        <summary>Proč stav zakázky ne jako štítek v Gmailu</summary>
+        <div><p>Štítek je nejjednodušší místo pro stav (Nová, Doplnit, Nacenit, Hotovo), ale zápis štítku potřebuje širší oprávnění ke schránce než dnešní „jen čtení“. Proto je stav v minimu uložený u výsledku a štítky jsou až další krok, pokud o ně produkční budou stát.</p></div>
+      </details>
+      <details>
+        <summary>Ještě jednodušší varianta bez serveru</summary>
+        <div><p>Rozšíření v Chromu by mohlo volat model přímo, bez vlastního serveru. Maskování a kontrolu citací by ale bylo nutné napsat znovu v jazyce rozšíření a obsah pošty by šel z prohlížeče rovnou do služby modelu. Za ušetřený server to nestojí, protože obě části už existují a fungují.</p></div>
+      </details>
+    </div>
+    <p>Jak by nasazení vypadalo a co stojí, je na stránce <a href="nasazeni.html">Nasazení EmailRatoru</a>.</p>
+  </section>
+</div>
+
+<script>
+// Kroky dnešní cesty e-mailu (Doc/SCHEMA-zpracovani.md, oddíl A) a jejich náhrada.
+// [zóna, dnes, dnes-podrobně, stav, jednoduchá verze, podrobně, nový kód?]; prázdná jednoduchá = krok nemá náhradu.
+const TRASA = [
+  ["Příjem", "Příjem nové pošty", "gmail_sync.py hist, ručně nebo každých 15 s", "odpada", "Klik na Převést v panelu", "tlačítko už existuje"],
+  ["Příjem", "Kopie e-mailu na disk a do SQLite", "data/eml, emailrator.db", "odpada", "", ""],
+  ["Příjem", "Uložení do databáze Postgres", "pg_store.py push", "odpada", "Vlákno přímo z Gmail API", "jen čtení, nic se neukládá napřed", true],
+  ["Příjem", "Přílohy PDF na text", "attach.py", "odpada", "", ""],
+  ["Třídění", "Je to tisková poptávka?", "Jev, u staré pošty i podobnost textů", "odpada", "Rozhodne člověk kliknutím", ""],
+  ["Převod", "Maskování osobních údajů", "maskovani.py", "zustava", "Maskování osobních údajů", "jen když model běží v cloudu"],
+  ["Převod", "Model vyplní pole s citacemi", "extract.py, schéma s 20 bloky", "zuzit", "Model vyplní pole s citacemi", "zúžené schéma"],
+  ["Převod", "Kontrola citací", "citace musí být v e-mailu doslova", "zustava", "Kontrola citací", ""],
+  ["Převod", "Kontroly hodnot", "checks.py, formáty, spadávka, rozpory", "zuzit", "Dvě až tři kontroly", "formát a barevnost"],
+  ["Výsledek", "Karta v kanbanu", "kanban.py, 4 sloupce, detail", "odpada", "Výsledek v panelu, uložený v souboru", "", true],
+  ["Výsledek", "Brána jistoty u každé hodnoty", "brana.py, automatické přijetí vypnuté", "odpada", "", "všechno je „ověř“"],
+  ["Výsledek", "Doplňující dotaz zákazníkovi", "dotaz.py, pevné šablony", "zustava", "Doplňující dotaz zákazníkovi", "text ke zkopírování"],
+  ["Mimo provoz", "Zlatá sada a měření přesnosti", "zlata.py, metrika.py, čtou z databáze", "zuzit", "Malá testovací sada", "nad soubory výsledků, při každé změně", true],
+];
+const STAV = { zustava: "zůstává", zuzit: "zúžit", odpada: "odpadá" };
+
+// Moduly src/*.py po skupinách: [skupina, [[modul, řádků, bere se?], …]]. Počty ověřuje scripts/jednoduchy_asistent_kontrola.py.
+const MODULY = [["Příjem pošty", [["gmail_sync", 506, true], ["panel_sync", 17, true], ["attach", 319, false], ["klienti", 325, false], ["sortiment", 113, false], ["testovaci", 124, false], ["automat", 154, false]]], ["Úložiště a třídění", [["pg_store", 169, false], ["embed", 240, false], ["trideni", 217, false], ["prunik", 51, false], ["jev", 574, false], ["jev_cinnosti", 223, false], ["jev_stav", 129, false]]], ["Převod e-mailu", [["extract", 1006, true], ["cisteni", 234, false], ["maskovani", 439, true], ["ollama_cfg", 35, true], ["priklady", 89, false], ["termin", 90, false], ["rozpis", 266, false], ["rozmery", 148, true], ["vyrobky", 73, false], ["odvozeni", 170, false]]], ["Kontroly a brána jistoty", [["checks", 299, true], ["brana", 438, false], ["brana_provoz", 229, false], ["jev_pole", 368, false]]], ["Panel, kanban a dotaz", [["api", 327, false], ["api_panel", 77, true], ["panel", 108, true], ["kanban", 453, false], ["dotaz", 309, true]]], ["Měření a ladění", [["metrika", 502, true], ["zlata", 462, true], ["mereni", 103, false], ["bench_cloud", 304, false], ["gemini", 134, false], ["bez_nepodl", 45, false], ["chyby_citace", 34, false], ["citace_autor", 59, false], ["citace_puvod", 69, false], ["kdo_rekl", 60, false], ["pole_behy", 66, false], ["porovnej_prompty", 60, false], ["porovnej_spolecna", 69, false], ["shoda_modelu", 139, false], ["sonda_ozvena", 58, false], ["subagent_extrakce", 90, false], ["vyber_behu", 18, false], ["rozpis_shoda", 131, false]]], ["Rozbor zakázek z wall2, číselníky, stránky", [["wall2", 529, false], ["wall2_analyza", 894, false], ["wall2_crawl", 549, false], ["poznamky_llm", 853, false], ["poznamky_parser", 600, false], ["poznamky_shoda", 301, false], ["api_katalog", 126, false], ["api_poznamky", 172, false], ["designclass", 350, false], ["euipo_test", 46, false], ["prelude_schema", 256, false], ["vedeni_stranka", 30, false], ["vytizeni_stranka", 455, false]]]];
+
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const fmt = n => n.toLocaleString("cs-CZ");
+
+// trasa
+(() => {
+  const g = document.getElementById("trasa-g");
+  g.append(el("div", "trasa-hl", "Dnes"), el("div", "trasa-hl stred", "Co se stane"), el("div", "trasa-hl", "Jednoduchá verze"));
+  let zona = "";
+  for (const [z, dnes, dnesP, st, nove, noveP, novy] of TRASA) {
+    if (z !== zona) { g.append(el("div", "zona", z)); zona = z; }
+    const r = el("div", "radek");
+    const a = el("div", "krok" + (st === "odpada" ? " pryc" : ""));
+    a.append(el("span", "kdo", "Dnes"), el("span", "co", dnes), el("span", "jak", dnesP));
+    const m = el("div", "mezi"); m.append(el("span", "st " + st, STAV[st]));
+    let b;
+    if (nove) {
+      b = el("div", "krok" + (novy ? " nove" : ""));
+      b.append(el("span", "kdo", "Jednoduchá verze"), el("span", "co", nove));
+      if (noveP) b.append(el("span", "jak", noveP));
+    } else {
+      b = el("div", "krok nic"); b.append(el("span", "co", noveP || "bez náhrady"));
+    }
+    r.append(a, m, b); g.append(r);
+  }
+})();
+
+// součty a graf
+(() => {
+  const skup = MODULY.map(([jm, ms]) => ({ jm, ms, cel: ms.reduce((s, m) => s + m[1], 0), zak: ms.filter(m => m[2]).reduce((s, m) => s + m[1], 0) }));
+  const vse = skup.flatMap(s => s.ms), cel = skup.reduce((s, x) => s + x.cel, 0), zak = skup.reduce((s, x) => s + x.zak, 0);
+  const nz = vse.filter(m => m[2]).length;
+  const t = document.getElementById("soucet");
+  const tile = (cls, b, s) => { const d = el("div", "dlazdice " + cls); d.append(el("b", "", b), el("small", "", s)); t.append(d); };
+  tile("", fmt(vse.length), `modulů ve složce src dnes, ${fmt(cel)} řádků`);
+  tile("hl", fmt(nz), `modulů, ze kterých jednoduchá verze bere kód`);
+  tile("hl", `${Math.round(zak / cel * 100)} %`, `řádků je v těchto modulech; převezme se méně`);
+
+  const max = Math.max(...skup.map(s => s.cel)), krok = 1000, strop = Math.ceil(max / krok) * krok;
+  const g = document.getElementById("graf");
+  for (const s of skup) {
+    const jm = el("div", "jm", s.jm); jm.append(el("small", "", `${s.ms.length} modulů`));
+    const st = el("div", "stopa"), p = el("div", "pruh");
+    p.style.width = `calc((100% - 120px) * ${s.cel / strop})`;
+    const z = el("i"); z.style.width = `${s.zak / s.cel * 100}%`; p.append(z);
+    const h = el("span", "hod");
+    if (s.zak) { h.append(el("b", "", fmt(s.zak)), document.createTextNode(` z ${fmt(s.cel)}`)); } else h.textContent = fmt(s.cel);
+    st.append(p, h); g.append(jm, st);
+  }
+  const osa = el("div", "osa-g"); osa.style.width = `calc((100% - 120px))`;
+  for (let v = 0; v <= strop; v += krok) osa.append(el("span", "", fmt(v)));
+  g.append(osa);
+
+  const tb = document.querySelector("#moduly-t tbody");
+  for (const s of skup) {
+    const r = el("tr");
+    const ber = s.ms.filter(m => m[2]).map(m => m[0] + ".py").join(", ") || "nic";
+    const pryc = s.ms.filter(m => !m[2]).map(m => m[0] + ".py").join(", ") || "nic";
+    r.append(el("td", "", s.jm), el("td"), el("td", "", pryc));
+    r.children[1].textContent = ber; tb.append(r);
+  }
+})();
+</script>
+
+</body>
+</html>

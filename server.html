@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Server pro místní AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Rozvržení: hlavička, tři varianty vedle sebe, tři pruhové grafy, tabulka ověření, provoz, kde koupit, zdroje.
+   Vzhled převzat z Doc/vedeni/sablona.html (stránky pro vedení). */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --grid: #e2e4e7;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eefa;
+  --good: #006300;
+  --warn: #8a5a00;
+  --bad: #b3261e;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --grid: #2a2d33; --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --warn: #e0a83a; --bad: #f07b72;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --grid: #2a2d33; --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --warn: #e0a83a; --bad: #f07b72;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.eyebrow { font: 500 12px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--ink-2); font-size: 18px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* hlavička s ořezovými značkami */
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+
+section { display: grid; gap: 20px; }
+.sec-head { display: grid; gap: 8px; }
+.note { font-size: 13px; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+
+/* tři varianty */
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .opts { grid-template-columns: 1fr; } }
+.opt-head { display: grid; gap: 4px; }
+.opt-head h3 { display: flex; align-items: center; gap: 9px; }
+.sw { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--c); }
+.opt-head p { color: var(--ink-2); font-size: 14px; }
+.facts { display: grid; margin: 0; }
+.facts div { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.facts dt { font: 500 12px/1.6 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 0; font-size: 15px; }
+.facts dd b { font-weight: 700; }
+.fit { font-size: 14px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* pruhové grafy: plná část = nejnižší zjištěná hodnota, světlá = rozpětí */
+.charts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
+.card-head p { color: var(--ink-2); font-size: 14px; margin-top: 3px; }
+.bars { display: grid; gap: 14px; }
+.bar { display: grid; gap: 5px; }
+.bar-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
+.bar-top span:first-child { color: var(--ink-2); display: inline-flex; align-items: center; gap: 7px; }
+.bar-top b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.track { position: relative; height: 14px; border-left: 1px solid var(--axis); }
+.track i { position: absolute; top: 0; bottom: 0; background: var(--c); }
+.track i.lo { left: 0; border-radius: 0 4px 4px 0; }
+.track i.hi { border-radius: 0 4px 4px 0; opacity: .38; border-left: 2px solid var(--surface); }
+.track.has-hi i.lo { border-radius: 0; }
+.track.none { border-left-style: dashed; }
+.track.none::after { content: "měření nenalezeno"; position: absolute; left: 8px; top: -3px; font: 12px var(--font-mono); color: var(--muted); }
+.c1 { --c: var(--s1); } .c2 { --c: var(--s2); } .c3 { --c: var(--s3); }
+
+/* tabulka ověření */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 720px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+td:nth-child(2) { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+td:last-child { white-space: nowrap; }
+tr.grp td { font: 700 15px var(--font-display); padding-top: 18px; border-bottom-color: var(--axis); }
+.v { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.v::before { font: 700 13px var(--font-mono); }
+.v.ok { color: var(--good); } .v.ok::before { content: "✓"; }
+.v.part { color: var(--warn); } .v.part::before { content: "≈"; }
+.v.no { color: var(--bad); } .v.no::before { content: "✕"; }
+.v.unk { color: var(--muted); } .v.unk::before { content: "?"; }
+
+/* provoz */
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+.points { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.points li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.points li b { font-weight: 700; }
+
+/* kde koupit */
+.shops { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .shops { grid-template-columns: 1fr; } }
+.shop-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.shop-list li { padding: 9px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+.shop-list a { font-weight: 600; }
+.shop-list span { font-size: 14px; color: var(--ink-2); }
+
+footer { color: var(--muted); font-size: 14px; display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 18px; }
+footer p { max-width: 95ch; }
+footer b { color: var(--ink-2); }
+.src { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 28px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; }
+@media (max-width: 760px) { .src { grid-template-columns: 1fr; } }
+.src li { padding: 3px 0; overflow-wrap: anywhere; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">Podklad k rozhodnutí · tři varianty hardwaru</div>
+    <h1>Server pro místní AI</h1>
+    <p class="lede">Na čem ve firmě provozovat jazykový model bez posílání dat ven. Původní srovnání tří variant jsem ověřil proti výrobcům, obchodům a zveřejněným měřením. Po ověření vychází pořadí jinak: nový Mac Studio je na středně velkém modelu rychlejší než karta ze staršího serveru, a obě varianty s kartami NVIDIA jsou dražší, než podklad uváděl.</p>
+    <div class="meta"><span>Ověřeno 30. 9. 2026</span><span>Ceny v Kč s DPH, kurz asi 21 Kč za dolar</span><span>U každého údaje je zdroj na konci stránky</span></div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Tři varianty</div>
+      <h2>Co se dá koupit</h2>
+    </div>
+    <div class="opts">
+      <div class="card c1">
+        <div class="opt-head">
+          <h3><span class="sw"></span>Starší server s 8 kartami</h3>
+          <p>Inspur NF5288M5, 8× NVIDIA Tesla V100 32 GB, použitý z datového centra.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Cena</dt><dd><b>asi 170 tisíc Kč</b> a doprava z USA. Nabídka 6 767 USD bez daně; na eBay 6,6 až 11,5 tisíce USD.</dd></div>
+          <div><dt>Paměť</dt><dd><b>256 GB</b> pro modely (8 × 32 GB).</dd></div>
+          <div><dt>Rychlost</dt><dd><b>16 až 34 tokenů za sekundu</b> na modelu s 27 miliardami parametrů, měřeno na jedné kartě.</dd></div>
+          <div><dt>Spotřeba</dt><dd><b>2 000 až 2 400 W</b> jen karty při plné zátěži.</dd></div>
+          <div><dt>Hluk</dt><dd>Chlazení pro datové centrum. Patří do serverovny, ne do kanceláře.</dd></div>
+          <div><dt>Podpora</dt><dd>Záruka prodejce 60 dní. Ovladače NVIDIA pro tyto karty končí v polovině roku 2028.</dd></div>
+        </dl>
+        <p class="fit"><b>Hodí se,</b> když je k dispozici serverovna a jde o zpracování mnoha úloh najednou za nízkou pořizovací cenu.</p>
+      </div>
+
+      <div class="card c2">
+        <div class="opt-head">
+          <h3><span class="sw"></span>Mac Studio M5 Ultra</h3>
+          <p>Nový stolní počítač Apple, v prodeji od 22. 9. 2026.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Cena</dt><dd><b>274 990 Kč</b> s 256 GB paměti. Základ s 96 GB stojí 154 990 Kč.</dd></div>
+          <div><dt>Paměť</dt><dd><b>96 nebo 256 GB</b>, verze s 512 GB přijde koncem října.</dd></div>
+          <div><dt>Rychlost</dt><dd><b>39 až 48 tokenů za sekundu</b> na modelu s 27 miliardami parametrů.</dd></div>
+          <div><dt>Spotřeba</dt><dd><b>nejvýše 385 W</b>, v klidu 9 W (celý počítač, údaj Apple).</dd></div>
+          <div><dt>Hluk</dt><dd>Recenzent ventilátor při zátěži neslyšel. Může stát na stole.</dd></div>
+          <div><dt>Podpora</dt><dd>Nový, se zárukou. V Česku zatím na objednávku, dodání 4 až 8 týdnů.</dd></div>
+        </dl>
+        <p class="fit"><b>Hodí se,</b> když má stroj stát v kanceláři, běžet nepřetržitě a obsluhovat pár lidí nebo jednu frontu úloh.</p>
+      </div>
+
+      <div class="card c3">
+        <div class="opt-head">
+          <h3><span class="sw"></span>4 nové karty RTX 6000 Ada</h3>
+          <p>Profesionální karty NVIDIA po 48 GB, k nim je potřeba pracovní stanice nebo server.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Cena</dt><dd><b>0,8 až 1,2 milionu Kč</b> jen za čtyři karty (205 až 309 tisíc Kč za kus).</dd></div>
+          <div><dt>Paměť</dt><dd><b>192 GB</b> pro modely (4 × 48 GB).</dd></div>
+          <div><dt>Rychlost</dt><dd>Na stejném modelu jsem měření nenašel. Na větším modelu (70 miliard) <b>18 tokenů za sekundu</b>, stejně s jednou i čtyřmi kartami.</dd></div>
+          <div><dt>Spotřeba</dt><dd><b>1 200 W</b> jen karty (4 × 300 W), s počítačem kolem 1 500 W.</dd></div>
+          <div><dt>Hluk</dt><dd>Podle skříně. Čtyři karty vedle sebe potřebují silné chlazení.</dd></div>
+          <div><dt>Podpora</dt><dd>Nové, záruka 24 měsíců (pro firmy 12). Jde o předchozí generaci; nástupce RTX PRO 6000 má 96 GB na kartu.</dd></div>
+        </dl>
+        <p class="fit"><b>Hodí se,</b> když je nutný software psaný pro NVIDIA (CUDA) a cena není hlavní kritérium.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Srovnání</div>
+      <h2>Cena, spotřeba a rychlost vedle sebe</h2>
+      <p class="note">Každý graf má vlastní měřítko. Plná část pruhu je nejnižší zjištěná hodnota, světlá část ukazuje rozpětí.</p>
+    </div>
+    <div class="charts">
+      <div class="card">
+        <div class="card-head"><h3>Pořizovací cena</h3><p>tisíce Kč s DPH, kratší pruh je lepší</p></div>
+        <div class="bars">
+          <div class="bar c1"><div class="bar-top"><span><span class="sw"></span>Starší server</span><b>asi 170</b></div><div class="track" title="6 767 USD bez daně, přepočteno a s DPH; bez dopravy"><i class="lo" style="width:13.1%"></i></div></div>
+          <div class="bar c2"><div class="bar-top"><span><span class="sw"></span>Mac Studio 256 GB</span><b>275</b></div><div class="track" title="274 990 Kč s DPH"><i class="lo" style="width:21.2%"></i></div></div>
+          <div class="bar c3"><div class="bar-top"><span><span class="sw"></span>4× RTX 6000 Ada</span><b>822 až 1 237</b></div><div class="track has-hi" title="4 karty po 205 561 až 309 318 Kč s DPH, bez počítače"><i class="lo" style="width:63.2%"></i><i class="hi" style="left:63.2%;width:32%"></i></div></div>
+        </div>
+        <p class="note">Server bez dopravy z USA, karty RTX bez počítače.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Příkon při plné zátěži</h3><p>watty, kratší pruh je lepší</p></div>
+        <div class="bars">
+          <div class="bar c1"><div class="bar-top"><span><span class="sw"></span>Starší server</span><b>2 000 až 2 400</b></div><div class="track has-hi" title="8 karet po 250 až 300 W, bez procesorů a ventilátorů"><i class="lo" style="width:76.9%"></i><i class="hi" style="left:76.9%;width:15.4%"></i></div></div>
+          <div class="bar c2"><div class="bar-top"><span><span class="sw"></span>Mac Studio</span><b>385</b></div><div class="track" title="Nejvyšší příkon celého počítače podle Apple"><i class="lo" style="width:14.8%"></i></div></div>
+          <div class="bar c3"><div class="bar-top"><span><span class="sw"></span>4× RTX 6000 Ada</span><b>1 200</b></div><div class="track" title="4 karty po 300 W, bez počítače"><i class="lo" style="width:46.2%"></i></div></div>
+        </div>
+        <p class="note">U serveru a RTX jen grafické karty, zbytek stroje přidá další stovky wattů. U Macu celý počítač.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Rychlost odpovědi</h3><p>tokeny za sekundu, model s 27 miliardami parametrů, delší pruh je lepší</p></div>
+        <div class="bars">
+          <div class="bar c1"><div class="bar-top"><span><span class="sw"></span>Jedna karta V100</span><b>16 až 34</b></div><div class="track has-hi" title="Qwen 3.6 27B, 4 bity, llama.cpp; 16 při dlouhém vstupu, 34 při krátkém"><i class="lo" style="width:26.7%"></i><i class="hi" style="left:26.7%;width:30%"></i></div></div>
+          <div class="bar c2"><div class="bar-top"><span><span class="sw"></span>Mac Studio</span><b>39 až 48</b></div><div class="track has-hi" title="Qwen 3.8 27B, 4 bity, MLX; 39 při dlouhém vstupu, 48 při krátkém"><i class="lo" style="width:65%"></i><i class="hi" style="left:65%;width:15%"></i></div></div>
+          <div class="bar c3"><div class="bar-top"><span><span class="sw"></span>RTX 6000 Ada</span><b>?</b></div><div class="track none"></div></div>
+        </div>
+        <p class="note">Nižší číslo platí pro dlouhý vstupní text, vyšší pro krátký. Měření pocházejí od dvou různých autorů na podobně velkém modelu, srovnání je proto orientační.</p>
+      </div>
+    </div>
+    <p><b>Víc karet jednu odpověď nezrychlí.</b> Model se mezi karty jen rozloží; měření na čtyřech kartách RTX 6000 Ada vyšlo stejně jako na jedné. Víc karet pomáhá dvěma věcem: vejde se větší model a dá se vyřizovat víc úloh současně.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Kontrola původního podkladu</div>
+      <h2>Co z původních čísel platí</h2>
+    </div>
+    <div class="card">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Údaj</th><th>Podklad</th><th>Co jsem zjistil</th><th>Závěr</th></tr></thead>
+          <tbody>
+            <tr class="grp"><td colspan="4">Starší server, 8× V100</td></tr>
+            <tr><td>Cena</td><td>asi 5 000 USD</td><td>Konkrétní nabídka 6 767 USD, na eBay 6,6 až 11,5 tisíce USD. Samotná použitá karta stojí asi 660 USD.</td><td><span class="v no">dnes dražší</span></td></tr>
+            <tr><td>Spotřeba</td><td>2 000 W</td><td>Osm karet po 250 až 300 W dává 2 000 až 2 400 W, a to bez procesorů a ventilátorů.</td><td><span class="v part">spíš víc</span></td></tr>
+            <tr><td>Propustnost paměti</td><td>7,2 TB/s</td><td>Jedna karta má 900 GB/s. Číslo v podkladu je součet osmi karet, který rychlost jedné odpovědi neurčuje.</td><td><span class="v part">zavádějící</span></td></tr>
+            <tr><td>Rychlost</td><td>asi 35 tokenů/s</td><td>Sedí pro jednu kartu, model s 27 miliardami parametrů a krátký vstup. Při dlouhém vstupu 16. Podklad neříká, o jaký model jde.</td><td><span class="v part">jen v nejlepším případě</span></td></tr>
+            <tr class="grp"><td colspan="4">Mac Studio M5 Ultra</td></tr>
+            <tr><td>Cena</td><td>asi 8 900 USD</td><td>Od 5 499 USD s 96 GB. S 256 GB 9 499 USD, v Česku 274 990 Kč. Přesně za 8 900 USD žádnou sestavu nenabízí.</td><td><span class="v part">přibližně</span></td></tr>
+            <tr><td>Spotřeba</td><td>300 W</td><td>Apple uvádí nejvýše 385 W a 9 W v klidu.</td><td><span class="v part">přibližně</span></td></tr>
+            <tr><td>Propustnost paměti</td><td>1,2 TB/s</td><td>Stejný údaj uvádí Apple v tiskové zprávě.</td><td><span class="v ok">platí</span></td></tr>
+            <tr><td>Rychlost</td><td>asi 15 tokenů/s</td><td>Recenze naměřila 39 až 48 na modelu s 27 miliardami parametrů a 75 až 91 na rychlém modelu Qwen Flash.</td><td><span class="v no">neplatí, je rychlejší</span></td></tr>
+            <tr class="grp"><td colspan="4">4× RTX 6000 Ada</td></tr>
+            <tr><td>Cena</td><td>25 000 USD a víc</td><td>Jedna karta v USA od 8 949 USD, čtyři tedy nejméně 35 800 USD. V Česku 205 až 309 tisíc Kč za kartu. K tomu počítač.</td><td><span class="v no">výrazně dražší</span></td></tr>
+            <tr><td>Spotřeba</td><td>1 500 W</td><td>Čtyři karty po 300 W dávají 1 200 W, zbytek připadá na počítač.</td><td><span class="v ok">platí jako odhad</span></td></tr>
+            <tr><td>Propustnost paměti</td><td>3,8 TB/s</td><td>Jedna karta má 960 GB/s. Opět jde o součet čtyř karet.</td><td><span class="v part">zavádějící</span></td></tr>
+            <tr><td>Rychlost</td><td>asi 65 tokenů/s</td><td>Bez názvu modelu nejde ověřit. Na modelu se 70 miliardami parametrů naměřeno 18, na malém modelu s 8 miliardami 131.</td><td><span class="v unk">nelze ověřit</span></td></tr>
+            <tr class="grp"><td colspan="4">Závěry podkladu</td></tr>
+            <tr><td>Server je rychlejší než Mac</td><td>35 proti 15</td><td>Na srovnatelně velkém modelu je Mac rychlejší než jedna karta V100.</td><td><span class="v no">neplatí</span></td></tr>
+            <tr><td>Elektřina smaže rozdíl v ceně za rok až dva</td><td></td><td>Platí při nepřetržité plné zátěži: rozdíl asi 85 tisíc Kč ročně proti rozdílu v ceně asi 100 tisíc Kč. Při běžném provozu s přestávkami to trvá déle.</td><td><span class="v part">jen při plné zátěži</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Provoz</div>
+      <h2>Co stojí a obnáší běh</h2>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h3>Elektřina při nepřetržité plné zátěži</h3>
+        <ul class="points">
+          <li><b>Starší server:</b> asi 105 tisíc Kč ročně (2 000 W, 17 520 kWh).</li>
+          <li><b>4× RTX 6000 Ada:</b> asi 79 tisíc Kč ročně (1 500 W, 13 140 kWh).</li>
+          <li><b>Mac Studio:</b> asi 20 tisíc Kč ročně (385 W, 3 370 kWh).</li>
+        </ul>
+        <p class="note">Počítáno s cenou 6 Kč za kWh. To je předpoklad podle běžných sazeb pro rok 2026 (5,57 až 6,61 Kč včetně distribuce a DPH); firemní sazba se může lišit. Jde o horní mez: stroj, který většinu dne čeká, spotřebuje zlomek. Klidový odběr serveru se mi dohledat nepodařilo, u Macu je 9 W.</p>
+      </div>
+      <div class="card">
+        <h3>Na co myslet mimo cenu</h3>
+        <ul class="points">
+          <li><b>Umístění.</b> Server s osmi kartami je hlučný a vydává tolik tepla jako přímotop o výkonu 2 kW. Potřebuje vlastní místnost s chlazením a dostatečně dimenzovaný přívod.</li>
+          <li><b>Životnost softwaru.</b> Karty V100 jsou z roku 2017. NVIDIA je podporuje v řadě ovladačů 580 do poloviny roku 2028 a novější verze vývojových nástrojů CUDA 13 už pro ně programy nesestaví.</li>
+          <li><b>Záruka.</b> Použitý server má záruku prodejce v řádu týdnů až měsíců. Mac a karty RTX jsou nové.</li>
+          <li><b>Software.</b> Mac běží na vlastní technologii Apple (MLX). Běžné nástroje pro místní modely ji podporují, specializovaný software psaný jen pro NVIDIA na něm nepoběží.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Kde koupit</div>
+      <h2>Obchody a bazary</h2>
+      <p class="note">Ceny a dostupnost podle stavu k 30. 9. 2026. Před objednávkou je ověřte, u použitého zboží se mění ze dne na den.</p>
+    </div>
+    <div class="shops">
+      <div class="card c2">
+        <h3><span class="sw" style="display:inline-block;margin-right:8px"></span>Mac Studio</h3>
+        <ul class="shop-list">
+          <li><a href="https://www.apple.com/cz/mac-studio/" target="_blank" rel="noopener">Apple</a><span>Výrobce, vlastní sestavy na přání.</span></li>
+          <li><a href="https://istyle.cz/collections/mac-studio" target="_blank" rel="noopener">iStyle</a><span>Od 154 990 Kč, 256 GB za 274 990 Kč, dodání 4 až 8 týdnů.</span></li>
+          <li><a href="https://www.alza.cz/mac-studio/18894763.htm" target="_blank" rel="noopener">Alza</a><span>Předobjednávky. Stránku se mi nepodařilo načíst, cenu ověřte.</span></li>
+          <li><a href="https://www.ispace.cz/p/apple-mac-studio-m5-ultra-30-cpu-64-gpu-96gb-1tb/" target="_blank" rel="noopener">iSpace</a><span>Sestava s 96 GB a 1 TB.</span></li>
+        </ul>
+      </div>
+      <div class="card c3">
+        <h3><span class="sw" style="display:inline-block;margin-right:8px"></span>Karty RTX 6000 Ada</h3>
+        <ul class="shop-list">
+          <li><a href="https://www.ab-com.cz/nvidia-rtx-6000-ada-48gb-pcie-4-0-smallbox/" target="_blank" rel="noopener">AB-COM</a><span>309 318 Kč s DPH, skladem víc než 10 kusů, záruka 24 měsíců (pro firmy 12).</span></li>
+          <li><a href="https://pcvcomp.cz/pny-nvidia-rtx-6000-ada-generation-48gb-gddr6_d387213.html" target="_blank" rel="noopener">PCV Computers</a><span>205 561 Kč s DPH, podle vyhledávání není skladem.</span></li>
+          <li><a href="https://graficke-karty.heureka.cz/pny-rtx-6000-ada-48gb-gddr6-vcnrtx6000ada-pb/" target="_blank" rel="noopener">Heureka</a><span>Srovnání českých obchodů, od 226 827 Kč.</span></li>
+        </ul>
+      </div>
+      <div class="card c1">
+        <h3><span class="sw" style="display:inline-block;margin-right:8px"></span>Použité servery a karty</h3>
+        <ul class="shop-list">
+          <li><a href="https://pc.bazos.cz/inzeraty/gpu-server/" target="_blank" rel="noopener">Bazoš</a><span>České inzeráty. Dnes například skříň Supermicro pro 4 karty za 39 000 Kč (Praha 5) nebo server se 4× RTX 3080 za 76 000 Kč (Louny).</span></li>
+          <li><a href="https://unixsurplus.com/inspur-nf5288m5-gpu-server-8x-nvidia-v100-32gb-sxm2-40c-128gb/" target="_blank" rel="noopener">UnixSurplus (USA)</a><span>Přesně ten server z podkladu: 8× V100 32 GB za 6 767 USD, záruka 60 dní.</span></li>
+          <li><a href="https://www.ebay.de/shop/tesla-v100-32gb?_nkw=tesla+v100+32gb" target="_blank" rel="noopener">eBay.de</a><span>Karty V100 a celé servery z Evropy i Číny.</span></li>
+          <li><a href="https://www.secondbest.com/en/tesla-v100-32gb-gpu-computing-accelerator.html" target="_blank" rel="noopener">SecondBest (Nizozemsko)</a><span>Repasované karty V100 32 GB za 743 až 899 EUR.</span></li>
+          <li><a href="https://www.bargainhardware.co.uk/nvidia-tesla-v100-32gb-hbm2-sxm3-gpu-692-2g503-0200-010-699-2g504-0200-001" target="_blank" rel="noopener">Bargain Hardware (Británie)</a><span>Repasované karty V100, záruka 90 dní, dodává do EU.</span></li>
+          <li><a href="https://czech-server.cz/" target="_blank" rel="noopener">Czech-Server (Praha 6)</a><span>Repasované servery se zárukou 2 roky. Servery s grafickými kartami v nabídce nemá, hodí se pro skříň a paměti.</span></li>
+          <li><a href="https://www.technimax.cz/repasovane-servery" target="_blank" rel="noopener">Technimax (Rapotín)</a><span>Repasované servery Dell se zárukou 2 roky, bez grafických karet.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Jak jsem ověřoval.</b> Každé číslo z původního podkladu jsem hledal u výrobce, v obchodě nebo ve zveřejněném měření. Ceny Macu, karty RTX u AB-COM, serveru u UnixSurplus a inzeráty na Bazoši jsem četl přímo na stránkách obchodů. Rozpětí cen na eBay, americká cena karty RTX, ceny u PCV Computers, na Heurece a u zahraničních prodejců karet V100 pocházejí z výsledků vyhledávání, stránky jsem neotevíral. Dolary jsou přepočteny kurzem asi 20,9 Kč (průměr roku 2026) a u serveru je připočtena DPH 21 %.</p>
+    <p><b>Co se ověřit nepodařilo.</b> Rychlost celého serveru s osmi kartami na velkém modelu, klidový odběr a hlučnost serveru v číslech, rychlost karty RTX 6000 Ada na modelu s 27 miliardami parametrů, česká cena nástupce RTX PRO 6000 a cena Macu na Alze. Rychlost Macu na modelech se 70 miliardami parametrů zatím uvádějí jen odhady, proto tu není.</p>
+    <p><b>Zdroje.</b></p>
+    <ul class="src">
+      <li><a href="https://www.apple.com/newsroom/2026/08/apple-introduces-new-mac-studio-with-m5-max-and-m5-ultra/" target="_blank" rel="noopener">Apple: tisková zpráva k Mac Studio M5</a> (cena, paměť, 1,2 TB/s)</li>
+      <li><a href="https://support.apple.com/en-gb/102027" target="_blank" rel="noopener">Apple: spotřeba Mac Studio</a> (385 W, 9 W)</li>
+      <li><a href="https://www.macstories.net/stories/m5-ultra-mac-studio-review-the-dream-mac-for-local-ai-agents/" target="_blank" rel="noopener">MacStories: recenze M5 Ultra</a> (rychlost, hluk)</li>
+      <li><a href="https://pinggy.io/blog/self_hosting_llms_on_512gb_m5_ultra_mac_studio/" target="_blank" rel="noopener">Pinggy: ceny sestav M5 Ultra</a> (9 499 USD za 256 GB)</li>
+      <li><a href="https://www.appliste.cz/mac-studio-zdrazuje-m5-ultra-stoji-pres-150-tisic/" target="_blank" rel="noopener">Appliště: české ceny Mac Studio</a></li>
+      <li><a href="https://www.hardware-corner.net/guides/tesla-v100-32gb-for-llm/" target="_blank" rel="noopener">Hardware Corner: test Tesla V100 32 GB</a> (rychlost, 900 GB/s)</li>
+      <li><a href="https://gpudojo.com/tesla-v100" target="_blank" rel="noopener">GPU Dojo: ceny použitých V100</a> (660 USD, 250 W)</li>
+      <li><a href="https://insiderllm.com/guides/used-server-gpus-local-ai/" target="_blank" rel="noopener">InsiderLLM: použité serverové karty</a> (300 W)</li>
+      <li><a href="https://developer.nvidia.com/blog/navigating-gpu-architecture-support-a-guide-for-nvidia-cuda-developers" target="_blank" rel="noopener">NVIDIA: podpora starších architektur</a> (ovladač 580, CUDA 13)</li>
+      <li><a href="https://github.com/XiongjieDai/GPU-Benchmarks-on-LLM-Inference" target="_blank" rel="noopener">GitHub: měření karet na Llama 3</a> (RTX 6000 Ada, 1 a 4 karty)</li>
+      <li><a href="https://lenovopress.lenovo.com/LP1940" target="_blank" rel="noopener">Lenovo Press: RTX 6000 Ada</a> (960 GB/s, 300 W)</li>
+      <li><a href="https://thinkmate.com/product/pny/vcnrtx6000ada-pb" target="_blank" rel="noopener">Thinkmate: cena RTX 6000 Ada v USA</a></li>
+      <li><a href="https://www.tzb-info.cz/ceny-paliv-a-energii/14-ceny-elektriny" target="_blank" rel="noopener">TZB-info: ceny elektřiny 2026</a></li>
+      <li><a href="https://www.poundsterlinglive.com/history/USD-CZK-2026" target="_blank" rel="noopener">Pound Sterling Live: kurz USD/CZK 2026</a></li>
+    </ul>
+  </footer>
+</div>
+
+</body>
+</html>

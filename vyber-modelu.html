@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Výběr modelu převodu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Nejjednodušší EmailRator (Doc/vedeni/jednoduchy-asistent.html): hlavička s ořezovými značkami, karty.
+   Všechna čísla jsou v bloku D níže; scripts/modely_kontrola.py je porovná se zdroji (mereni.txt, DB, metrika, ceníky). */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eef9;
+  --ok: #1f7a4d;
+  --ok-wash: #e7f4ec;
+  --bad: #b3261e;
+  --bad-wash: #fbeceb;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1a2638; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1a2638; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.meta .pozor { color: var(--bad); }
+.teze { font-size: 20px; line-height: 1.45; max-width: 64ch; color: var(--ink-2); }
+.teze b { color: var(--ink); font-weight: 600; }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.sec-head > p { color: var(--ink-2); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.card b { color: var(--ink); font-weight: 600; }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); font-size: 18px; }
+
+/* doporučení */
+.kroky { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: k; }
+.kroky li { counter-increment: k; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; }
+.kroky li::before { content: counter(k); font: 800 22px/1.2 var(--font-display); color: var(--accent); text-align: right; }
+.kroky li p { color: var(--ink-2); }
+.kroky li b { color: var(--ink); font-weight: 600; }
+
+/* pruhy výsledků */
+.pruhy { display: grid; gap: 10px; }
+.pruh { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr) 120px; gap: 12px; align-items: center; }
+.pruh .jm { display: grid; gap: 2px; min-width: 0; }
+.pruh .jm b { font-weight: 600; overflow-wrap: anywhere; }
+.pruh .jm small { font: 12px var(--font-mono); color: var(--muted); }
+.pruh .dr { height: 22px; background: var(--lane); border-radius: 4px; position: relative; overflow: hidden; }
+.pruh .dr i { position: absolute; inset: 0 auto 0 0; background: var(--axis); border-radius: 4px; }
+.pruh.dnes .dr i { background: var(--accent); }
+.pruh.lepsi .dr i { background: var(--ok); }
+.pruh.horsi .dr i { background: var(--bad); opacity: .75; }
+.pruh .dr span { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font: 12px var(--font-mono); color: var(--ink-2); }
+.pruh .hod { font: 800 24px/1 var(--font-display); white-space: nowrap; font-stretch: 80%; text-align: right; font-variant-numeric: tabular-nums; }
+.pruh.bez .hod { font: 500 12px/1.3 var(--font-mono); color: var(--muted); }
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--ink-2); }
+.legenda span { display: inline-flex; align-items: center; gap: 8px; }
+.legenda i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+@media (max-width: 640px) {
+  .pruh { grid-template-columns: minmax(0, 1fr) 110px; }
+  .pruh .jm { grid-column: 1 / -1; }
+}
+
+/* dlaždice */
+.soucet { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dlazdice { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; min-width: 0; background: var(--surface); }
+.dlazdice.hl { background: var(--accent-wash); border-color: transparent; }
+.dlazdice b { font: 800 clamp(24px, 3vw, 32px)/1.1 var(--font-display); font-stretch: 80%; font-variant-numeric: tabular-nums; }
+.dlazdice.hl b { color: var(--accent); }
+.dlazdice small { font-size: 14px; color: var(--ink-2); }
+@media (max-width: 640px) { .soucet { grid-template-columns: 1fr; } }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+th { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
+td:first-child { color: var(--ink); font-weight: 600; }
+td.lepsi { color: var(--ok); font-weight: 600; }
+td.horsi { color: var(--bad); font-weight: 600; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }
+ul b { color: var(--ink); font-weight: 600; }
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+.pozn { font-size: 14px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · měření modelů</div>
+    <h1>Výběr modelu převodu</h1>
+    <div class="meta"><span>Měřeno 6. 10. 2026</span><span id="m-vlaken"></span><span>Většinou jeden běh na model</span><span class="pozor">Výchozí model se zatím nemění</span></div>
+    <p class="teze">Převod e-mailu na zadání zakázky dělá model <b>deepseek-v4.1-flash</b> a <b>zatím zůstává</b>: je rychlý a levný. Přesnější kimi-k3 je několikanásobně dražší, proto ho <b>nepoužijeme</b>. Levný <b>glm-5.3-flash</b> z OpenRouteru ale <b>s nastavením podle své dokumentace</b> vyšel na vzorku <b>lépe</b> (87 bodů proti 80–81): chybných údajů udělá zhruba třikrát méně. Převod je dvakrát až čtyřikrát dražší než dnes, ale stále levný, a trvá asi 4 minuty. Výsledek je z jednoho běhu.</p>
+  </header>
+
+  <section id="doporuceni">
+    <div class="sec-head">
+      <div class="eyebrow">Doporučení</div>
+      <h2>Co udělat dál</h2>
+    </div>
+    <div class="card">
+      <ol class="kroky">
+        <li><p><b>Nechat deepseek-v4.1-flash</b> (rozhodnuto 6. 10.). Je rychlý, levný a od včerejší úpravy zadání vychází na vzorku 80–81 bodů. Vyměníme ho, jen když se najde lepší model, který není výrazně dražší.</p></li>
+        <li><p><b>kimi-k3 nepoužívat.</b> Je přesnější, ale převod přes Ollamu stojí zhruba osmkrát víc než dnes (tabulka Cena).</p></li>
+        <li><p><b>Ověřit glm-5.3-flash s nastavením podle dokumentace na celé zkušební sadě ve třech bězích</b> a na e-mailech, které poptávky nejsou. Až potom rozhodnout o změně; jeden běh na 20 e-mailech nestačí.</p></li>
+        <li><p><b>Ke každému modelu přistupovat podle jeho dokumentace.</b> Týž glm s nastavením dnešního modelu vyšel na 78 bodů, s vlastním na 87. Výsledky modelů měřených s nastavením dnešního modelu proto nejsou konečné.</p></li>
+        <li><p><b>Levné modely z OpenRouteru s nastavením dnešního modelu nenasazovat</b>. Nejblíž je placený glm-5.3-flash: o 2–3 body pod dnešním modelem, chybných údajů dělá méně, ale víc jich vynechá; převod je levnější. Bezplatné modely vyšly výrazně hůř a dva z nich skoro nic nepřevedly. Texty šly maskované a jen k poskytovatelům, kteří data neuchovávají.</p></li>
+        <li><p><b>Ostatní nové modely z Ollamy zatím nepoužívat.</b> deepseek-v4-pro, minimax-m3 a nemotron-3-ultra vyšly s nastavením dnešního modelu hůř a část e-mailů nepřevedly vůbec. glm-5.3 převáděl jeden e-mail 5 minut. Podle vlastní dokumentace měřeny nebyly.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="vysledky">
+    <div class="sec-head">
+      <div class="eyebrow">Výsledky</div>
+      <h2>Jak přesně který model převádí</h2>
+      <p>Délka pruhu je shoda s vzorovými odpověďmi ve stupnici 0 až 100 (míra F1: zahrnuje správné, chybné i chybějící údaje). Všechny modely dostaly stejné zadání a stejně maskovaný text e-mailu.</p>
+      <div class="legenda">
+        <span><i style="background: var(--accent)"></i>dnešní model</span>
+        <span><i style="background: var(--ok)"></i>lepší než dnešní</span>
+        <span><i style="background: var(--bad); opacity: .75"></i>horší než dnešní</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="pruhy" id="pruhy"></div>
+      <details>
+        <summary>Podrobnosti ke každému modelu</summary>
+        <div class="tablewrap"><table id="modely-t"><thead><tr><th>Model</th><th>Shoda F1</th><th>Přesnost</th><th>Úplnost</th><th>Nepřevedeno</th><th>Sekund na e-mail</th><th>Poznámka</th></tr></thead><tbody></tbody></table></div>
+        <p class="pozn">Přesnost = kolik vyplněných údajů je správně. Úplnost = kolik údajů ze vzorové odpovědi model našel. Nepřevedený e-mail (model nevrátil platnou odpověď) se počítá jako e-mail bez údajů. Sekundy jsou průměr převedených e-mailů.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="kimi">
+    <div class="sec-head">
+      <div class="eyebrow">Kimi-k3 proti dnešnímu modelu</div>
+      <h2>Kde je rozdíl</h2>
+      <p>Na stejných e-mailech. Dnešní model má tři běhy, proto má tři čísla.</p>
+    </div>
+    <div class="soucet" id="soucet"></div>
+    <div class="card">
+      <details>
+        <summary>Rozdíl po údajích zadání</summary>
+        <div class="tablewrap"><table id="pole-t"><thead><tr><th>Údaj</th><th>Chybné: kimi-k3</th><th>Chybné: dnešní</th><th>Chybí: kimi-k3</th><th>Chybí: dnešní</th></tr></thead><tbody></tbody></table></div>
+        <p class="pozn">Uvedeny jen údaje, kde se výsledky liší. Zelená = kimi-k3 lepší ve všech třech bězích dnešního modelu, červená = horší ve všech třech.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="cena">
+    <div class="sec-head">
+      <div class="eyebrow">Cena</div>
+      <h2>Kolik stojí převod</h2>
+      <p>Cena za 1000 převedených e-mailů a za běžný měsíc (<span id="c-mesic"></span> převodů, odhad ze stránky Vytížení). Počítáno z ceníků poskytovatelů a z tokenů změřených při tomto testu; výpočet je náš, ceníky jsou převzaté.</p>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table id="cena-t"><thead><tr><th>Model a poskytovatel</th><th>Za 1000 převodů</th><th>Za měsíc</th><th>Z kreditu Ollama Pro</th></tr></thead><tbody></tbody></table></div>
+      <p class="pozn" id="c-pozn"></p>
+      <details>
+        <summary>Ceníky a tokeny</summary>
+        <div>
+          <div class="tablewrap"><table id="cenik-t"><thead><tr><th>Model a poskytovatel</th><th>Vstup $ / mil. tokenů</th><th>Výstup $ / mil. tokenů</th><th>Tokenů vstupu na převod</th><th>Tokenů výstupu na převod</th></tr></thead><tbody></tbody></table></div>
+          <p class="pozn">Ollama: ceník ollama.com/pricing, 6. 10. 2026; levnější sazba mimo špičku platí mimo 12–18 UTC ve všední dny a o víkendu, kimi-k3 ji nemá. Předplatné Pro: 20 $ měsíčně, v něm kredit 60 $. OpenRouter: ceník z jeho API, 6. 10. 2026; skutečně účtovaná cena bývá nižší, protože OpenRouter volí mezi poskytovateli (test glm-5.3-flash s nastavením dnešního modelu stál 0,016 $ za 19 převodů, tedy méně, než dává ceník). Počítáno bez slevy za opakovaný vstup (horní mez).</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="zmeny">
+    <div class="sec-head">
+      <div class="eyebrow">Poskytovatelé</div>
+      <h2>Co se změnilo od posledního srovnání</h2>
+      <p>Poslední srovnání modelů v Ollamě bylo 23. 9. 2026.</p>
+    </div>
+    <div class="card">
+      <ul>
+        <li><b>Ollama</b> nově nabízí kimi-k3, deepseek-v4-pro, minimax-m3, glm-5.3 a nemotron-3. Model qwen3.5:397b z nabídky zmizel.</li>
+        <li><b>Google Gemini</b> 6. 10. ráno odmítal všechny požadavky našeho bezplatného klíče kvůli vytížení regionu, i obyčejný výpis modelů. Gemini 3.8-flash se proto změřit nepodařilo.</li>
+        <li><b>Nefunkční přístupy:</b> klíč Kimi Code je neplatný a token TokenRouteru vypršel.</li>
+      </ul>
+      <details>
+        <summary>Které další modely máme k dispozici</summary>
+        <div>
+          <ul>
+            <li><b>OpenRouter:</b> stovky modelů včetně kimi-k3, Claude a Gemini; u těchto tří nabízí i poskytovatele, kteří data neuchovávají.</li>
+            <li><b>Moonshot</b> (výrobce kimi): kimi-k3 přímo.</li>
+            <li><b>NVIDIA, SambaNova, Groq:</b> menší výběr, mimo jiné kimi-k3, deepseek-v4.1-flash, glm-5.3, MiniMax-M3, qwen3.8-27b.</li>
+            <li><b>OpenCode:</b> modely Claude, GPT a Gemini.</li>
+          </ul>
+          <p class="pozn">Ráno se měřilo přes Ollamu, tedy stejnou cestou, kterou dnes jdou e-maily k deepseeku; odpoledne levné modely přes OpenRouter, jen u poskytovatelů, kteří data neuchovávají. Text odchází maskovaný: jména, e-maily a telefony zákazníků jsou nahrazené značkami.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="neovereno">
+    <div class="sec-head">
+      <div class="eyebrow">Co ověřené není</div>
+      <h2>Co zatím nevíme</h2>
+    </div>
+    <div class="card">
+      <ul>
+        <li><b>Jak by ostatní modely vyšly s vlastním nastavením.</b> Ráno jsme všechny volali stejně jako dnešní model (bez přemýšlení, tvar odpovědi jen popsaný v zadání). Podle vlastní dokumentace jsme zatím změřili glm-5.3-flash a apodex-1.1-mini (výsledky výše); oba ling se ještě měří, modely z Ollamy ne. Jejich výsledky proto můžou být horší, než by musely.</li>
+        <li>Jestli by glm-5.3-flash podle dokumentace vyšel stejně i ve více bězích a na celé zkušební sadě; měřen jeden běh na 20 e-mailech.</li>
+        <li>Jestli bezplatné modely vydrží běžný provoz: bezplatný přístup má denní limit a poskytovatel je občas přetížený (6. 10. odpoledne odmítal ling-3.1-flash).</li>
+        <li>Kolik ušetří sleva za opakovaný vstup. Ceny výše jsou bez ní.</li>
+        <li>Jak by si vedl Gemini 3.8-flash.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+const D = {"vlaken": 19, "mesic_prevodu": 1265, "kredit_pro": 60,
+ "modely": [
+  {"jm": "deepseek-v4.1-flash", "kde": "Ollama · dnešní model", "druh": "dnes", "f1": [81, 80, 80], "p": [78, 77, 78], "r": [84, 82, 82], "nepr": 0, "s": 2, "pozn": "tři běhy v noci na 6. 10."},
+  {"jm": "kimi-k3", "kde": "Ollama", "druh": "lepsi", "f1": [86], "p": [87], "r": [86], "nepr": 0, "s": 8, "pozn": ""},
+  {"jm": "deepseek-v4-pro", "kde": "Ollama", "druh": "horsi", "f1": [77], "p": [81], "r": [74], "nepr": 3, "s": 3, "pozn": ""},
+  {"jm": "minimax-m3", "kde": "Ollama", "druh": "horsi", "f1": [57], "p": [71], "r": [48], "nepr": 6, "s": 7, "pozn": ""},
+  {"jm": "nemotron-3-ultra", "kde": "Ollama", "druh": "horsi", "f1": [33], "p": [79], "r": [21], "nepr": 15, "s": 43, "pozn": ""},
+  {"jm": "glm-5.3", "kde": "Ollama", "druh": "bez", "f1": [], "p": [], "r": [], "nepr": null, "s": 301, "pozn": "zastaveno: jeden e-mail za 5 minut"},
+  {"jm": "gemini-3.8-flash", "kde": "Google", "druh": "bez", "f1": [], "p": [], "r": [], "nepr": null, "s": null, "pozn": "nezměřeno: Google odmítal požadavky"},
+  {"jm": "apodex-1.1-mini", "kde": "OpenRouter · zdarma · nastavení deepseeku", "druh": "horsi", "f1": [10], "p": [64], "r": [6], "nepr": 17, "s": 2, "pozn": "odpovídal v jiném tvaru, než zadání předepisuje"},
+  {"jm": "ling-3.0-flash-sante", "kde": "OpenRouter · zdarma · nastavení deepseeku", "druh": "bez", "f1": [], "p": [], "r": [], "nepr": 20, "s": null, "pozn": "nepřevedl nic: odpovídal v jiném tvaru, než zadání předepisuje"},
+  {"jm": "glm-5.3-flash", "kde": "OpenRouter · placený · nastavení deepseeku", "druh": "horsi", "f1": [78], "p": [87], "r": [70], "nepr": 1, "s": 8, "cena": 0.016, "pozn": "chybných údajů méně než dnešní model, ale víc jich nenajde"},
+  {"jm": "ling-3.1-flash", "kde": "OpenRouter · zdarma · nastavení deepseeku", "druh": "horsi", "f1": [69], "p": [71], "r": [66], "nepr": 3, "s": 14, "pozn": "poskytovatel byl občas přetížený (1 e-mail odmítl)"},
+  {"jm": "glm-5.3-flash", "klic": "glm-5.3-flash-dok", "kde": "OpenRouter · placený · podle dokumentace", "druh": "lepsi", "f1": [87], "p": [90], "r": [83], "nepr": 1, "s": 223, "cena": 0.124, "pozn": "přemýšlí naplno, proto asi 4 minuty na e-mail"},
+  {"jm": "apodex-1.1-mini", "klic": "apodex-1.1-mini-dok", "kde": "OpenRouter · zdarma · podle dokumentace", "druh": "horsi", "f1": [67, 66], "p": [89, 85], "r": [54, 54], "nepr": [6, 5], "s": 73, "pozn": "dva běhy; chybných údajů málo, ale asi polovinu údajů nenajde"},
+  {"jm": "ling-3.1-flash", "klic": "ling-3.1-flash-dok", "kde": "OpenRouter · zdarma · podle dokumentace", "druh": "bez", "f1": [], "p": [], "r": [], "nepr": null, "s": null, "pozn": "měří se: asi 3 minuty na e-mail, poskytovatel zdarma často přetížený"},
+  {"jm": "ling-3.0-flash-sante", "klic": "ling-3.0-flash-sante-dok", "kde": "OpenRouter · zdarma · podle dokumentace", "druh": "bez", "f1": [], "p": [], "r": [], "nepr": null, "s": null, "pozn": "čeká na měření (po ling-3.1-flash)"}
+ ],
+ "celkem": {"kimi": [107, 16, 18], "dnes": [[105, 29, 20], [103, 31, 22], [102, 29, 23]]},
+ "pole": [
+  ["Stav tiskových dat", "tiskova_data.stav", [16, 3, 3], [[13, 6, 6], [13, 6, 6], [13, 6, 6]]],
+  ["Formát tiskových dat", "tiskova_data.format", [9, 2, 3], [[8, 1, 4], [6, 2, 6], [5, 2, 7]]],
+  ["Firma zákazníka", "zakaznik.firma", [9, 1, 3], [[8, 3, 4], [8, 3, 4], [8, 2, 4]]],
+  ["Náklad", "naklad", [2, 1, 1], [[3, 2, 0], [3, 3, 0], [3, 4, 0]]],
+  ["Termín", "termin", [7, 2, 1], [[6, 3, 2], [7, 3, 1], [6, 4, 2]]],
+  ["Jméno zákazníka", "zakaznik.jmeno", [15, 2, 2], [[15, 3, 2], [15, 4, 2], [15, 2, 2]]],
+  ["E-mail zákazníka", "zakaznik.email", [17, 1, 0], [[17, 2, 0], [17, 2, 0], [17, 1, 0]]],
+  ["Typ produktu", "typ_produktu", [19, 0, 0], [[19, 0, 0], [18, 1, 1], [18, 1, 1]]],
+  ["Čistý formát: název", "format_cisty_mm.nazev", [3, 0, 0], [[3, 1, 0], [3, 1, 0], [3, 1, 0]]],
+  ["Čistý formát: šířka", "format_cisty_mm.sirka", [1, 1, 0], [[1, 2, 0], [1, 2, 0], [1, 2, 0]]],
+  ["Čistý formát: výška", "format_cisty_mm.vyska", [1, 1, 0], [[1, 2, 0], [1, 2, 0], [1, 2, 0]]],
+  ["Barevnost vnitřku", "barevnost.vnitrek", [1, 0, 1], [[1, 2, 1], [1, 0, 1], [2, 0, 0]]]
+ ],
+ "ceny": [
+  {"jm": "deepseek-v4.1-flash · Ollama, špička", "vst": 0.30, "vys": 1.20, "tok": [9187, 485]},
+  {"jm": "deepseek-v4.1-flash · Ollama, mimo špičku", "vst": 0.15, "vys": 0.60, "tok": [9187, 485]},
+  {"jm": "kimi-k3 · Ollama", "vst": 3.00, "vys": 15.00, "tok": [6892, 520]},
+  {"jm": "kimi-k3 · OpenRouter", "vst": 0.65, "vys": 14.00, "tok": [6892, 520]},
+  {"jm": "glm-5.3-flash · OpenRouter", "vst": 0.15, "vys": 0.50, "tok": [6634, 516]},
+  {"jm": "glm-5.3-flash · OpenRouter, podle dokumentace", "klic": "glm-5.3-flash-dok", "vst": 0.15, "vys": 0.50, "tok": [6633, 11296]}
+ ]};
+
+const cs = (x, d = 0) => x.toLocaleString("cs-CZ", {minimumFractionDigits: d, maximumFractionDigits: d});
+const prum = a => a.reduce((s, x) => s + x, 0) / a.length;
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+
+document.getElementById("m-vlaken").textContent = `${D.vlaken} e-mailů se vzorovou odpovědí`;
+
+const pruhy = document.getElementById("pruhy");
+for (const m of D.modely) {
+  const r = el("div", `pruh ${m.druh}`);
+  r.append(el("div", "jm", `<b>${m.jm}</b><small>${m.kde}</small>`));
+  const dr = el("div", "dr");
+  if (m.f1.length) { const i = el("i"); i.style.width = `${prum(m.f1)}%`; dr.append(i); }
+  else dr.append(el("span", null, m.pozn));
+  r.append(dr);
+  r.append(el("div", "hod", m.f1.length ? m.f1.join(" / ") : "—"));
+  pruhy.append(r);
+}
+
+const tb = document.querySelector("#modely-t tbody");
+for (const m of D.modely) {
+  const v = a => a.length ? a.join(" / ") : "—";
+  tb.append(el("tr", null, `<td>${m.jm}<br><small class="pozn">${m.kde}</small></td><td>${v(m.f1)}</td><td>${v(m.p)}</td><td>${v(m.r)}</td>`
+    + `<td>${m.nepr == null ? "—" : `${[].concat(m.nepr).join(" / ")} z 20`}</td><td>${m.s == null ? "—" : m.s}</td>`
+    + `<td>${m.pozn}${m.cena != null ? `${m.pozn ? "; " : ""}celý test stál ${cs(m.cena, 3)} $` : ""}</td>`));
+}
+
+const k = D.celkem.kimi, dn = D.celkem.dnes;
+const sou = document.getElementById("soucet");
+const dl = (cls, cislo, txt) => sou.append(el("div", `dlazdice ${cls}`, `<b>${cislo}</b><small>${txt}</small>`));
+dl("", `${k[0]} · ${dn.map(x => x[0]).join(" / ")}`, "správně vyplněných údajů: kimi-k3 · dnešní model");
+dl("hl", `${k[1]} · ${dn.map(x => x[1]).join(" / ")}`, "chybně vyplněných údajů: kimi-k3 · dnešní model");
+dl("", `${k[2]} · ${dn.map(x => x[2]).join(" / ")}`, "chybějících údajů: kimi-k3 · dnešní model");
+
+const pt = document.querySelector("#pole-t tbody");
+const tr = (kv, dv) => dv.every(x => kv < x) ? "lepsi" : dv.every(x => kv > x) ? "horsi" : "";
+for (const [jm, , kv, dv] of D.pole) {
+  pt.append(el("tr", null, `<td>${jm}</td><td class="${tr(kv[1], dv.map(x => x[1]))}">${kv[1]}</td><td>${dv.map(x => x[1]).join(" / ")}</td>`
+    + `<td class="${tr(kv[2], dv.map(x => x[2]))}">${kv[2]}</td><td>${dv.map(x => x[2]).join(" / ")}</td>`));
+}
+
+document.getElementById("c-mesic").textContent = cs(D.mesic_prevodu);
+const ct = document.querySelector("#cena-t tbody"), ck = document.querySelector("#cenik-t tbody");
+for (const c of D.ceny) {
+  const tis = (c.tok[0] * c.vst + c.tok[1] * c.vys) / 1000;
+  const mes = tis * D.mesic_prevodu / 1000;
+  const kredit = c.jm.includes("Ollama") ? `${cs(mes / D.kredit_pro * 100)} %` : "—";
+  ct.append(el("tr", null, `<td>${c.jm}</td><td>${cs(tis, 2)} $</td><td>${cs(mes, mes < 10 ? 1 : 0)} $</td><td>${kredit}</td>`));
+  ck.append(el("tr", null, `<td>${c.jm}</td><td>${cs(c.vst, 2)}</td><td>${cs(c.vys, 2)}</td><td>${cs(c.tok[0])}</td><td>${cs(c.tok[1])}</td>`));
+}
+document.getElementById("c-pozn").textContent = "Tokeny jsou průměr z tohoto testu na stejných 20 e-mailech. Každý model počítá tokeny po svém, proto se počty vstupu liší, i když text byl stejný.";
+</script>
+
+</body>
+</html>

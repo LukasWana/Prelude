@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Nejjednodušší EmailRator v kostce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Přehledová varianta stránky Nejjednodušší EmailRator (podrobná: Doc/vedeni/jednoduchy-asistent.html), styl Stopa.
+   Jeden obrázek nahoře (dlouhá dnešní cesta × krátká jednoduchá), pod ním tři sloupce a jeden pruh kódu.
+   Pruh kreslí skript z pole MODULY; počty ověřuje scripts/jednoduchy_asistent_kontrola.py. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eef9;
+  --on-accent: #ffffff;
+  --ok: #1f7a4d;
+  --ok-wash: #e7f4ec;
+  --bad: #b3261e;
+  --bad-wash: #fbeceb;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1a2638; --on-accent: #0b1422; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1a2638; --on-accent: #0b1422; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.5 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 64px; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 56px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(22px, 3vw, 28px); font-weight: 750; font-stretch: 85%; }
+p { margin: 0; max-width: 70ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+header { position: relative; padding: 26px 26px 28px; display: grid; gap: 12px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.meta .pozor { color: var(--bad); }
+.teze { font-size: 20px; line-height: 1.45; color: var(--ink-2); }
+.teze b { color: var(--ink); font-weight: 600; }
+
+section { display: grid; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 18px; min-width: 0; }
+
+/* hlavní obrázek: dvě cesty pod sebou */
+.cesta { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 10px 18px; align-items: start; }
+.cesta-jm { display: grid; gap: 2px; padding-top: 6px; }
+.cesta-jm b { font: 800 22px/1 var(--font-display); font-stretch: 85%; }
+.cesta-jm small { font: 400 12px var(--font-mono); color: var(--muted); }
+.dnes { display: flex; flex-wrap: wrap; gap: 6px; }
+.b { font-size: 13.5px; line-height: 1.2; padding: 7px 9px; border-radius: 6px; border: 1.5px solid var(--axis); background: var(--surface); color: var(--ink); }
+.b.zustava { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+.b.zuzit { background: var(--accent-wash); border-color: var(--accent); color: var(--ink); }
+.b.odpada { border-style: dashed; background: transparent; color: var(--muted); text-decoration: line-through; text-decoration-color: var(--axis); }
+.b.dopsat { border-style: dashed; border-color: var(--ok); background: var(--ok-wash); color: var(--ink); }
+.jedn { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; counter-reset: k; }
+.k { position: relative; display: grid; gap: 4px; align-content: start; padding: 12px 12px 14px; margin-right: 18px; border-radius: 8px; background: var(--accent); color: var(--on-accent); min-height: 96px; }
+.k:last-child { margin-right: 0; }
+.k::before { counter-increment: k; content: counter(k); font: 500 12px var(--font-mono); opacity: .75; }
+.k b { font: 700 16px/1.2 var(--font-display); font-stretch: 90%; }
+.k small { font-size: 13px; line-height: 1.3; opacity: .85; }
+.k:not(:last-child)::after { content: ""; position: absolute; right: -14px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left: 8px solid var(--ink-2); }
+.k.nove { background: var(--ok-wash); color: var(--ink); outline: 1.5px dashed var(--ok); outline-offset: -1.5px; }
+.mimo { grid-column: 2; font-size: 14px; color: var(--ink-2); display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.mimo .b { font-size: 13px; }
+.oddel { grid-column: 1 / -1; height: 1px; background: var(--line); margin-block: 4px; }
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13.5px; color: var(--ink-2); }
+.legenda span { display: inline-flex; gap: 8px; align-items: center; }
+.legenda .b { padding: 2px 10px; font-size: 12px; font-style: normal; }
+@media (max-width: 900px) {
+  .jedn { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .k { margin-right: 0; min-height: 0; }
+  .k:not(:last-child)::after { right: auto; left: 24px; top: auto; bottom: -13px; margin-top: 0; border: 6px solid transparent; border-top: 8px solid var(--ink-2); }
+}
+@media (max-width: 640px) {
+  .cesta { grid-template-columns: minmax(0, 1fr); }
+  .mimo { grid-column: 1; }
+}
+
+/* tři sloupce */
+.tri { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 860px) { .tri { grid-template-columns: minmax(0, 1fr); } }
+.sl { border-radius: 12px; padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; border: 1px solid var(--line); background: var(--surface); }
+.sl h3 { font-size: 20px; font-weight: 750; font-stretch: 88%; display: flex; gap: 10px; align-items: center; }
+.sl h3 i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; flex: none; }
+.sl.zustava { border-top: 4px solid var(--accent); }
+.sl.zustava h3 i { background: var(--accent); }
+.sl.odpada { border-top: 4px solid var(--axis); }
+.sl.odpada h3 i { border: 1.5px dashed var(--muted); }
+.sl.dopsat { border-top: 4px solid var(--ok); }
+.sl.dopsat h3 i { border: 1.5px dashed var(--ok); background: var(--ok-wash); }
+.sl ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.sl li { display: grid; gap: 1px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.sl li:last-child { border-bottom: 0; padding-bottom: 0; }
+.sl li b { font-weight: 600; color: var(--ink); }
+.sl li span { font-size: 14px; color: var(--ink-2); }
+
+/* hranice smyslu: jeden pruh */
+.mira { display: grid; grid-template-columns: 2fr 3fr 2fr; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.mira > div { padding: 14px 16px; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.mira .c { font: 500 11px var(--font-mono); letter-spacing: .07em; text-transform: uppercase; }
+.mira b { font: 700 17px/1.2 var(--font-display); font-stretch: 90%; }
+.mira span:not(.c) { font-size: 14px; color: var(--ink-2); }
+.mira .pod { background: var(--bad-wash); }
+.mira .pod .c { color: var(--bad); }
+.mira .min { background: var(--accent-wash); box-shadow: inset 0 0 0 2px var(--accent); }
+.mira .min .c { color: var(--accent); }
+.mira .nad { background: var(--lane); }
+.mira .nad .c { color: var(--muted); }
+@media (max-width: 760px) { .mira { grid-template-columns: minmax(0, 1fr); } }
+
+/* pruh kódu */
+.kod { display: grid; gap: 10px; }
+.pruh { display: flex; height: 34px; border-radius: 6px; overflow: hidden; background: var(--chip); }
+.pruh i { display: block; height: 100%; background: var(--accent); }
+.kod-pop { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; font-size: 14.5px; color: var(--ink-2); }
+.kod-pop b { color: var(--ink); font-weight: 600; }
+.kod-pop .modra b { color: var(--accent); }
+.pozn { font-size: 14px; color: var(--muted); }
+.dalsi { font-size: 15px; color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · návrh na zjednodušení · přehled</div>
+    <h1>Nejjednodušší EmailRator</h1>
+    <div class="meta"><span>Stav kódu k 5. 10. 2026</span><span class="pozor">Návrh, zatím nepostavený ani nezměřený</span></div>
+    <p class="teze">Produkční otevře e-mail, klikne na <b>Převést</b> a vedle e-mailu uvidí vyplněné zadání zakázky. U každé hodnoty je <b>citace z e-mailu</b> a pod tím text dotazu na to, co chybí.</p>
+  </header>
+
+  <section id="cesta">
+    <div class="eyebrow">Na jeden pohled</div>
+    <h2>Z dlouhé cesty zbude šest kroků</h2>
+    <div class="card">
+      <div class="cesta">
+        <div class="cesta-jm"><b>Dnes</b><small>13 kroků</small></div>
+        <div class="dnes" id="dnes"></div>
+        <div class="oddel"></div>
+        <div class="cesta-jm"><b>Jednoduše</b><small>6 kroků</small></div>
+        <div class="jedn">
+          <div class="k"><b>Klik na Převést</b><small>tlačítko v panelu u e-mailu už existuje</small></div>
+          <div class="k nove"><b>Vlákno z Gmailu</b><small>jen čtení, bez databáze</small></div>
+          <div class="k"><b>Maskování</b><small>jména, e-maily, telefony</small></div>
+          <div class="k"><b>Model vyplní pole</b><small>méně polí, u každého citace</small></div>
+          <div class="k"><b>Kontrola citací</b><small>citace musí v e-mailu opravdu být</small></div>
+          <div class="k nove"><b>Výsledek a dotaz</b><small>v panelu, uložený do souboru</small></div>
+        </div>
+        <div class="mimo"><span>Mimo provoz:</span><span class="b zuzit">malá testovací sada, pustit při každé změně</span></div>
+      </div>
+      <div class="legenda">
+        <span><i class="b zustava">zůstává</i></span>
+        <span><i class="b zuzit">zúžit</i></span>
+        <span><i class="b odpada">odpadá</i></span>
+        <span><i class="b dopsat">nové, dopsat</i></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="sloupce">
+    <div class="tri">
+      <div class="sl zustava">
+        <h3><i></i>Zůstává</h3>
+        <ul>
+          <li><b>Panel s tlačítkem Převést</b><span>místo samovolného příjmu pošty a třídění</span></li>
+          <li><b>Kontrola citací</b><span>bez ní si model může vymýšlet</span></li>
+          <li><b>Maskování</b><span>když text jde do modelu v cloudu</span></li>
+          <li><b>Doplňující dotaz</b><span>pevné šablony, nic se neodesílá</span></li>
+          <li><b>Testovací sada</b><span>menší, jen při změně</span></li>
+        </ul>
+      </div>
+      <div class="sl odpada">
+        <h3><i></i>Odpadá</h3>
+        <ul>
+          <li><b>Databáze a třídění pošty</b><span>o poptávce rozhodne člověk kliknutím</span></li>
+          <li><b>Druhá kontrola Jev a brána jistoty</b><span>automatické přijetí hodnot je dnes stejně vypnuté</span></li>
+          <li><b>Kanban</b><span>výsledek je v panelu u e-mailu</span></li>
+          <li><b>Přílohy PDF</b><span>zadání jen v příloze se nepřevede</span></li>
+        </ul>
+      </div>
+      <div class="sl dopsat">
+        <h3><i></i>Dopsat</h3>
+        <ul>
+          <li><b>Text vlákna z Gmailu</b><span>dnes se čte z databáze</span></li>
+          <li><b>Výsledek do souboru</b><span>pole, citace, stav a oprava od produkčního</span></li>
+          <li><b>Méně polí</b><span>výběr musí potvrdit produkční</span></li>
+          <li><b>Měření nad soubory</b><span>dnes čte z databáze</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="hranice">
+    <div class="eyebrow">Kam až se dá ubrat</div>
+    <h2>Pod minimum už ne</h2>
+    <div class="mira">
+      <div class="pod"><span class="c">Nedává smysl</span><b>Jen model</b><span>Odpověď bez kontroly, totéž umí chat.</span></div>
+      <div class="min"><span class="c">Minimum</span><b>Citace s kontrolou, maskování, testovací sada</b><span>Každá hodnota je doložená a je vidět, když se něco rozbije.</span></div>
+      <div class="nad"><span class="c">Navíc dnes</span><b>Automatizace</b><span>Samovolný příjem, třídění, Jev, kanban, brána.</span></div>
+    </div>
+  </section>
+
+  <section id="kod">
+    <div class="eyebrow">Kolik kódu je potřeba</div>
+    <h2>Kód se bere jen z menší části programu</h2>
+    <div class="card kod">
+      <div class="pruh" id="pruh" role="img"></div>
+      <div class="kod-pop" id="kod-pop"></div>
+      <p class="pozn">Počítá se jen hlavní program (složka src). Z velkých modulů se převezme jen část, takže skutečně převzatého kódu bude méně. Skupina „Rozbor zakázek z wall2, číselníky, stránky“ obsahuje moduly, které ze starého systému jen čtou (rozbor zakázek, kalibrace polí, příprava souboru pro převod do nového systému), dále číselníky a generátory stránek pro vedení. Převod e-mailu nic z toho nepotřebuje.</p>
+    </div>
+  </section>
+
+  <p class="dalsi">Podrobnosti (každý krok, které moduly, co se ztratí): <a href="jednoduchy-asistent.html">Nejjednodušší EmailRator, podrobná verze</a>.</p>
+</div>
+
+<script>
+// Dnešní kroky (Doc/SCHEMA-zpracovani.md, oddíl A) a co se s nimi stane; shodné s podrobnou stránkou.
+const DNES = [
+  ["Příjem pošty", "odpada"], ["Kopie do SQLite", "odpada"], ["Databáze Postgres", "odpada"], ["Přílohy PDF", "odpada"],
+  ["Třídění (Jev)", "odpada"], ["Maskování", "zustava"], ["Model vyplní pole", "zuzit"], ["Kontrola citací", "zustava"],
+  ["Kontroly hodnot", "zuzit"], ["Kanban", "odpada"], ["Brána jistoty", "odpada"], ["Dotaz zákazníkovi", "zustava"],
+  ["Zlatá sada a měření", "zuzit"],
+];
+
+// Moduly src/*.py po skupinách: [skupina, [[modul, řádků, bere se?], …]]. Počty ověřuje scripts/jednoduchy_asistent_kontrola.py.
+const MODULY = [["Příjem pošty", [["gmail_sync", 506, true], ["panel_sync", 17, true], ["attach", 319, false], ["klienti", 325, false], ["sortiment", 113, false], ["testovaci", 124, false], ["automat", 154, false]]], ["Úložiště a třídění", [["pg_store", 169, false], ["embed", 240, false], ["trideni", 217, false], ["prunik", 51, false], ["jev", 574, false], ["jev_cinnosti", 223, false], ["jev_stav", 129, false]]], ["Převod e-mailu", [["extract", 1006, true], ["cisteni", 234, false], ["maskovani", 439, true], ["ollama_cfg", 35, true], ["priklady", 89, false], ["termin", 90, false], ["rozpis", 266, false], ["rozmery", 148, true], ["vyrobky", 73, false], ["odvozeni", 170, false]]], ["Kontroly a brána jistoty", [["checks", 299, true], ["brana", 438, false], ["brana_provoz", 229, false], ["jev_pole", 368, false]]], ["Panel, kanban a dotaz", [["api", 327, false], ["api_panel", 77, true], ["panel", 108, true], ["kanban", 453, false], ["dotaz", 309, true]]], ["Měření a ladění", [["metrika", 502, true], ["zlata", 462, true], ["mereni", 103, false], ["bench_cloud", 304, false], ["gemini", 134, false], ["bez_nepodl", 45, false], ["chyby_citace", 34, false], ["citace_autor", 59, false], ["citace_puvod", 69, false], ["kdo_rekl", 60, false], ["pole_behy", 66, false], ["porovnej_prompty", 60, false], ["porovnej_spolecna", 69, false], ["shoda_modelu", 139, false], ["sonda_ozvena", 58, false], ["subagent_extrakce", 90, false], ["vyber_behu", 18, false], ["rozpis_shoda", 131, false]]], ["Rozbor zakázek z wall2, číselníky, stránky", [["wall2", 529, false], ["wall2_analyza", 894, false], ["wall2_crawl", 549, false], ["poznamky_llm", 853, false], ["poznamky_parser", 600, false], ["poznamky_shoda", 301, false], ["api_katalog", 126, false], ["api_poznamky", 172, false], ["designclass", 350, false], ["euipo_test", 46, false], ["prelude_schema", 256, false], ["vedeni_stranka", 30, false], ["vytizeni_stranka", 455, false]]]];
+
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const fmt = n => n.toLocaleString("cs-CZ");
+
+const d = document.getElementById("dnes");
+for (const [co, st] of DNES) d.append(el("span", "b " + st, co));
+
+const vse = MODULY.flatMap(([, ms]) => ms);
+const cel = vse.reduce((s, m) => s + m[1], 0), ber = vse.filter(m => m[2]), zak = ber.reduce((s, m) => s + m[1], 0);
+const podil = Math.round(zak / cel * 100);
+const pruh = document.getElementById("pruh"), modra = el("i");
+modra.style.width = `${zak / cel * 100}%`; pruh.append(modra);
+pruh.setAttribute("aria-label", `Kód se bere z ${podil} % řádků programu`);
+const pop = document.getElementById("kod-pop");
+const a = el("span", "modra"); a.append(el("b", "", `${ber.length} z ${vse.length} modulů`), document.createTextNode(`, ${podil} % řádků: z nich se bere kód`));
+const b = el("span"); b.append(el("b", "", `${vse.length - ber.length} modulů`), document.createTextNode(", zbytek: odpadá"));
+pop.append(a, b);
+</script>
+
+</body>
+</html>

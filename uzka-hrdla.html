@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Úzká hrdla zakázek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránek Nasazení a Stopa zakázky (Doc/vedeni/): hlavička s ořezovými značkami, karty, rozbalovací části.
+   Rozvržení: jeden sloupec textu, souhrnné dlaždice nahoře, každé zjištění = karta s čísly a závěrem. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e4edf9;
+  --bad: #b3261e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d; --bad: #f07b72;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d; --bad: #f07b72;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 17px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 72ch; }
+li { color: var(--ink-2); }
+li b, p b { color: var(--ink); }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.uvod { font-size: 18px; color: var(--ink-2); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); font-size: 18px; }
+.pozor { color: var(--ink-2); font-size: 15px; }
+.pozor b { color: var(--bad); font-weight: 600; }
+
+.soucet { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.dlazdice { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; min-width: 0; background: var(--surface); }
+.dlazdice b { font: 800 clamp(30px, 4vw, 42px)/1 var(--font-display); font-stretch: 80%; }
+.dlazdice small { font-size: 14px; color: var(--ink-2); }
+@media (max-width: 860px) { .soucet { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .soucet { grid-template-columns: 1fr; } }
+
+.tab { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; font-variant-numeric: tabular-nums; }
+td { color: var(--ink-2); }
+th { font: 500 12px var(--font-mono); color: var(--muted); }
+td.c, th.c { text-align: right; }
+td:first-child { color: var(--ink); font-weight: 600; }
+tr.soucet-r td { border-top: 1px solid var(--axis); }
+
+/* rozpětí týdnů: šedý pruh = prostřední polovina týdnů, svislá čára = medián, kroužek = nejvíc */
+.rozpeti { position: relative; height: 18px; min-width: 180px; background: linear-gradient(to right, var(--line) 1px, transparent 1px) 0 0 / 25% 100%; border-right: 1px solid var(--line); }
+.rozpeti .pas { position: absolute; top: 4px; height: 10px; background: var(--accent-wash); border: 1px solid var(--accent); border-radius: 2px; }
+.rozpeti .med { position: absolute; top: 1px; width: 2px; height: 16px; background: var(--accent); }
+.rozpeti .max { position: absolute; top: 5px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; border: 1.5px solid var(--ink-2); background: var(--surface); }
+.osa { display: flex; justify-content: space-between; font: 11px var(--font-mono); color: var(--muted); min-width: 180px; }
+.legenda { font-size: 13px; color: var(--muted); }
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+footer { display: grid; gap: 12px; font-size: 14px; color: var(--ink-2); }
+footer code { font: 13px var(--font-mono); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · data starého systému wall2</div>
+    <h1>Úzká hrdla zakázek</h1>
+    <div class="meta"><span>9 705 zakázek z let 2023–2026</span><span>rok 2026 do 25. 9.</span><span>bez storna a rozpracovaných</span></div>
+  </header>
+
+  <p class="uvod">Kde se při zadávání a vyřizování zakázek ztrácí čas a co z toho jde doložit daty. Čísla o zakázkách jsou spočítaná z dat starého systému wall2 za roky 2023–2026. Co data neukazují, je vyjmenované na konci.</p>
+
+  <div class="soucet">
+    <div class="dlazdice"><span class="eyebrow">Víc výrobků</span><b class="num">48 %</b><small>zakázek má dva a víc výrobků</small></div>
+    <div class="dlazdice"><span class="eyebrow">Rozměr v textu</span><b class="num">25 %</b><small>výrobků má rozměr jen v popisu nebo poznámce</small></div>
+    <div class="dlazdice"><span class="eyebrow">Fotka montáže</span><b class="num">0,5 %</b><small>zakázek s montáží ji má u zakázky</small></div>
+    <div class="dlazdice"><span class="eyebrow">Tři produkční</span><b class="num">77 %</b><small>všech zakázek vyřizují tři lidé</small></div>
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Zadání</span><h2>Zadání se píše volným textem</h2></div>
+    <div class="card">
+      <ul>
+        <li><b>48 %</b> zakázek má dva a víc výrobků, <b>51 %</b> obsahuje službu, například dopravu, instalaci, grafiku nebo zaměření.</li>
+        <li>Rozměr má <b>25 %</b> výrobků jen v textu popisu nebo poznámky, ne ve vlastním poli. Podíl za poslední roky vzrostl: 2023 22 %, 2024 24 %, 2025 28 %, 2026 27 %. Rozměr nemá vůbec <b>21 %</b> výrobků.</li>
+        <li>Poznámku má <b>54 %</b> položek. Nejčastěji je v ní odkaz na soubor (31 % poznámek), rozměr nebo formát (25 %), počet (24 %) a materiál (19 %).</li>
+        <li>Materiál nemá vyplněný <b>34 %</b> výrobků.</li>
+      </ul>
+      <p class="zaver">Velká část zadání je volný text. Z volného textu vytahuje údaje i EmailRator, jen z e-mailu.</p>
+      <details>
+        <summary>Rozměr a zaměření podle typu výrobku</summary>
+        <div>
+          <p>U některých typů rozměr chybí nejčastěji. Zaměření se jako samostatná služba účtuje u různých typů velmi různě často.</p>
+          <div class="tab"><table>
+            <thead><tr><th>Typ výrobku</th><th class="c">Zakázek</th><th class="c">Výrobků bez rozměru</th><th class="c">Zakázek se zaměřením</th></tr></thead>
+            <tbody>
+              <tr><td>polep vozidla</td><td class="c">210</td><td class="c">64 %</td><td class="c">1 %</td></tr>
+              <tr><td>textil, vlajky</td><td class="c">254</td><td class="c">53 %</td><td class="c">1 %</td></tr>
+              <tr><td>3D logo, písmena</td><td class="c">564</td><td class="c">42 %</td><td class="c">20 %</td></tr>
+              <tr><td>polep skla, výlohy</td><td class="c">467</td><td class="c">12 %</td><td class="c">16 %</td></tr>
+            </tbody>
+          </table></div>
+          <p class="legenda">Výrobky bez rozměru: podíl výrobků daného typu, které rozměr nemají ani v poli, ani v textu. Zakázky se zaměřením: zaměření jako samostatná položka nebo zmíněné v popisu výrobku.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Podklady</span><h2>Podklady se k zakázce skoro neukládají</h2></div>
+    <div class="card">
+      <ul>
+        <li>Pole Zprávy u zakázky je <b>prázdné ve všech zakázkách</b>. Zprávy k zakázce se ve wall2 nevedly.</li>
+        <li>Přílohy jsou u zakázek výjimkou: grafický návrh má nahraný <b>6,9 %</b> zakázek, dokumenty 3,9 %, fotografii původního stavu 0,8 %, fotografii instalace 0,1 %.</li>
+        <li><b>21 %</b> zakázek odkazuje v poznámce nebo specifikaci na soubor, cestou na disk nebo jménem souboru.</li>
+        <li>Montáž (služba instalace nebo vyplněné datum instalace) má <b>2 257</b> zakázek (23 %). Fotografii instalace má u zakázky <b>11</b> z nich (0,5 %).</li>
+      </ul>
+      <p class="zaver">Podklady a fotky z montáže se k zakázce ve wall2 skoro neukládají. Kde jsou, data neříkají.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Šablony</span><h2>Deset typů výrobků pokryje většinu zakázek</h2></div>
+    <div class="card">
+      <ul>
+        <li>Deset nejčastějších typů: samolepka a fólie, deska a cedule, tisk obecně, CLV a plakát, banner, vizitky, rollup, 3D logo, leták, polep skla.</li>
+        <li>U <b>83 %</b> zakázek s výrobkem jsou všechny výrobky z těchto deseti typů. Šest nejčastějších typů pokryje 66 %.</li>
+        <li>Třicet nejčastějších materiálů tvoří <b>75 %</b> všech výskytů materiálu.</li>
+        <li>Stejný název jako v ukázkovém číselníku nového systému má jen <b>4 %</b> výskytů materiálu.</li>
+      </ul>
+      <p class="pozor"><b>Pozor:</b> ukázkový číselník nového systému má 143 materiálů a není ostrý. Shoda 4 % je proto jen orientační.</p>
+      <p class="zaver">Šablona podle typu výrobku by pokryla většinu zakázek, převodní tabulka pro 30 materiálů většinu výskytů materiálu.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Lidé</span><h2>Tři produkční vyřizují tři čtvrtiny zakázek</h2></div>
+    <div class="card">
+      <p>Osoba A, Osoba B a Osoba C vyřizují <b>77 %</b> všech zakázek. Podíl je podobný každý rok: 2023 75 %, 2024 79 %, 2025 80 %, 2026 76 %. Aspoň 100 zakázek za tu dobu má osm produkčních.</p>
+      <h3>Kolik zakázek má termín výroby v jednom týdnu</h3>
+      <div class="tab"><table>
+        <thead><tr><th>Kdo</th><th class="c">Běžný týden</th><th class="c">9 z 10 týdnů nejvýš</th><th class="c">Nejvíc</th><th>Rozpětí týdnů (0–80 zakázek)</th></tr></thead>
+        <tbody>
+          <tr><td>Osoba A</td><td class="c">17</td><td class="c">25</td><td class="c">32</td><td><div class="rozpeti"><span class="pas" style="left:17.5%;width:8.75%"></span><span class="med" style="left:21.25%"></span><span class="max" style="left:40%"></span></div></td></tr>
+          <tr><td>Osoba B</td><td class="c">10</td><td class="c">19</td><td class="c">25</td><td><div class="rozpeti"><span class="pas" style="left:7.5%;width:11.25%"></span><span class="med" style="left:12.5%"></span><span class="max" style="left:31.25%"></span></div></td></tr>
+          <tr><td>Osoba C</td><td class="c">8</td><td class="c">14</td><td class="c">20</td><td><div class="rozpeti"><span class="pas" style="left:7.5%;width:6.25%"></span><span class="med" style="left:10%"></span><span class="max" style="left:25%"></span></div></td></tr>
+          <tr><td>ostatní</td><td class="c">9</td><td class="c">15</td><td class="c">24</td><td><div class="rozpeti"><span class="pas" style="left:7.5%;width:7.5%"></span><span class="med" style="left:11.25%"></span><span class="max" style="left:30%"></span></div></td></tr>
+          <tr class="soucet-r"><td>všichni</td><td class="c">46</td><td class="c">62</td><td class="c">76</td><td><div class="rozpeti"><span class="pas" style="left:48.75%;width:20%"></span><span class="med" style="left:57.5%"></span><span class="max" style="left:95%"></span></div></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td><div class="osa"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span></div></td></tr>
+        </tbody>
+      </table></div>
+      <p class="legenda">Běžný týden = medián ze 195 týdnů od ledna 2023 do září 2026, týdny bez zakázek se počítají. Počítají se zakázky s vyplněným produkčním a termínem v tom týdnu, i když mají číslo z dřívějšího roku. Pruh = prostřední polovina týdnů, svislá čára = běžný týden, kroužek = nejvíc.</p>
+      <p class="zaver">V běžném týdnu má termín výroby 46 zakázek, v nejrušnějším 76. Jestli to lidi přetěžuje, z počtu zakázek poznat nejde.</p>
+      <details>
+        <summary>Co tabulka měří</summary>
+        <div>
+          <p>Zakázka se počítá do týdne, na který má termín výroby. Je to počet termínů, ne hodiny práce: zakázky se velikostí liší a wall2 čas práce neeviduje. Kolik zakázek člověk zvládne, data neříkají.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Čas</span><h2>Jak dlouho zakázka trvá, z wall2 spočítat nejde</h2></div>
+    <div class="card">
+      <p>wall2 neukládá datum vzniku zakázky, historii stavů ani datum faktury. Dobu od poptávky po fakturu a čas práce na zakázce z něj proto zjistit nejde.</p>
+      <p>Nejbližší údaj má <b>624 zakázek</b> (6 %), u kterých byla první příloha nahraná před termínem výroby. Od první nahrané přílohy po termín výroby u nich uběhne obvykle <b>9 dní</b>, u poloviny zakázek 3 až 25 dní.</p>
+      <p class="pozor"><b>Pozor:</b> příloha se mohla nahrát později, než zakázka vznikla. Jde jen o 6 % zakázek, které nemusí být typické. Doba končí termínem výroby, ne fakturou. Dalších 37 zakázek mělo první přílohu až po termínu, do výpočtu nejsou zahrnuté.</p>
+      <p>Časy na stránce <a href="stopa-zakazky.html">Stopa jedné zakázky</a> (4 dny, z toho 5 hodin práce) jsou ilustrační příklad, ne měření.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Co z toho plyne</span><h2>Co pomáhá a co jsou zatím jen návrhy</h2></div>
+    <div class="card">
+      <h3>EmailRator</h3>
+      <p>Hotové je čtení pošty, převod e-mailu na zadání a panel v Gmailu. Chybí zápis zakázky do nového systému, provoz na serveru a mazání osobních údajů.</p>
+      <ul>
+        <li>Z e-mailu s poptávkou vytáhne zadání (produkt, náklad, rozměr, materiál, termín) a u každého údaje ukáže větu z e-mailu. Produkční zadání zkontroluje. Do systému ho zatím zapisuje sám.</li>
+        <li>Model Jev posoudí převedený e-mail, jestli jde o poptávku tisku. Panel jeho posudek jen ukáže.</li>
+        <li>Od 3. 10. nástroj před odesláním modelům nahradí osobní údaje zástupkami.</li>
+      </ul>
+      <p>Podrobnosti na stránce <a href="nasazeni.html">Nasazení EmailRatoru</a>. Kolik času nástroj ušetří, změřené není.</p>
+      <h3>Návrhy z dat (zatím nevyzkoušené)</h3>
+      <ul>
+        <li>Šablony zakázky podle deseti typů výrobku, materiál vybírat z číselníku.</li>
+        <li>Převodní tabulka pro 30 nejčastějších materiálů ze starého systému do nového.</li>
+        <li>Rozměr hledat i ve volném textu. U polepu vozidel, textilu a 3D log, kde rozměr často chybí, se doptat nebo zaměřit.</li>
+        <li>Jedna zakázka, jedno místo: podklady, schválení a fotka z montáže patří k zakázce. Jestli to v praxi půjde, nikdo nezkoušel.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <h3>Co ověřené není</h3>
+    <ul>
+      <li>Doba od poptávky po fakturu a čas práce na zakázce. wall2 je neeviduje.</li>
+      <li>Kde jsou fotky z montáže, schválení a komunikace s klientem. Fotky a zprávy u zakázek ve wall2 skoro nejsou, schválení data nezachycují.</li>
+      <li>Jestli týdny s nejvíc termíny produkční přetížily.</li>
+      <li>Jestli lidé budou v novém systému zapisovat fotky, hodiny a stavy. Co systém umí, je na stránce <a href="novy-system.html">Co změní nový systém</a>.</li>
+      <li>Kolik času ušetří EmailRator.</li>
+    </ul>
+    <h3>Zdroje</h3>
+    <p>Data wall2 stažená 25.–26. 9. 2026. Čísla počítá <code>scripts/overeni_uzkych_hrdel.py</code> a rozbor <code>Doc/analyza-zakazek.md</code> (rozměry, poznámky, materiály). Stránku s nimi porovnává <code>scripts/uzka_hrdla_kontrola.py</code>.</p>
+  </footer>
+</div>
+
+</body>
+</html>

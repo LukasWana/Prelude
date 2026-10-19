@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>AI v Business Starteru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Rozvržení: hlavička s tarifem Business Starter, co Starter v AI obsahuje (tabulka s limity), co nemá,
+   jak se nástroje hodí na poptávky v poště, vlastní řešení nad daty firmy, další čtení (návody, příklady), zdroje.
+   Vzhled převzat z Doc/vedeni/server-50.html (stránky pro vedení). Na stránce jsou jen údaje přečtené přímo u zdroje. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eefa;
+  --yes: #13865e; --yes-wash: #e3f4ec;
+  --no: #b5492a; --no-wash: #f8e7e1;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1c2940;
+    --yes: #4cc596; --yes-wash: #15302a; --no: #ee8a6b; --no-wash: #3a2019;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1c2940;
+  --yes: #4cc596; --yes-wash: #15302a; --no: #ee8a6b; --no-wash: #3a2019;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.eyebrow { font: 500 12px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--ink-2); font-size: 18px; }
+
+/* hlavička s ořezovými značkami */
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 22px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.head-text { display: grid; gap: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+
+/* tarif v hlavičce */
+.plan { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .plan { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.price { font: 800 44px/1 var(--font-display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.price small { display: block; font: 400 14px/1.45 var(--font-body); color: var(--ink-2); margin-top: 8px; }
+.facts { display: grid; margin: 0; }
+.facts div { display: grid; grid-template-columns: 120px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.facts dt { font: 500 12px/1.6 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 0; font-size: 15px; }
+
+section { display: grid; gap: 20px; }
+.wrap > *, section > * { min-width: 0; }
+.sec-head { display: grid; gap: 8px; }
+.note { font-size: 13px; color: var(--muted); }
+
+/* tabulky */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 680px; }
+th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+td:first-child { font-weight: 700; white-space: nowrap; }
+td .sub { display: block; font-weight: 400; font-size: 13px; color: var(--muted); white-space: normal; }
+.lim { font-variant-numeric: tabular-nums; }
+sup a { font: 500 11px var(--font-mono); text-decoration: none; padding-left: 1px; }
+
+/* štítky dostupnosti */
+.tag { display: inline-block; font: 500 11.5px/1.5 var(--font-mono); letter-spacing: .04em; text-transform: uppercase;
+  padding: 1px 7px; border-radius: 4px; white-space: nowrap; }
+.tag.yes { color: var(--yes); background: var(--yes-wash); }
+.tag.no { color: var(--no); background: var(--no-wash); }
+.tag.part { color: var(--accent); background: var(--accent-wash); }
+
+.missing { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; margin: 0; padding: 0; list-style: none; }
+@media (max-width: 760px) { .missing { grid-template-columns: 1fr; } }
+.missing li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; display: grid; gap: 2px; }
+.missing li b { font-weight: 700; }
+.missing li span { color: var(--ink-2); font-size: 14px; }
+
+.uses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .uses { grid-template-columns: 1fr; } }
+.uses p { font-size: 15px; color: var(--ink-2); }
+.verdict { font: 500 12px/1.4 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; }
+.verdict.ok { color: var(--yes); } .verdict.part { color: var(--accent); }
+
+.points { display: grid; margin: 0; padding: 0; list-style: none; }
+.points li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.points li b { font-weight: 700; }
+
+.callout { background: var(--accent-wash); border-radius: 12px; padding: 18px 20px; display: grid; gap: 8px; }
+.callout p { max-width: 80ch; }
+
+footer { color: var(--muted); font-size: 14px; display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 18px; }
+footer p { max-width: 95ch; }
+footer b { color: var(--ink-2); }
+.src { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 28px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; counter-reset: src; }
+@media (max-width: 760px) { .src { grid-template-columns: 1fr; } }
+.src li { padding: 3px 0; overflow-wrap: anywhere; scroll-margin-top: 20px; }
+.src li:target { background: var(--accent-wash); border-radius: 4px; }
+.src li::before { counter-increment: src; content: "[" counter(src) "] "; font-family: var(--font-mono); color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="head-text">
+      <div class="eyebrow">Google Workspace · nejmenší firemní tarif</div>
+      <h1>Business Starter a nástroje AI</h1>
+      <p class="lede">Co nejlevnější firemní tarif Google nabízí pro práci s e-maily a s daty firmy, kde jsou limity a co v něm chybí. Na konci je, jak se to hodí na poptávky v poště.</p>
+      <div class="meta"><span>Přečteno 1. 10. 2026 přímo u Googlu, znovu ověřeno 4. 10.</span><span>Číslo v závorce = zdroj dole</span></div>
+    </div>
+    <div class="plan">
+      <div class="card">
+        <div class="eyebrow">Business Starter</div>
+        <div class="price">6,80 €<small>za uživatele a měsíc, bez DPH, platba měsíčně. Noví zákazníci mají na ceníku slevu na první 3 měsíce; její výše se mění (1. 10. ukázal ceník 50 % a při dalším načtení 20 %). Roční závazek ušetří 16 %.<sup><a href="#z1">[1]</a></sup></small></div>
+      </div>
+      <div class="card">
+        <dl class="facts">
+          <div><dt>Pošta</dt><dd>Gmail na firemní doméně, bez reklam</dd></div>
+          <div><dt>Úložiště</dt><dd>30 GB na uživatele (Business Standard 2 TB)</dd></div>
+          <div><dt>Uživatelé</dt><dd>nejvýš 300</dd></div>
+          <div><dt>AI v ceně</dt><dd>Gemini v Gmailu, aplikace Gemini (základní přístup), Gems, Gemini Notebook (základní přístup), Workspace Studio, AI ve Vids</dd></div>
+          <div><dt>Ochrana dat</dt><dd>„Enterprise-grade security and privacy“ i u aplikace Gemini<sup><a href="#z1">[1]</a></sup></dd></div>
+        </dl>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Co Starter obsahuje</div>
+      <h2>Nástroje AI a jejich limity</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Nástroj</th><th>Ve Starteru</th><th>K čemu je</th><th>Limit ve Starteru</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Gemini v Gmailu</td>
+            <td><span class="tag yes">ano</span></td>
+            <td>napíše nebo přepíše e-mail (Help me write), zkontroluje styl (Proofread), navrhne odpovědi, shrne vlákno a navrhne odpověď, shrne výsledky hledání v poště<sup><a href="#z2">[2]</a></sup></td>
+            <td class="lim">číslem neuveden</td>
+          </tr>
+          <tr>
+            <td>Aplikace Gemini<span class="sub">chat na webu a v mobilu</span></td>
+            <td><span class="tag part">základní</span></td>
+            <td>AI asistent Googlu<sup><a href="#z1">[1]</a></sup></td>
+            <td class="lim">nejschopnější modely Googlu jen od Business Standard<sup><a href="#z1">[1]</a></sup></td>
+          </tr>
+          <tr>
+            <td>Gems</td>
+            <td><span class="tag yes">ano</span></td>
+            <td>vlastní AI expert na zvolené téma<sup><a href="#z1">[1]</a></sup></td>
+            <td class="lim">číslem neuveden</td>
+          </tr>
+          <tr>
+            <td>Gemini Notebook</td>
+            <td><span class="tag part">základní</span></td>
+            <td>AI partner pro rešerše: sešity se zdroji, dotazy nad nimi, audio shrnutí se dvěma hlasy<sup><a href="#z1">[1]</a></sup></td>
+            <td class="lim">audio shrnutí nejvýš 3 denně (Standard 20); pětkrát víc sešitů, dotazů a zdrojů jen od Standard<sup><a href="#z1">[1]</a></sup></td>
+          </tr>
+          <tr>
+            <td>Workspace Studio<span class="sub">agenti bez programování</span></td>
+            <td><span class="tag part">propagačně</span></td>
+            <td>agenti propojení s Gmailem, Diskem a Sheets; šablony například označí e-maily s úkoly štítkem nebo pošlou denní souhrn nepřečtené pošty<sup><a href="#z11">[11]</a></sup>; tok může spustit událost v Gmailu<sup><a href="#z4">[4]</a></sup></td>
+            <td class="lim">limity platí od 1. 11. 2026<sup><a href="#z3">[3]</a></sup>: nejvýš 25 toků, z nich 25 spouštěných Gmailem, 20 kroků v toku; denní počet běhů má strop, číslo Google neuvádí<sup><a href="#z4">[4]</a></sup></td>
+          </tr>
+          <tr>
+            <td>Google Vids</td>
+            <td><span class="tag yes">ano</span></td>
+            <td>videa s AI: avatary, klipy, hlas, hudba, obrázky<sup><a href="#z2">[2]</a></sup></td>
+            <td class="lim">za měsíc 10 avatarů, 200 sekund videa, 20 hudebních klipů a 10 celých skladeb, 5 obrázků Nano Banana Pro<sup><a href="#z3">[3]</a></sup></td>
+          </tr>
+          <tr>
+            <td>Sheets bez Gemini</td>
+            <td><span class="tag yes">ano</span></td>
+            <td>Smart Fill, Smart Cleanup a odpovědi pro snazší rozbor dat<sup><a href="#z1">[1]</a></sup></td>
+            <td class="lim">číslem neuveden</td>
+          </tr>
+          <tr>
+            <td>AppSheet</td>
+            <td><span class="tag yes">ano</span></td>
+            <td>stavba aplikací bez programování<sup><a href="#z1">[1]</a></sup></td>
+            <td class="lim">číslem neuveden</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Co Starter nemá</div>
+      <h2>Dostupné až od Business Standard</h2>
+    </div>
+    <ul class="missing">
+      <li><b>Gemini v Docs, Sheets, Slides, Drive, Meet a Chatu</b><span>z aplikací Workspace má Starter Gemini jen v Gmailu a AI ve Vids<sup><a href="#z1">[1]</a></sup></span></li>
+      <li><b>Funkce AI v tabulce Sheets</b><span>Standard 5 000 za měsíc, Starter nemá přístup<sup><a href="#z3">[3]</a></sup></span></li>
+      <li><b>Hledání a shrnutí souborů na Disku</b><span>Gemini v Drive, audio shrnutí PDF, třídění souborů<sup><a href="#z3">[3]</a></sup></span></li>
+      <li><b>Help me schedule</b><span>návrh termínu schůzky v Gmailu a Kalendáři<sup><a href="#z2">[2]</a></sup></span></li>
+      <li><b>Data regions</b><span>volba, kde se data Workspace ukládají (USA, Evropská unie, bez preference); nabízí Business Standard a Plus, zpracování v regionu jen Enterprise Plus<sup><a href="#z5">[5]</a></sup></span></li>
+      <li><b>Doplněk AI Expanded Access</b><span>vyšší limity AI, koupit jde jen k Standard a výš<sup><a href="#z3">[3]</a></sup></span></li>
+      <li><b>Nahrávání schůzek v Meetu</b><span>i potlačení hluku<sup><a href="#z1">[1]</a></sup></span></li>
+      <li><b>E-podpis a rezervační stránky</b><span>podpis v Docs a PDF, rezervace termínů<sup><a href="#z1">[1]</a></sup></span></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Nad daty firmy vlastním řešením</div>
+      <h2>Co jde ve Starteru naprogramovat</h2>
+      <p>Tyto cesty nestojí na funkcích AI ve Workspace: s poštou firmy pracuje vlastní program a AI volá z vlastního kódu.</p>
+    </div>
+    <ul class="points">
+      <li><b>Interní aplikace čtoucí poštu.</b> Projekt v Google Cloudu pod organizací firmy může povolit přihlášení jen lidem z firmy. Přístup k Gmailu patří mezi riziková oprávnění a může vyžadovat nastavení správcem firemního účtu<sup><a href="#z6">[6]</a></sup>.</li>
+      <li><b>Apps Script a doplněk do Gmailu.</b> Když autor i uživatelé patří do stejné domény Workspace, Google skript ověřovat nemusí<sup><a href="#z7">[7]</a></sup>. Ukázka Googlu: doplněk zobrazí v Gmailu postranní panel, ve kterém uživatel nechá Gemini přes Vertex AI rozebrat zprávy a označit je štítkem<sup><a href="#z12">[12]</a></sup>.</li>
+      <li><b>Gemini přes Vertex AI.</b> Služba Google Cloudu, data spadají pod jeho zpracovatelský dodatek (Cloud Data Processing Addendum). Google na datech nemá trénovat ani dolaďovat modely bez souhlasu zákazníka<sup><a href="#z9">[9]</a></sup>. Při volání se dá zvolit koncový bod EU a zpracování pak zůstane v Evropské unii<sup><a href="#z10">[10]</a></sup>.</li>
+      <li><b>Gemini přes klíč z AI Studia.</b> Aplikaci pro uživatele v EU smí poskytovat jen placená služba. Data z bezplatné úrovně se v EU řídí podmínkami placené služby<sup><a href="#z8">[8]</a></sup>.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Naše posouzení</div>
+      <h2>Jak se to hodí na poptávky v poště</h2>
+      <p>Úkol: z e-mailu s poptávkou tisku vytáhnout jednotné zadání (produkt, náklad, rozměr, materiál, termín) a ukázat, odkud každý údaj je.</p>
+    </div>
+    <div class="uses">
+      <div class="card">
+        <h3>Gemini v Gmailu</h3>
+        <div class="verdict part">pomůže jednotlivci</div>
+        <p>Shrne vlákno nebo výsledky hledání a navrhne odpověď. Pracuje na požádání člověka, ne sám na každý nový e-mail. Jednotný formulář zadání ani kontrolu, ze které věty které číslo vzal, mezi funkcemi nemá.</p>
+      </div>
+      <div class="card">
+        <h3>Workspace Studio</h3>
+        <div class="verdict part">ukázka pro vedení</div>
+        <p>Tok spuštěný e-mailem může pracovat s Gmailem i se Sheets. Kontrolu, že údaj v e-mailu opravdu stojí, v něm bez vlastního kódu nepostavíme. Limity platí od 1. 11. 2026 a počet běhů za den Google neuvádí.</p>
+      </div>
+      <div class="card">
+        <h3>Panel v Gmailu + vlastní služba</h3>
+        <div class="verdict ok">doporučená cesta</div>
+        <p>Panel se zadáním vedle e-mailu a za ním náš postup s kontrolou citací. Panel je od 1. 10. rozšíření do Chrome: doplněk Gmailu smí používat jen karty Googlu. Model může být Gemini přes Vertex AI s koncovým bodem EU. Na tohle Starter stačí.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <p><b>Kdy přejít na Business Standard.</b> Když mají data ve Workspace ležet jen v EU, když lidé chtějí Gemini i v Docs, Sheets a na Disku, nebo když Studiu nebudou stačit limity Starteru. Pro doporučenou cestu potřeba není.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Další čtení</div>
+      <h2>Návody, příklady použití a novinky</h2>
+    </div>
+    <h3>Návody a prompty od Googlu</h3>
+    <ul class="points">
+      <li><b><a href="https://workspace.google.com/learning/content/smb-startups-prompting-guide">SMB &amp; Startups Prompting Guide</a></b> — příručka promptů pro malé firmy a startupy</li>
+      <li><b><a href="https://workspace.google.com/intl/en/resources/ai-for-small-business/">AI Tools for Small Business</a></b> — Gemini ve Workspace pro malé firmy</li>
+      <li><b><a href="https://workspace.google.com/intl/en_ie/resources/ai/prompts-for-customer-service/">AI Prompts for Customer Service</a></b> — ukázky promptů pro zákaznickou podporu</li>
+      <li><b><a href="https://workspace.google.com/intl/en_ie/resources/ai/writing-effective-prompts/">Writing Effective AI Prompts for Business</a></b> — jak psát prompty v práci</li>
+      <li><b><a href="https://workspace.google.com/blog/ai-and-machine-learning/beyond-the-prompt-resources-gemini">Beyond the prompt</a></b> — rozcestník Googlu k začátkům s Gemini</li>
+    </ul>
+    <h3>Novinky, které platí i pro Business Starter</h3>
+    <ul class="points">
+      <li><b><a href="https://workspaceupdates.googleblog.com/2025/03/gemini-gems-deep-research-available-for-more-google-workspace-customers.html">Deep Research a Gems v aplikaci Gemini</a></b> (březen 2025) — mezi edicemi je Business Starter; dnešní limity viz tabulka výše</li>
+      <li><b><a href="https://workspaceupdates.googleblog.com/2025/05/google-workspace-apps-are-now-generally-available-for-the-gemini-app.html">Aplikace Gemini nad Gmailem, Diskem, Dokumenty, Kalendářem, Keep a Úkoly</a></b> (květen 2025) — mezi edicemi je Business Starter</li>
+      <li><b><a href="https://workspaceupdates.googleblog.com/2025/11/gemini-deep-research-integrates-workspace-content.html">Deep Research pracuje i s obsahem Workspace</a></b> (listopad 2025) — mezi edicemi je Business Starter</li>
+    </ul>
+    <h3>Pro správce</h3>
+    <ul class="points">
+      <li><b><a href="https://knowledge.workspace.google.com/admin/generative-ai/gemini-app/turn-the-gemini-app-on-or-off?hl=en">Zapnutí a vypnutí aplikace Gemini</a></b> — Business Starter ji má jako základní službu</li>
+      <li><b><a href="https://knowledge.workspace.google.com/admin/generative-ai/gemini-app/turn-google-apps-in-gemini-on-or-off?hl=en">Přístup aplikace Gemini ke službám Workspace</a></b> — ve výchozím stavu zapnutý; Gemini pak hledá i v Gmailu, na Disku a v Kalendáři</li>
+      <li><b><a href="https://support.google.com/gemininotebook/answer/16337734?hl=en">Gemini Notebook s pracovním účtem</a></b> — Business Starter ho má jako základní službu</li>
+      <li><b><a href="https://support.google.com/chrome/a/answer/16291696?hl=en">Gemini v Chrome</a></b> — práci na webu za uživatele (agent) Google uvádí až od Business Standard</li>
+    </ul>
+    <h3>Příklady z firem (Google)</h3>
+    <ul class="points">
+      <li><b><a href="https://workspace.google.com/blog/customer-stories/why-mark-cuban-cost-plus-drugs-switched-google-workspace">Cost Plus Drugs</a></b> — firma uvádí úsporu asi 5 hodin týdně na zaměstnance jen díky AI v Gmailu</li>
+      <li><b><a href="https://workspace.google.com/customers/goldbond/">Gold Bond</a></b> (reklamní předměty a tiskoviny) — 42,9 % účastníků pilotu uvedlo úsporu 1–2 hodiny denně</li>
+    </ul>
+    <p>Příběhy Business Starter nezmiňují; Starter má Gemini jen v Gmailu<sup><a href="#z1">[1]</a></sup>. Čísla jsou údaje těch firem, ne měření Googlu.</p>
+    <h3>Nezávislé články (jejich údaje jsme neověřovali)</h3>
+    <ul class="points">
+      <li><a href="https://www.eesel.ai/blog/gemini-workspace-pricing">eesel AI: Gemini ve Workspace, ceny a tarify</a></li>
+      <li><a href="https://www.layer3labs.io/guides/google-gemini-for-small-business">Layer3Labs: Google Gemini pro malé firmy</a></li>
+      <li><a href="https://www.googally.com/blog/gemini-gems">Googally: Gems, které může tým sdílet</a></li>
+      <li><a href="https://www.itgenius.com/blog/notebooklm-for-business/">IT Genius: NotebookLM ve firmě, 5 použití</a></li>
+      <li><a href="https://promevo.com/blog/notebooklm-for-businesses">Promevo: NotebookLM ve firmě</a></li>
+      <li><a href="https://skimai.com/10-enterprise-use-cases-for-google-notebooklm/">Skim AI: 10 firemních použití NotebookLM</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p><b>Ceny</b> jsou z ceníku v eurech (irská verze stránky). V jiné zemi se cena i slevy můžou lišit, konečná cena se ukáže před objednáním. U funkcí s poznámkou „číslem neuveden“ Google limit pro Starter na uvedených stránkách neuvádí.</p>
+    <p><b>Co ověřené není.</b> Limity Gemini v Gmailu, Gems, Smart Fill a AppSheet pro Starter (Google je na uvedených stránkách číslem neuvádí); denní strop běhů Workspace Studia; cena v korunách pro Českou republiku (česká verze ceníku cenu bez spuštění stránky v prohlížeči neukázala). Oddíl „Naše posouzení“ je náš úsudek, ne údaj Googlu.</p>
+    <p><b>Zdroje</b> (přečteno 1. 10. 2026)</p>
+    <ul class="src">
+      <li id="z1"><a href="https://workspace.google.com/intl/en_ie/pricing">Google Workspace: ceník a srovnání tarifů</a></li>
+      <li id="z2"><a href="https://support.google.com/mail/answer/13952129?hl=en">Gemini ve Workspace: funkce podle edice</a></li>
+      <li id="z3"><a href="https://knowledge.workspace.google.com/admin/getting-started/editions/compare-google-ai-expansion-add-ons?hl=en">Limity AI podle edice a AI Expanded Access</a></li>
+      <li id="z4"><a href="https://support.google.com/workspace-studio/answer/16765942?hl=en">Limity Workspace Studio</a></li>
+      <li id="z5"><a href="https://support.google.com/a/answer/7630496?hl=en">Data regions: podporované edice</a></li>
+      <li id="z6"><a href="https://support.google.com/cloud/answer/15549945?hl=en">Google Cloud: interní aplikace a ověření OAuth</a></li>
+      <li id="z7"><a href="https://developers.google.com/apps-script/guides/client-verification">Apps Script: kdy je potřeba ověření</a></li>
+      <li id="z8"><a href="https://ai.google.dev/gemini-api/terms">Podmínky Gemini API</a></li>
+      <li id="z9"><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance">Vertex AI: správa dat a zákaz trénování</a></li>
+      <li id="z10"><a href="https://cloud.google.com/vertex-ai/generative-ai/docs/learn/data-residency">Vertex AI: kde se data zpracují</a></li>
+      <li id="z11"><a href="https://workspaceupdates.googleblog.com/2025/12/workspace-studio.html">Workspace Updates: představení Workspace Studio</a></li>
+      <li id="z12"><a href="https://developers.google.com/workspace/add-ons/samples/gmail-sentiment-analysis-ai">Ukázka doplňku do Gmailu s Gemini a Vertex AI</a></li>
+    </ul>
+  </footer>
+</div>
+
+</body>
+</html>

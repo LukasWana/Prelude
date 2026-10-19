@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Co změní nový systém</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránek Nasazení, Stopa zakázky a Úzká hrdla (Doc/vedeni/).
+   Rozvržení: jeden sloupec; hlavní tabulka „dnes ve wall2 × nový systém“, pod ní co zůstává a co nevíme. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e4edf9;
+  --bad: #b3261e;
+  --bad-wash: #fbeceb;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d; --bad: #f07b72; --bad-wash: #3a1d1b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d; --bad: #f07b72; --bad-wash: #3a1d1b;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 17px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 72ch; }
+li { color: var(--ink-2); }
+li b, p b { color: var(--ink); }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.uvod { font-size: 18px; color: var(--ink-2); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); font-size: 18px; }
+.pozor { border-left: 3px solid var(--bad); padding-left: 14px; color: var(--ink); font-size: 18px; }
+
+.tab { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; font-variant-numeric: tabular-nums; }
+td { color: var(--ink-2); }
+th { font: 500 12px var(--font-mono); color: var(--muted); }
+td:first-child { color: var(--ink); font-weight: 600; width: 20%; }
+td.dnes { width: 30%; }
+td.dnes b { color: var(--bad); font-weight: 600; }
+.stitek { display: inline-block; font: 500 10px/1 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; padding: 4px 6px; border-radius: 3px; background: var(--accent-wash); color: var(--accent); margin-bottom: 4px; }
+@media (max-width: 640px) {
+  table.srovnani thead { display: none; }
+  table.srovnani tr { display: grid; gap: 4px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+  table.srovnani td { border: 0; padding: 0; width: auto; }
+}
+
+.dve { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .dve { grid-template-columns: 1fr; } }
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+footer { display: grid; gap: 12px; font-size: 14px; color: var(--ink-2); }
+footer code { font: 13px var(--font-mono); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · nový systém Prelude</div>
+    <h1>Co změní nový systém</h1>
+    <div class="meta"><span>Podle programového rozhraní (API) systému</span><span>ověřeno 4. 10. 2026</span><span>srovnání s daty wall2 2023–2026</span></div>
+  </header>
+
+  <p class="uvod">Co se po přechodu celé firmy na nový systém Prelude může změnit, a co zůstane jako dnes. Nový systém jsme prošli podle jeho programového rozhraní (API), protože data v něm jsou zatím jen ukázková. Rozhraní ukazuje, co systém umí uložit. Jestli to lidé budou používat, z něj poznat nejde.</p>
+
+  <p class="pozor">Samotná funkce nestačí. Starý systém měl také místo na fotky z instalace a na zprávy u zakázky. Fotku instalace má ale jen 0,5 % zakázek s montáží a pole Zprávy je prázdné ve všech zakázkách.</p>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Co systém umí</span><h2>Dnes ve wall2 a v novém systému</h2></div>
+    <div class="card">
+      <div class="tab"><table class="srovnani">
+        <thead><tr><th>Oblast</th><th>Dnes ve wall2 (data zakázek)</th><th>Nový systém</th></tr></thead>
+        <tbody>
+          <tr><td>Zadání výrobku</td><td class="dnes">Rozměr má <b>25 %</b> výrobků jen v textu popisu. Materiál nemá vyplněný <b>34 %</b> výrobků.</td><td>Produkt má šířku a výšku v milimetrech jako samostatná pole. Materiál se vybírá z číselníku ve čtyřech úrovních. Systém má šablony zakázek.</td></tr>
+          <tr><td>Fotky z montáže</td><td class="dnes">Fotku instalace má u zakázky <b>11 z 2 257</b> zakázek s montáží (0,5 %).</td><td>Fotky se ukládají k zakázce, zvlášť původní stav a instalace, a zakázka ukazuje jejich počet.</td></tr>
+          <tr><td>Montáž</td><td class="dnes">U zakázky datum instalace a montáž jako položka.</td><td>Montáž je výjezd k zakázce: termín, lidé, auta, nářadí a místo se souřadnicemi GPS. Každý vidí své výjezdy. U každého člověka se zapisují plánované a skutečné hodiny. Vedoucí výjezd uzavře podpisem svým a zákazníka a vznikne předávací protokol v PDF.</td></tr>
+          <tr><td>Faktura</td><td class="dnes">V datech zakázek faktura není.</td><td>Zálohová i konečná faktura se vystaví ze zakázky a odešle do účetního programu Pohoda. Výroba u položek zapisuje skutečné množství a vícepráce.</td></tr>
+          <tr><td>Doba a čas práce</td><td class="dnes">Nedají se změřit: chybí datum vzniku zakázky, historie stavů i datum faktury.</td><td>Zakázka má datum založení, poptávky, zaměření a instalace a historii změn s datem a jménem. Výrobní úkol má začátek, konec a dobu výroby v minutách. Faktura má datum vystavení.</td></tr>
+          <tr><td>Opravy</td><td class="dnes">Příznak opravy wall2 nemá. Oprava je zmíněná v textu u asi <b>0,7 %</b> zakázek (od roku 2021).</td><td>Když skutečné množství nesedí s plánem, systém chce důvod: technický, nebo lidský.</td></tr>
+          <tr><td>Plánování</td><td class="dnes">U zakázky termín výroby a datum instalace.</td><td>Kalendář událostí (lidé, auta, nářadí), fronta práce u výrobních technologií a dovolené.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="zaver">Největší změna: doba zakázky a čas práce půjdou poprvé změřit, pokud se budou stavy, časy a výjezdy opravdu zapisovat.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="dve">
+      <div class="card">
+        <span class="eyebrow">Co zůstane</span>
+        <h2>V rozhraní to není</h2>
+        <ul>
+          <li><b>Poptávka z e-mailu</b> se do zakázky nedostane sama. Systém poštu nečte, přepis zadání zůstává. Zadání z e-mailu umí připravit EmailRator, zapsat ho do nového systému zatím neumí. Viz <a href="nasazeni.html">Nasazení EmailRatoru</a>.</li>
+          <li><b>Schválení od zákazníka.</b> Nabídku jde poslat kontaktům e-mailem, ale stav „schváleno“ nemá. Schválení náhledu nebo rozpočtu zůstane v poště.</li>
+          <li><b>Zprávy zákazníkům.</b> SMS, upozornění v mobilu ani připomínky zákazníkům v rozhraní nejsou. Upozornění jsou jen pro uživatele uvnitř systému.</li>
+          <li><b>Komunikace s klientem</b> u zakázky neleží. Zakázka má jen poznámku.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Co nevíme</span>
+        <h2>Neověřené</h2>
+        <ul>
+          <li>Jestli lidé budou fotky, hodiny a stavy zapisovat. Ve wall2 se to nedělalo.</li>
+          <li>Jestli budou rozměr a materiál povinné. Rozhraní ukládá položky zakázky jako volnou strukturu, takže povinná pole z něj vyčíst nejde.</li>
+          <li>Jak se pracuje v mobilu. Montáže mají ve webové aplikaci vlastní stránku, samostatnou mobilní aplikaci jsme nenašli. V mobilu jsme ji nezkoušeli.</li>
+          <li>Jestli konečná faktura bere plánované, nebo skutečné množství. Rozhraní říká jen, že vznikne ze všech položek zakázky a odečte zálohy.</li>
+          <li>Jestli začátek a konec výrobního úkolu musí člověk naklikat, nebo se doplní samy.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Doporučení</span><h2>Jak zajistit, aby se zapisovalo</h2>
+      <p>Zápis musí být podmínkou dalšího kroku, ne práce navíc. Co lidé zapsat nemusí, to v datech nejspíš chybět bude. Ve wall2 to tak bylo.</p></div>
+    <div class="card">
+      <h3>Co systém vynucuje sám</h3>
+      <ul id="vynucuje">
+        <li>Výjezd uzavře jen vedoucí, a to podpisem svým a zákazníka. Teprve tím vznikne předávací protokol. Když jsou uzavřené všechny výjezdy, systém sám dokončí instalaci u zakázky.</li>
+        <li>Dokončení produktu na kartě Dokončení odemkne návaznou dopravu a instalaci. Zapisovat do ní smí jen pracoviště typu Dokončení.</li>
+        <li>Když skutečné množství nesedí s plánem, systém chce důvod: technický, nebo lidský.</li>
+        <li>Skutečné hodiny lidí na výjezdu zapisuje jen vedoucí výjezdu.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Co musí vyřešit firemní pravidlo</h3>
+      <ul>
+        <li><b>Fotka z montáže.</b> Rozhraní systému k uzavření výjezdu fotku nechce. Pravidlo: bez fotky instalace se výjezd neuzavírá.</li>
+        <li><b>Hodiny na montáži.</b> Vedoucí zapíše skutečné hodiny všech, než výjezd uzavře.</li>
+        <li><b>Datum poptávky.</b> Zakázka má pole pro datum poptávky a dá se vyplnit už při založení. Od něj se dá měřit doba zakázky. Pravidlo: vyplnit ho vždy, nebo zakázku zakládat hned při poptávce. EmailRator by ho mohl vyplnit z data e-mailu, až bude umět zakázku do systému zapsat.</li>
+        <li><b>Faktura až po dokončení.</b> Jestli systém konečnou fakturu bez dokončených položek nepustí, nevíme. Pokud ji pustí, musí to hlídat pravidlo.</li>
+        <li><b>Rozměr a materiál v polích</b>, ne v poznámce.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Jak to hlídat</h3>
+      <ul>
+        <li>Týdenní přehled úplnosti z dat systému: výjezdy neuzavřené, bez fotky nebo bez hodin, výrobní úkoly bez začátku či konce, zakázky bez data poptávky. Data k tomu rozhraní systému nabízí, číst je jde po přihlášení.</li>
+        <li>Přehled slouží k nalezení míst, kde zápis vázne, ne k hodnocení lidí.</li>
+        <li>Začít pilotem se třemi produkčními, kteří vyřizují 77 % zakázek, a s jedním montážním týmem. První měsíc sledovat jen úplnost zápisu a teprve potom z dat počítat dobu zakázky a čas práce.</li>
+      </ul>
+      <p>Doporučení vychází ze srovnání výše a zatím ho nikdo nezkoušel.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Tým</span><h2>Jak získat tým pro nový zápis</h2>
+      <p>Pravidla nestačí, když je lidé nepřijmou. Ve wall2 se léta vyplňovalo jen něco.</p></div>
+    <div class="card">
+      <h3>Co se ve wall2 vyplňovalo (2023–2026)</h3>
+      <ul id="vyplnovalo">
+        <li>Termín výroby má <b>93 %</b> zakázek.</li>
+        <li>Poznámku má <b>54 %</b> položek.</li>
+        <li>Fotku instalace má <b>0,5 %</b> zakázek s montáží.</li>
+        <li>Pole Zprávy je prázdné ve všech zakázkách.</li>
+      </ul>
+      <p>Náš výklad, ne zjištění: lidé vyplňovali, co hned potřeboval další člověk v řadě. Termín řídí výrobu, poznámka nese pokyn. Pole, která sloužila jen pro přehled, zůstala prázdná. Proč to tak bylo, vědí jen produkční.</p>
+    </div>
+    <div class="card">
+      <h3>Možnosti práce s týmem</h3>
+      <p>Jsou to obecně osvědčené postupy. Ve firmě je zatím nikdo nezkoušel.</p>
+      <ul>
+        <li><b>Zeptat se, proč se to dřív nedělalo.</b> Krátké otázky produkčním a montérům: proč nenahrávali fotky do wall2 a co by jim zápis usnadnilo. Odpovědi ukážou, co doopravdy brání.</li>
+        <li><b>Ukázat užitek pro ně samotné.</b> Montér má předávací protokol s podpisem zákazníka, který dokládá, v jakém stavu práci předal. Produkční má fotky a hodiny u zakázky a nemusí je na konci shánět z více míst. Doba zakázky v číslech je podklad pro plánování a pro rozhodnutí o lidech.</li>
+        <li><b>Málo věcí najednou.</b> Začít třemi: fotka z montáže, hodiny na výjezdu, datum poptávky. Další přidat, až se tyhle ujmou.</li>
+        <li><b>Zápis co nejlehčí a tam, kde práce probíhá:</b> v mobilu na montáži, na tabletu u stroje. Co jde, předvyplnit, třeba šablonou nebo zadáním z EmailRatoru.</li>
+        <li><b>Jasně, kdo co a kdy zapisuje.</b> Jedna stránka s rozdělením a jeden člověk v týmu, za kterým se chodí s dotazy.</li>
+        <li><b>Zrušit starou cestu.</b> Od určitého dne wall2 jen pro čtení a žádné souběžné tabulky ani papíry. Jinak se zapisuje dvakrát, nebo vůbec.</li>
+        <li><b>Vedení jde příkladem.</b> Porady nad daty ze systému: co v systému není, o tom se nejedná.</li>
+        <li><b>Týdenní přehled úplnosti pro celý tým.</b> Hledat, kde zápis vázne, a odstraňovat překážky, ne viníky.</li>
+        <li><b>Začít s těmi, kdo mají nejvíc zakázek.</b> Když systém přijmou tři produkční se 77 % zakázek, poteče většina dat. Mohou pak pomáhat ostatním.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <details>
+      <summary>Jak jsme to ověřovali</summary>
+      <div>
+        <p>Tvrzení o novém systému pocházejí z popisu jeho programového rozhraní (schéma GraphQL), staženého 25. 9. a porovnaného s živým 4. 10. 2026 bez rozdílu (<code>Doc/ref/prelude-graphql/schema.graphql</code>). Stránky webové aplikace (Instalace, Výroba, Dokončení, Kalendář) jsou z jejího kódu. Data v systému jsou ukázková, proto z nich nic nepočítáme. Do systému jsme nic nezapisovali.</p>
+        <p>Čísla o wall2 počítá <code>scripts/overeni_uzkych_hrdel.py</code> ze stejných dat jako stránka <a href="uzka-hrdla.html">Úzká hrdla zakázek</a>. Opravy, poznámky a materiál jsou z rozboru <code>Doc/analyza-zakazek.md</code>. Stránku porovnává se zdroji <code>scripts/novy_system_kontrola.py</code>.</p>
+      </div>
+    </details>
+  </footer>
+</div>
+
+</body>
+</html>

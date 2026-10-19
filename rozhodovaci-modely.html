@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Rozhodovací modely</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Výběr modelu převodu (Doc/vedeni/vyber-modelu.html): hlavička s ořezovými značkami, karty, pruhy.
+   Každé číslo má zdroj [n]; scripts/rozhodovaci_modely_kontrola.py ho hledá v textu zdroje a na stránce. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eef9;
+  --ok: #1f7a4d;
+  --ok-wash: #e7f4ec;
+  --bad: #b3261e;
+  --bad-wash: #fbeceb;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1a2638; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1a2638; --ok: #5cc493; --ok-wash: #15281f; --bad: #f07b72; --bad-wash: #3a1d1b;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+a.z { font: 500 12px var(--font-mono); text-decoration: none; vertical-align: 1px; }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.meta .pozor { color: var(--bad); }
+.teze { font-size: 20px; line-height: 1.45; max-width: 64ch; color: var(--ink-2); }
+.teze b { color: var(--ink); font-weight: 600; }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.sec-head > p { color: var(--ink-2); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.card b { color: var(--ink); font-weight: 600; }
+.dvoje { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .dvoje { grid-template-columns: 1fr; } }
+
+.kroky { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: k; }
+.kroky li { counter-increment: k; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; align-items: start; }
+.kroky li::before { content: counter(k); font: 800 22px/1.2 var(--font-display); color: var(--accent); text-align: right; }
+.kroky li p { color: var(--ink-2); }
+.kroky li b { color: var(--ink); font-weight: 600; }
+
+.pruhy { display: grid; gap: 10px; }
+.pruh { display: grid; grid-template-columns: minmax(130px, 200px) minmax(0, 1fr) 84px; gap: 12px; align-items: center; }
+.pruh .jm { display: grid; gap: 2px; min-width: 0; }
+.pruh .jm b { font-weight: 600; overflow-wrap: anywhere; }
+.pruh .jm small { font: 12px var(--font-mono); color: var(--muted); }
+.pruh .dr { height: 22px; background: var(--lane); border-radius: 4px; position: relative; overflow: hidden; }
+.pruh .dr i { position: absolute; inset: 0 auto 0 0; background: var(--axis); border-radius: 4px; }
+.pruh.jev .dr i { background: var(--accent); }
+.pruh.otevreny .dr i { background: var(--ok); }
+.pruh .hod { font: 800 24px/1 var(--font-display); white-space: nowrap; font-stretch: 80%; text-align: right; font-variant-numeric: tabular-nums; }
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--ink-2); }
+.legenda span { display: inline-flex; align-items: center; gap: 8px; }
+.legenda i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+@media (max-width: 640px) {
+  .pruh { grid-template-columns: minmax(0, 1fr) 76px; }
+  .pruh .jm { grid-column: 1 / -1; }
+}
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+th { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
+td:first-child { color: var(--ink); font-weight: 600; }
+td.ano { color: var(--ok); font-weight: 600; }
+td.ne { color: var(--bad); font-weight: 600; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--ink-2); }
+ul b { color: var(--ink); font-weight: 600; }
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+.pozn { font-size: 14px; color: var(--muted); }
+ol.zdroje { margin: 0; padding-left: 26px; display: grid; gap: 4px; font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
+ol.zdroje li:target { background: var(--accent-wash); }
+
+/* Záložky: bez JavaScriptu jsou vidět všechny panely pod sebou; skript skryje neaktivní a pamatuje si záložku v #adrese. */
+.zalozky { display: flex; flex-wrap: wrap; gap: 4px 2px; border-bottom: 1px solid var(--line); margin-top: -20px; }
+.zalozky button { font: 500 13px/1 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); background: none; border: 0;
+  border-bottom: 2px solid transparent; padding: 12px 12px 10px; cursor: pointer; margin-bottom: -1px; }
+.zalozky button:hover { color: var(--ink); }
+.zalozky button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.zalozky button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.panel { display: grid; gap: 44px; }
+[hidden] { display: none !important; }   /* i při otevření souboru mimo prohlížeč artefaktů (.panel a .zalozky mají vlastní display) */
+.stav { display: inline-block; font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+  padding: 4px 7px; border-radius: 4px; background: var(--lane); color: var(--ink-2); white-space: nowrap; vertical-align: 2px; }
+.stav.ok { background: var(--ok-wash); color: var(--ok); }
+.stav.ne { background: var(--bad-wash); color: var(--bad); }
+.stav.ted { background: var(--accent-wash); color: var(--accent); }
+.osa { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.osa li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.osa li:first-child { border-top: 0; }
+.osa .krok { font: 800 20px/1.2 var(--font-display); font-stretch: 80%; color: var(--ink); }
+.osa li > div { display: grid; gap: 6px; }
+.osa p { color: var(--ink-2); }
+.doklad { font: 500 11px/1 var(--font-mono); padding: 3px 5px; border-radius: 3px; border: 1px solid var(--line); color: var(--muted); }
+.doklad.d { color: var(--ok); border-color: var(--ok); }
+@media (max-width: 520px) { .osa li { grid-template-columns: 1fr; gap: 6px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · rešerše</div>
+    <h1>Rozhodovací modely</h1>
+    <div class="meta"><span>Stav k 11. 10. 2026</span><span>Čísla přečtená přímo u zdrojů</span><span class="pozor">Přesnosti uvádějí většinou sami autoři</span></div>
+    <p class="teze">EmailRator dnes pozná, jestli je vlákno tisková poptávka, pomocí modelu <b>Jev</b> od TypeSafe přes OpenRouter. Takový <b>rozhodovací model</b> nepíše text: dostane e-mail a otázky (ano/ne, výběr z možností, stupnice) a vrátí pravděpodobnost každé odpovědi. Na Ollamě je dnes ke stažení pět modelů stejného typu, které poběží i na vlastním počítači. Stránka shrnuje, jak jsou velké, jak přesné a jestli je jde dotrénovat na našich e-mailech. Záložky Náš projekt, Příprava dat a Plán čištění popisují náš vlastní pokus a doplňují se průběžně.</p>
+  </header>
+
+  <nav class="zalozky" role="tablist" aria-label="Části stránky" hidden>
+    <button type="button" role="tab" id="t-shrnuti" aria-controls="p-shrnuti">Shrnutí</button>
+    <button type="button" role="tab" id="t-modely" aria-controls="p-modely">Modely</button>
+    <button type="button" role="tab" id="t-projekt" aria-controls="p-projekt">Náš projekt</button>
+    <button type="button" role="tab" id="t-data" aria-controls="p-data">Příprava dat</button>
+    <button type="button" role="tab" id="t-cisteni" aria-controls="p-cisteni">Plán čištění</button>
+    <button type="button" role="tab" id="t-cestina" aria-controls="p-cestina">Model pro češtinu</button>
+  </nav>
+
+  <div class="panel" id="p-shrnuti" role="tabpanel" aria-labelledby="t-shrnuti">
+  <section id="zavery">
+    <div class="sec-head">
+      <div class="eyebrow">Shrnutí</div>
+      <h2>Co z toho plyne</h2>
+    </div>
+    <div class="card">
+      <ol class="kroky">
+        <li><p><b>Jev zatím zůstává.</b> Náš vlastní pokus: malý model Qwen3.5-0.8B dotrénovaný na 287 hodnocených vláknech dosáhl na 273 společných vláknech AUC 0,948 proti 0,975 u Jevu a ve 19 jistých odpovědech se spletl; Jev v žádné <a class="z" href="#z21">[21]</a>.</p></li>
+        <li><p><b>Přesnost se dá postavit rozdělením otázky.</b> Ve veřejném opakovatelném testu na 2 000 phishingových e-mailech měl Jev s jednou otázkou 62,6 %. Když se otázka rozdělila na pět úzkých a jejich váhy se naučily na 1 000 označených e-mailech, dosáhl 95,0 %. Claude Haiku 4.5 měl stejným postupem 93,2 % a dvouřádkový regulární výraz 91,8 % <a class="z" href="#z17">[17]</a>.</p></li>
+        <li><p><b>Na vlastní grafické kartě 12 GB jde dotrénovat jen malé modely:</b> Qwen3.5 do velikosti 2B (náš trénink 2B potřeboval 11 GB) nebo laya. Modely 9B a větší jde na takové kartě nanejvýš spouštět <a class="z" href="#z15">[15]</a> <a class="z" href="#z16">[16]</a> <a class="z" href="#z21">[21]</a>.</p></li>
+        <li><p><b>Hotový model na české tiskové poptávky jsme nenašli.</b> E-mailové modely v oddílu níže řeší spam, phishing nebo obecné třídění; češtinu žádný z nich neuvádí a laya umí jen anglicky.</p></li>
+        <li><p><b>Další krok je vyčistit vstup, ne zvětšit model.</b> Při tréninku model vidí jen prvních 4 096 tokenů vlákna, při vyhodnocení až 16 384. Polovinu vstupu tvoří citované kopie starších zpráv a chyby se kupí právě v konverzacích s citací. Postup je v záložce Plán čištění <a class="z" href="#z22">[22]</a> <a class="z" href="#z23">[23]</a>.</p></li>
+        <li><p><b>Pro češtinu je nejslibnější vyzkoušet malý vícejazyčný enkodér mmBERT.</b> Unsloth ho umí dotrénovat stejným postupem, pojme až 8 192 tokenů a na procesoru je výrazně levnější než Qwen. České výsledky zatím nikdo nezměřil, proto až po čištění a na stejných datech (záložka Model pro češtinu) <a class="z" href="#z24">[24]</a>.</p></li>
+      </ol>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" id="p-modely" role="tabpanel" aria-labelledby="t-modely">
+  <section id="modely">
+    <div class="sec-head">
+      <div class="eyebrow">Přehled</div>
+      <h2>Které modely existují</h2>
+      <p>Filtr Ollamy „Decision“ ukazuje pět modelů <a class="z" href="#z1">[1]</a>. Všechny kromě layi vznikly dotrénováním jazykových modelů Qwen. Velikost souboru je místo na disku pro danou přesnost vah (4bit, 8bit, plná).</p>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table id="modely-t">
+        <thead><tr><th>Model</th><th>Autor a základ</th><th>Parametrů</th><th>Soubor</th><th>Délka vstupu</th><th>Licence</th><th>Dotrénovat</th></tr></thead>
+        <tbody>
+          <tr><td>tev1 4B</td><td>Together AI, Qwen3.5-4B <a class="z" href="#z2">[2]</a></td><td>4 mld.</td><td>2,7 GB (4bit), 4,5 GB (8bit), 8,4 GB (plná) <a class="z" href="#z3">[3]</a></td><td>asi 2 000 tokenů</td><td>skripty a data MIT, váhy neuvedeno</td><td class="ano">ano, otevřené skripty i data <a class="z" href="#z4">[4]</a></td></tr>
+          <tr><td>tev1 0.8B</td><td>Together AI, Qwen3.5-0.8B <a class="z" href="#z2">[2]</a></td><td>0,8 mld.</td><td>812 MB (8bit), 1,5 GB (plná) <a class="z" href="#z3">[3]</a></td><td>asi 2 000 tokenů</td><td>jako 4B</td><td class="ano">ano <a class="z" href="#z4">[4]</a></td></tr>
+          <tr><td>nimble</td><td>Bespoke Labs, Qwen3.5-9B <a class="z" href="#z5">[5]</a></td><td>9 mld.</td><td>5,6 GB (4bit), 9,5 GB (8bit), 18 GB (plná) <a class="z" href="#z6">[6]</a></td><td>8 192 tokenů</td><td>Apache 2.0</td><td>je to doplněk k Qwenu (asi 165 MiB), návod nemá <a class="z" href="#z7">[7]</a></td></tr>
+          <tr><td>clef-flash</td><td>Cloudflare, Qwen3.5-9B <a class="z" href="#z10">[10]</a></td><td>9 mld.</td><td>11 GB (8bit) <a class="z" href="#z11">[11]</a></td><td>64K tokenů</td><td>Apache 2.0</td><td class="ano">podle Unsloth ano <a class="z" href="#z15">[15]</a></td></tr>
+          <tr><td>clef</td><td>Cloudflare, Qwen3.8-27B <a class="z" href="#z8">[8]</a></td><td>27 mld.</td><td>18 GB (4bit), 30 GB (8bit) <a class="z" href="#z9">[9]</a></td><td>64K tokenů</td><td>Apache 2.0</td><td class="ano">podle Unsloth ano <a class="z" href="#z15">[15]</a></td></tr>
+          <tr><td>laya</td><td>Convai Innovations, ModernBERT-large <a class="z" href="#z1">[1]</a></td><td>421 mil.</td><td>846 MB <a class="z" href="#z13">[13]</a></td><td>512 tokenů na otázku, jen angličtina <a class="z" href="#z12">[12]</a></td><td>Apache 2.0</td><td class="ano">ano, sešit pro Kaggle zdarma <a class="z" href="#z14">[14]</a></td></tr>
+          <tr><td>laya-multilingual</td><td>Convai Innovations, mmBERT-base <a class="z" href="#z12">[12]</a></td><td>322 mil.</td><td>678 MB, na Ollamě jen pro Mac (MLX) <a class="z" href="#z13">[13]</a></td><td>1 024 tokenů, s nastavením až 8 192 <a class="z" href="#z14">[14]</a></td><td>Apache 2.0 <a class="z" href="#z14">[14]</a></td><td class="ano">ano <a class="z" href="#z14">[14]</a></td></tr>
+          <tr><td>Jev 1.13</td><td>TypeSafe, přes OpenRouter (dnes v EmailRatoru)</td><td>neuvedeno</td><td>jen přes API</td><td>neuvedeno</td><td>placená služba</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+      <details>
+        <summary>Na jakých datech se modely učily</summary>
+        <div>
+          <ul>
+            <li><b>tev1 4B:</b> 37 840 příkladů převedených do tvaru „text, otázka, možnosti“: MultiNLI 5 000, BoolQ 3 000, Banking77 3 000, AG News 1 500, SST-5 2 000, uměle vytvořená pravidla 13 500, směrování podle priorit 6 000 a taxonomie výzkumu <a class="z" href="#z2">[2]</a>. Recept: LoRA s hodností 8 na službě Together <a class="z" href="#z4">[4]</a>.</li>
+            <li><b>nimble:</b> kontrastní páry. Dva příklady se liší jedním faktem a ten otočí správnou odpověď <a class="z" href="#z5">[5]</a>.</li>
+            <li><b>laya:</b> skutečná data označená lidmi, mezi nimi třídění e-mailů (spam, phishing a směrování na oddělení); umělá data podle autorů nepoužili <a class="z" href="#z12">[12]</a>.</li>
+            <li><b>Unsloth (návod na vlastní rozhodovací model):</b> směs 12 veřejných sad a sady typed-decisions, LoRA s hodností 64, jedna epocha <a class="z" href="#z15">[15]</a>.</li>
+            <li><b>Jev:</b> data nezveřejnili. Na čtyřech interních sadách, kde správné odpovědi určily velké jazykové modely, dosáhl 67 % <a class="z" href="#z18">[18]</a>.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="presnost">
+    <div class="sec-head">
+      <div class="eyebrow">Přesnost</div>
+      <h2>Jak přesně rozhodují</h2>
+      <p>Každý graf je jiný test, čísla mezi grafy nejde porovnávat. Délka pruhu je přesnost v procentech (u clefu F1 nebo přesnost podle testu).</p>
+      <div class="legenda">
+        <span><i style="background: var(--accent)"></i>Jev (dnes v EmailRatoru)</span>
+        <span><i style="background: var(--ok)"></i>otevřený model</span>
+        <span><i style="background: var(--axis)"></i>jiný postup pro srovnání</span>
+      </div>
+    </div>
+    <div class="dvoje">
+      <div class="card">
+        <h3>13 veřejných sad, 3 880 rozhodnutí</h3>
+        <p class="pozn">Sady s lidskými štítky od Bespoke Labs, měřeno na Ollamě <a class="z" href="#z2">[2]</a>.</p>
+        <div class="pruhy">
+          <div class="pruh jev"><div class="jm"><b>Jev 1.13</b><small>TypeSafe</small></div><div class="dr"><i style="width: 76%"></i></div><div class="hod">76,0 %</div></div>
+          <div class="pruh otevreny"><div class="jm"><b>nimble 9B</b><small>Bespoke Labs</small></div><div class="dr"><i style="width: 75.7%"></i></div><div class="hod">75,7 %</div></div>
+          <div class="pruh otevreny"><div class="jm"><b>tev1 4B</b><small>Together AI</small></div><div class="dr"><i style="width: 73.3%"></i></div><div class="hod">73,3 %</div></div>
+          <div class="pruh otevreny"><div class="jm"><b>tev1 0.8B</b><small>Together AI</small></div><div class="dr"><i style="width: 63.5%"></i></div><div class="hod">63,5 %</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Phishing, 2 000 e-mailů (opakovatelný test)</h3>
+        <p class="pozn">Jedna otázka proti pěti úzkým otázkám s vahami naučenými na 1 000 e-mailech <a class="z" href="#z17">[17]</a>.</p>
+        <div class="pruhy">
+          <div class="pruh jev"><div class="jm"><b>Jev, 5 otázek</b><small>TypeSafe</small></div><div class="dr"><i style="width: 95%"></i></div><div class="hod">95,0 %</div></div>
+          <div class="pruh"><div class="jm"><b>Haiku 4.5, 5 otázek</b><small>Anthropic</small></div><div class="dr"><i style="width: 93.2%"></i></div><div class="hod">93,2 %</div></div>
+          <div class="pruh"><div class="jm"><b>Regulární výraz</b><small>dva řádky</small></div><div class="dr"><i style="width: 91.8%"></i></div><div class="hod">91,8 %</div></div>
+          <div class="pruh"><div class="jm"><b>Haiku 4.5, 1 otázka</b><small>Anthropic</small></div><div class="dr"><i style="width: 81.3%"></i></div><div class="hod">81,3 %</div></div>
+          <div class="pruh jev"><div class="jm"><b>Jev, 1 otázka</b><small>TypeSafe</small></div><div class="dr"><i style="width: 62.6%"></i></div><div class="hod">62,6 %</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Phishing PhishNChips (údaj Cloudflare)</h3>
+        <p class="pozn">Tabulka na stránce modelu clef <a class="z" href="#z8">[8]</a>.</p>
+        <div class="pruhy">
+          <div class="pruh otevreny"><div class="jm"><b>clef</b><small>27B</small></div><div class="dr"><i style="width: 79.6%"></i></div><div class="hod">79,6 %</div></div>
+          <div class="pruh otevreny"><div class="jm"><b>clef-flash</b><small>9B</small></div><div class="dr"><i style="width: 75%"></i></div><div class="hod">75,0 %</div></div>
+          <div class="pruh jev"><div class="jm"><b>Jev</b><small>TypeSafe</small></div><div class="dr"><i style="width: 62.5%"></i></div><div class="hod">62,5 %</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Naše poptávky, 273 vláken (náš pokus)</h3>
+        <p class="pozn">AUC × 100: jak dobře model řadí poptávky před ostatní vlákna <a class="z" href="#z21">[21]</a>.</p>
+        <div class="pruhy">
+          <div class="pruh jev"><div class="jm"><b>Jev</b><small>TypeSafe</small></div><div class="dr"><i style="width: 97.5%"></i></div><div class="hod">97,5</div></div>
+          <div class="pruh otevreny"><div class="jm"><b>Qwen3.5-0.8B</b><small>dotrénovaný u nás</small></div><div class="dr"><i style="width: 94.8%"></i></div><div class="hod">94,8</div></div>
+        </div>
+      </div>
+    </div>
+    <details>
+      <summary>Další čísla od autorů modelů</summary>
+      <div>
+        <ul>
+          <li><b>laya:</b> třídění e-mailů a phishing 73,2 %, průměr úloh, na kterých se učila, 83,8 %, úplně nové úlohy 65,1 % <a class="z" href="#z12">[12]</a>. Po dotrénování na typed-decisions 0,766 proti 0,362 bez něj <a class="z" href="#z14">[14]</a>.</li>
+          <li><b>nimble</b> na vlastní odložené sadě Bespoke Labs: 90,12 % (Jev 93,21 %) <a class="z" href="#z5">[5]</a>.</li>
+          <li><b>clef / clef-flash / Jev:</b> BANKING77 (F1) 94,2 / 90,9 / 79,7; CLINC150 (F1) 97,4 / 66,8 / 89,3; medián odezvy 209,3 / 38,8 / 524,1 ms <a class="z" href="#z8">[8]</a>.</li>
+          <li><b>tev1 4B</b> na vlastní vývojové sadě: 88,0 % (880 z 1 000); autoři upozorňují, že to není nezávislý test <a class="z" href="#z2">[2]</a>.</li>
+          <li><b>Kalibrace Jevu:</b> v jiném testu na 900 uměle vytvořených tiketech chyba kalibrace (ECE) 0,107. Autor doporučuje kalibrovat každou otázku zvlášť a ke každému výběru přidat možnost „nic z toho“ <a class="z" href="#z17">[17]</a>.</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <section id="trenink">
+    <div class="sec-head">
+      <div class="eyebrow">Trénink</div>
+      <h2>Co se dá dotrénovat na vlastní kartě</h2>
+      <p>Paměť grafické karty potřebná k dotrénování (LoRA). Naše karta je RTX 5070 s 12 GB <a class="z" href="#z21">[21]</a>. Přesnost je z návodu Unsloth na testu 3 000 otázek (2 000 z typed-decisions, 500 z BANKING77, 500 z CLINC150) <a class="z" href="#z15">[15]</a>.</p>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table id="trenink-t">
+        <thead><tr><th>Model</th><th>Paměť: návod Unsloth</th><th>Paměť: obecná tabulka Unsloth</th><th>Čas a přesnost (Unsloth)</th><th>Náš trénink</th><th>Karta 12 GB</th></tr></thead>
+        <tbody>
+          <tr><td>laya</td><td>2,5 GB</td><td>—</td><td>10 min, 77 %</td><td>—</td><td class="ano">ano</td></tr>
+          <tr><td>Qwen3.5-0.8B (základ tev1 0.8B)</td><td>4 GB</td><td>3 GB</td><td>42 min, 78 %</td><td>špička 7,191 GB</td><td class="ano">ano</td></tr>
+          <tr><td>Qwen3.5-2B</td><td>8 GB</td><td>5 GB</td><td>40 min, 81 %</td><td>11 GB</td><td class="ano">ano, těsně</td></tr>
+          <tr><td>Llama 3.2 3B</td><td>4,1 GB</td><td>—</td><td>30 min, 79 %</td><td>—</td><td class="ano">ano</td></tr>
+          <tr><td>Qwen3.5-4B (základ tev1 4B)</td><td>neuvedeno</td><td>10 GB</td><td>76 % za 10 min (krátký běh na L4)</td><td>—</td><td>na hraně</td></tr>
+          <tr><td>Gemma 4 E4B</td><td>14,4 GB</td><td>—</td><td>49 min, 77 %</td><td>—</td><td class="ne">ne</td></tr>
+          <tr><td>Qwen3.5-9B (základ nimble a clef-flash)</td><td>—</td><td>22 GB</td><td>—</td><td>—</td><td class="ne">ne</td></tr>
+          <tr><td>Qwen3.5-27B (clef stojí na Qwen3.8-27B)</td><td>—</td><td>56 GB</td><td>—</td><td>—</td><td class="ne">ne</td></tr>
+        </tbody>
+      </table></div>
+      <p class="pozn">Obecná tabulka Unsloth platí pro LoRA v plné přesnosti; 4bitový trénink modelů Qwen3.5 Unsloth nedoporučuje <a class="z" href="#z16">[16]</a>. Jeho návod na rozhodovací modely přesto načítá model 4bitově <a class="z" href="#z15">[15]</a>. Náš trénink: vstup do 4 096 tokenů, při vyhodnocení se 2B do 12 GB nevešel u dlouhých vláken.</p>
+    </div>
+  </section>
+
+  <section id="emaily">
+    <div class="sec-head">
+      <div class="eyebrow">Hotové modely</div>
+      <h2>Modely trénované na e-mailech</h2>
+    </div>
+    <div class="card">
+      <ul>
+        <li><b>laya</b> je dotrénovaná mimo jiné na třídění e-mailů (spam, phishing, oddělení), jen anglicky <a class="z" href="#z12">[12]</a>.</li>
+        <li><b>email-safety-triage (Qwen3.5-2B):</b> vrací JSON s tříděním, prioritou a rizikem. Učil se na 8 000 e-mailech ze sady email-safety-triage-10k; na testu stoupl průměr z 0,537 na 0,862 a podíl úspěšných odpovědí z 61,5 % na 89,0 %. Licence „other“ <a class="z" href="#z19">[19]</a>.</li>
+        <li><b>email-triage-lora (Llama 3.2 3B):</b> volí mezi předáním člověku, automatickou odpovědí a doplňujícím dotazem. Na 21 e-mailech 71,4 %, jednoduchá pravidla 76,2 % <a class="z" href="#z20">[20]</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="neovereno">
+    <div class="sec-head">
+      <div class="eyebrow">Co ověřené není</div>
+      <h2>Co zatím nevíme</h2>
+    </div>
+    <div class="card">
+      <ul>
+        <li>Nezávislé srovnání všech těchto modelů na stejných datech neexistuje; většinu přesností měřili autoři modelů.</li>
+        <li>Jestli laya-multilingual rozumí češtině. Autoři uvádějí přes 100 jazyků, seznam jsme nečetli.</li>
+        <li>Pod jakou licencí jsou váhy tev1. Stránka modelu uvádí licenci jen u skriptů a dat.</li>
+        <li>Kolik paměti potřebuje spuštění modelu s dlouhým e-mailem. Uvádíme jen velikost souboru; dlouhý vstup chce paměti víc.</li>
+        <li>Ohlasy uživatelů: diskuse se skutečnými zkušenostmi jsme nenašli, jen články a stránky autorů.</li>
+      </ul>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" id="p-projekt" role="tabpanel" aria-labelledby="t-projekt">
+  <section id="projekt">
+    <div class="sec-head">
+      <div class="eyebrow">Náš projekt</div>
+      <h2>Jak postupuje vlastní model</h2>
+      <p>Cíl je lokální model, který odpoví na otázku „je vlákno tisková poptávka?“ místo Jevu nebo jako jeho druhý hlas. O peníze nejde: Jev stál 0,054 $ za 770 vláken. Jde o nezávislost na OpenRouteru, o to, aby text e-mailů neodcházel z našich počítačů, a o model, který se dá doučovat <a class="z" href="#z21">[21]</a>.</p>
+    </div>
+    <div class="card">
+      <ol class="osa">
+        <li><span class="krok">S0</span><div><p><span class="stav ok">hotovo</span></p><p><b>Sonda proveditelnosti.</b> Dotrénovaný model jde provozovat i na procesoru bez Unsloth (llama.cpp). Domácí server zpracuje vlákno o 9 300 tokenech za 352 s, takže délka vstupu je i provozní otázka <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">S1</span><div><p><span class="stav ok">hotovo</span></p><p><b>Data a srovnávací laťky.</b> 136 lidsky označených vláken, pět skupin podle odesílatele a časový běh: trénink na starších 80 %, test na nejnovějších 20 %. Testovací vlákna do tréninku nepatří <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">S2</span><div><p><span class="stav ne">brána neprošla</span></p><p><b>První trénink Qwen3.5-0.8B a 2B</b> na kartě 12 GB. Model 2B dosáhl AUC 0,950, Jev 0,989. Jev zůstal <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">S2c</span><div><p><span class="stav ok">hotovo</span></p><p><b>Delší okno 8 192 tokenů</b> se do 12 GB nevejde (přetéká do sdílené paměti) a 31 ze 102 vláken by zůstalo uříznutých <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">S3a</span><div><p><span class="stav ok">brána prošla</span></p><p><b>Velký model glm jako druhý učitel</b> (Ollama cloud): na 136 vláknech AUC 0,997 a žádná jistá chyba <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">S3b–d</span><div><p><span class="stav ok">hotovo</span></p><p><b>Víc štítků.</b> glm a Jev navrhly štítky, sporná a kontrolní vlákna rozhodl člověk: 162 vláken <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">S3e</span><div><p><span class="stav ne">brána neprošla</span></p><p><b>Přeměření s víc štítky.</b> Na 273 společných vláknech AUC 0,948 proti 0,975 u Jevu a 19 jistých chyb. Víc štítků model zlepšilo jen nepatrně a udělalo ho přesvědčenějším <a class="z" href="#z21">[21]</a>.</p></div></li>
+        <li><span class="krok">Č</span><div><p><span class="stav ted">teď</span></p><p><b>Čištění trénovacích dat</b> podle průzkumu, viz záložky Příprava dat a Plán čištění <a class="z" href="#z22">[22]</a> <a class="z" href="#z23">[23]</a>.</p></div></li>
+      </ol>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" id="p-data" role="tabpanel" aria-labelledby="t-data">
+  <section id="data-stav">
+    <div class="sec-head">
+      <div class="eyebrow">Změřeno na našich datech</div>
+      <h2>Co model dnes dostává</h2>
+      <p>Měřeno na 340 trénovacích vláknech S3e: podíly v tokenech tokenizéru Qwen3.5, zkrácení a ořez ve znacích, chyby modelu na 287 hodnocených vláknech <a class="z" href="#z22">[22]</a>.</p>
+    </div>
+    <div class="card">
+      <ul>
+        <li><b>Polovina vstupu je historie.</b> Citované řádky (začínající znakem „&gt;“) tvoří 49,3 % tokenů, zástupné symboly masky 17,0 %.</li>
+        <li><b>Trénink a vyhodnocení vidí jiný text.</b> Unsloth při tréninku řeže vstup na 4 096 tokenů a konec zahodí bez značky; predikce čte až 16 384 tokenů <a class="z" href="#z25">[25]</a> <a class="z" href="#z26">[26]</a>. Týká se to 17 % vláken.</li>
+        <li><b>Dnešní čištění nestačí.</b> Nahrazení citovaných kopií značkou zkrátí sadu jen o 11,4 % a z 63 uříznutých vláken zachrání 6.</li>
+        <li><b>Celou historii smazat nejde.</b> U 20 poptávek je text poptávky jen v citaci.</li>
+        <li><b>Chyby se kupí v konverzacích s citací.</b> U negativních vláken s historií nad 50 % se model spletl ve 12 z 80 případů, bez historie v 1 ze 131. Je to souvislost, ne dokázaná příčina.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="data-praxe">
+    <div class="sec-head">
+      <div class="eyebrow">Z literatury</div>
+      <h2>Jak připravit data</h2>
+      <p>Studie jsou většinou na angličtině a na větších sadách. Co z nich platí pro nás, ověří jen pokus na stejných datech <a class="z" href="#z22">[22]</a>.</p>
+    </div>
+    <div class="dvoje">
+      <div class="card">
+        <h3>Čištění e-mailů</h3>
+        <ul>
+          <li><b>Odstranit citace a podpisy:</b> v klasifikaci žádostí v e-mailech stoupla přesnost ze 72,28 % na 83,76 % (Lampert 2010, klasické strojové učení). U malých jazykových modelů takové srovnání nikdo nezveřejnil.</li>
+          <li><b>Řezat po celých zprávách</b>, ne uprostřed věty. U BERT vyhrálo spojení začátku a konce textu (prvních 128 a posledních 382 tokenů).</li>
+          <li><b>Hotové knihovny češtinu neznají.</b> Pro české citační hlavičky zbývají vlastní pravidla.</li>
+          <li><b>Stejná funkce při tréninku i v provozu</b> pro čištění, řez i masku. Jinak model v provozu dostane jiný vstup, než na jakém se učil.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Štítky a skladba sady</h3>
+        <ul>
+          <li><b>Podezřelé štítky přezkoumat, ne mazat:</b> u kandidátů z confident learning potvrdili lidé chybu jen u 51–54 %.</li>
+          <li><b>Ponechat přirozený poměr tříd.</b> Převažování menšinové třídy AUC nezlepší a pokazí kalibraci.</li>
+          <li><b>Strojové štítky jen ze shody dvou učitelů.</b> Víc štítků od jednoho učitele u nás model jen zpřesvědčilo.</li>
+          <li><b>Téměř stejná vlákna</b> (šablony, newslettery) držet ve stejné skupině, jinak test vychází lépe, než je skutečnost.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" id="p-cisteni" role="tabpanel" aria-labelledby="t-cisteni">
+  <section id="cisteni">
+    <div class="sec-head">
+      <div class="eyebrow">Plán Č · doplňuje se průběžně</div>
+      <h2>Plán čištění dat</h2>
+      <p>Varianty dat se porovnávají na stejných pěti skupinách a časovém běhu, se stejnými opravenými štítky. Jev zůstává měřítkem na stejných vláknech <a class="z" href="#z23">[23]</a>.</p>
+    </div>
+    <div class="card">
+      <ol class="osa">
+        <li><span class="krok">0</span><div><p><span class="stav ok">hotovo</span></p><p><b>Změřit rozdíl okna bez tréninku.</b> Na dlouhých vláknech dá predikce na stejných 4 096 tokenech jako trénink AUC 0,910 místo 0,861 a 2 jisté chyby místo 4. Rozdíl okna tedy škodí.</p></div></li>
+        <li><span class="krok">1–3</span><div><p><span class="stav ne">zrušeno</span></p><p><b>Přezkum štítků naslepo.</b> Jisté chyby našeho modelu, Jevu i glm a stejný počet jistě správných vláken, zamíchaně a bez skóre. Zrušeno 12. 10., protože skoro všechna posuzovaná vlákna byla ze soukromé pošty.</p></div></li>
+        <li><span class="krok">2b</span><div><p><span class="stav ted">teď</span></p><p><b>Data jen z vláken Prelude.</b> Vlákna od Prelude nebo pro Prelude a všechna vlákna od kolegy, celkem 204. Člověk označí naslepo 181 vláken, která štítek ještě nemají. Pak z nich vznikne nová sada se skupinami podle odesílatele a nová laťka.</p></div></li>
+        <li><span class="krok">4–6</span><div><p><span class="stav">čeká</span></p><p><b>Jedna funkce délky.</b> Řez po celých zprávách (první zpráva a nejnovější zprávy) na rozpočet v tokenech Qwen, stejně pro trénink i predikci.</p></div></li>
+        <li><span class="krok">5</span><div><p><span class="stav">čeká</span></p><p><b>Deduplikace citací.</b> Opakovaný řádek zůstane jen při prvním výskytu ve vlákně, takže poptávka, která je jen v citaci, se neztratí.</p></div></li>
+        <li><span class="krok">7</span><div><p><span class="stav">čeká</span></p><p><b>Čtyři varianty textu:</b> cv0 dnešní vstup, cv1 s řezem po zprávách, cv2 navíc s deduplikací citací, cv3 navíc se sloučenými podpisovými bloky masky.</p></div></li>
+        <li><span class="krok">9</span><div><p><span class="stav">čeká</span></p><p><b>Trénink na HAL3000:</b> 4 varianty po 6 bězích, výchozí a nejlepší varianta se třemi semeny.</p></div></li>
+        <li><span class="krok">10</span><div><p><span class="stav">čeká</span></p><p><b>Vyhodnocení.</b> Brána beze změny: AUC aspoň 0,955 a žádná jistá chyba. Varianta se přijme, jen když se zlepší aspoň ve 4 z 5 skupin.</p></div></li>
+        <li><span class="krok">11</span><div><p><span class="stav">podle výsledků</span></p><p><b>Další páky:</b> téměř stejná vlákna do jedné skupiny, cílené štítkování konverzací s citací, jiný model (záložka Model pro češtinu).</p></div></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Průběh</h3>
+      <ul>
+        <li><b>11. 10. 2026:</b> plán napsán podle průzkumu, nic zatím neprovedeno.</li>
+        <li><b>11. 10. 2026:</b> uživatel plán schválil včetně srovnání s Jevem na stejných vláknech a štítcích (ne na stejném textu). Další krok: kostra skriptu a změření rozdílu okna bez tréninku.</li>
+        <li><b>11. 10. 2026:</b> rozdíl okna změřen na stávajících predikcích S3e (287 vláken, z toho 60 dlouhých). Predikce na 16 384 tokenech: AUC 0,927, na dlouhých 0,861. Predikce na 4 096 jako při tréninku: AUC 0,935, na dlouhých 0,910. Jde o jeden běh a horní odhad, ale směr podporuje řez po zprávách stejný pro trénink i predikci.</li>
+        <li><b>11. 10. 2026:</b> revize plánu proti průzkumu. Přezkum štítků je teď symetrický: posoudí se jisté chyby našeho modelu, Jevu i glm. Kdyby se opravovaly jen chyby našeho modelu, štítky by se posouvaly k němu a srovnání s Jevem by mu nadržovalo. Tři semena u všech variant a cílené štítkování konverzací s citací během tréninku uživatel nevybral. Vítěz se proto vybere z jednoho běhu a těsný výsledek bude potřeba ověřit dalšími semeny.</li>
+        <li><b>11. 10. 2026:</b> stránka k přezkumu je připravená. Mezi 287 hodnocenými vlákny má jistou chybu náš model ve 20 vláknech, glm v 5 a Jev v žádném. K 24 podezřelým vláknům přibylo 24 jistě správných, takže se posuzuje 48 vláken naslepo bez skóre i dnešního štítku. Čeká se na označení.</li>
+        <li><b>12. 10. 2026:</b> po 12 posudcích změna směru: uživatel si všiml, že většina vláken je z jeho soukromé pošty, která s projektem nesouvisí. Trénovat se bude jen na vláknech Prelude. V databázi EmailRatoru je jich 204 z 1 094, včetně všech 169 vláken od kolegy. Ta jdou do tréninku, i když zatím sloužila jako testovací sada EmailRatoru, a model se ověří křížovou validací. Z dosavadní sady 340 vláken jich do Prelude patří jen 23. Na stránce k označení je 181 vláken.</li>
+      </ul>
+    </div>
+  </section>
+  </div>
+
+  <div class="panel" id="p-cestina" role="tabpanel" aria-labelledby="t-cestina">
+  <section id="cestina">
+    <div class="sec-head">
+      <div class="eyebrow">Doporučení</div>
+      <h2>Který model dotrénovat na české e-maily</h2>
+      <p>Rešerše k 11. 10. 2026. Srovnání modelů na českých e-mailech nikdo nezveřejnil, takže pořadí je náš úsudek z dostupných čísel <a class="z" href="#z24">[24]</a>.</p>
+    </div>
+    <div class="card">
+      <ol class="kroky">
+        <li><p><b>Plán čištění dokončit na Qwen3.5-0.8B.</b> Výsledky půjdou porovnat s dosavadními pokusy a model mezi variantami dat se nemění.</p></li>
+        <li><p><b>Vítěznou variantu dat vyzkoušet s mmBERT-base.</b> Unsloth vedle Qwenu umí dotrénovat i enkodér s rozhodovací hlavou (cesta Laya, jen v 16 bitech) <a class="z" href="#z26">[26]</a>. Vícejazyčná laya na mmBERT-base má 322 mil. parametrů, s nastavením pojme 8 192 tokenů a na procesoru odpoví za 193–464 ms; trénink laya potřebuje podle Unsloth 2,5 GB <a class="z" href="#z15">[15]</a>. mmBERT měl v předtréninku 22,7 mld. tokenů češtiny a ve vícejazyčném testu XNLI 77,1 proti 74,6 u XLM-R. Česká čísla nemá.</p></li>
+        <li><p><b>Gemma 4 E2B jako druhý kandidát</b>, když mmBERT zaostane: ve vícejazyčném testu MMMLU 67,4 %, licence Apache 2.0. Větší E4B potřebuje k tréninku 14,4 GB a na naši kartu se nevejde; paměť pro E2B je potřeba nejdřív změřit.</p></li>
+        <li><p><b>Nejdřív změřit, kolik tokenů dá čeština</b> v tokenizéru každého kandidáta na našich vláknech. Na tom závisí, kolik vlákna se vejde do okna a kolik stojí provoz na procesoru.</p></li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="tablewrap"><table id="cestina-t">
+        <thead><tr><th>Model</th><th>Pro</th><th>Proti</th></tr></thead>
+        <tbody>
+          <tr><td>mmBERT-base (laya)</td><td>dlouhý vstup, levný provoz, dotrénování v Unsloth, Apache 2.0</td><td>bez dotrénování nefunguje, čeština neměřena</td></tr>
+          <tr><td>Qwen3.5-0.8B</td><td>vyzkoušený, export pro llama.cpp ověřen</td><td>na procesoru pomalý u dlouhých vláken, trénink jen do 4 096 tokenů</td></tr>
+          <tr><td>Qwen3.5-2B</td><td>vejde se na kartu</td><td>proti 0.8B u nás bez zisku (AUC 0,950 proti 0,949)</td></tr>
+          <tr><td>Gemma 4 E2B</td><td>silná vícejazyčnost, Apache 2.0</td><td>paměť pro trénink neověřena, s rozhodovací hlavou u nás nezkoušena</td></tr>
+          <tr><td>Llama 3.2 3B</td><td>v českém srovnání BenCzechMark nad křivkou skóre vůči velikosti, Unsloth trénink 4,1 GB</td><td>licence Llama, české e-maily neměřeny</td></tr>
+          <tr><td>RobeCzech, Czert, FERNET</td><td>silné v češtině na krátkých textech</td><td>vstup jen 512 tokenů, vlákna by se musela dělit</td></tr>
+        </tbody>
+      </table></div>
+      <p class="pozn">V českém dotrénování na úloze ABSA (2025) měla Gemma 3 4B F1 70,46; malé modely s 1–3 mld. parametrů byly na úrovni dřívějších enkodérů nebo pod ní <a class="z" href="#z24">[24]</a>.</p>
+    </div>
+  </section>
+  </div>
+
+  <section id="zdroje">
+    <div class="sec-head">
+      <div class="eyebrow">Zdroje</div>
+      <h2>Odkud čísla jsou</h2>
+    </div>
+    <ol class="zdroje">
+      <li id="z1"><a href="https://ollama.com/search?c=decision&amp;c=local">Ollama: rozhodovací modely</a></li>
+      <li id="z2"><a href="https://ollama.com/library/tev1">Ollama: tev1</a></li>
+      <li id="z3"><a href="https://ollama.com/library/tev1/tags">Ollama: tev1, velikosti</a></li>
+      <li id="z4"><a href="https://github.com/togethercomputer/tev1">GitHub: togethercomputer/tev1</a></li>
+      <li id="z5"><a href="https://ollama.com/library/nimble">Ollama: nimble</a></li>
+      <li id="z6"><a href="https://ollama.com/library/nimble/tags">Ollama: nimble, velikosti</a></li>
+      <li id="z7"><a href="https://huggingface.co/bespokelabs/Bespoke-Nimble-9B">Hugging Face: Bespoke-Nimble-9B</a></li>
+      <li id="z8"><a href="https://ollama.com/library/clef">Ollama: clef</a></li>
+      <li id="z9"><a href="https://ollama.com/library/clef/tags">Ollama: clef, velikosti</a></li>
+      <li id="z10"><a href="https://ollama.com/library/clef-flash">Ollama: clef-flash</a></li>
+      <li id="z11"><a href="https://ollama.com/library/clef-flash/tags">Ollama: clef-flash, velikosti</a></li>
+      <li id="z12"><a href="https://ollama.com/library/laya">Ollama: laya</a></li>
+      <li id="z13"><a href="https://ollama.com/library/laya/tags">Ollama: laya, velikosti</a></li>
+      <li id="z14"><a href="https://huggingface.co/convaiinnovations/laya">Hugging Face: convaiinnovations/laya</a></li>
+      <li id="z15"><a href="https://unsloth.ai/docs/basics/train-your-own-decision-model-with-unsloth">Unsloth: vlastní rozhodovací model</a></li>
+      <li id="z16"><a href="https://unsloth.ai/docs/models/qwen3.5/fine-tune">Unsloth: dotrénování Qwen3.5</a></li>
+      <li id="z17"><a href="https://www.beri.net/article/typesafe-jev-typed-decision-model-calibration-decomposition-shadow-eval">beri.net: Jev 62,6 % s jednou otázkou, 95 % s pěti</a></li>
+      <li id="z18"><a href="https://www.deeplearning.ai/the-batch/models-built-to-do-one-thing-well">The Batch: Models Built to Do One Thing Well</a></li>
+      <li id="z19"><a href="https://huggingface.co/weijianzhg/email-safety-triage-qwen3.5-2b">Hugging Face: email-safety-triage-qwen3.5-2b</a></li>
+      <li id="z20"><a href="https://huggingface.co/Proteinrequired/email-triage-lora">Hugging Face: email-triage-lora</a></li>
+      <li id="z21">Náš pokus: plán projektu collabQwen354b, <code>docs/plans/2026-10-10-rozhodovaci-model-design.md</code> (stav S2 a S3e, 10.–11. 10. 2026)</li>
+      <li id="z22">Náš průzkum přípravy dat: collabQwen354b, <code>reports/Čištění vláken pro trénink.md</code> a poznámky v <code>research_notes/</code> (11. 10. 2026; odkazy na studie jsou tam)</li>
+      <li id="z23">Plán čištění: collabQwen354b, <code>docs/plans/2026-10-11-cisteni-dat.md</code></li>
+      <li id="z24">Rešerše modelu pro češtinu: collabQwen354b, <code>research_notes/Model pro češtinu/model_pro_cestinu.md</code> (11. 10. 2026; odkazy na zdroje jsou tam)</li>
+      <li id="z25"><a href="https://raw.githubusercontent.com/unslothai/unsloth/main/unsloth/models/_decision_common.py">GitHub: Unsloth, _decision_common.py (délka tréninku a predikce)</a></li>
+      <li id="z26"><a href="https://raw.githubusercontent.com/unslothai/unsloth/main/unsloth/models/decision.py">GitHub: Unsloth, decision.py (predikce, cesta Laya)</a></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+// Záložky: panel podle #adresy (#p-cisteni …); odkaz na zdroj [n] je mimo panely, takže funguje z každé záložky.
+(function () {
+  var nav = document.querySelector(".zalozky");
+  var tlacitka = Array.prototype.slice.call(nav.querySelectorAll("button"));
+  var panely = tlacitka.map(function (b) { return document.getElementById(b.getAttribute("aria-controls")); });
+  function ukaz(id, doAdresy) {
+    if (!panely.some(function (p) { return p.id === id; })) id = panely[0].id;
+    tlacitka.forEach(function (b, i) {
+      var vybrano = panely[i].id === id;
+      b.setAttribute("aria-selected", vybrano ? "true" : "false");
+      b.tabIndex = vybrano ? 0 : -1;
+      panely[i].hidden = !vybrano;
+    });
+    if (doAdresy) {
+      try { history.replaceState(null, "", "#" + id); } catch (e) { /* sandbox bez historie: záložka jen nezůstane v adrese */ }
+    }
+  }
+  tlacitka.forEach(function (b, i) {
+    b.addEventListener("click", function () { ukaz(panely[i].id, true); });
+    b.addEventListener("keydown", function (e) {
+      var k = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (!k) return;
+      var j = (i + k + tlacitka.length) % tlacitka.length;
+      tlacitka[j].focus();
+      ukaz(panely[j].id, true);
+    });
+  });
+  window.addEventListener("hashchange", function () {
+    var h = location.hash.slice(1);
+    if (panely.some(function (p) { return p.id === h; })) ukaz(h, false);
+  });
+  nav.hidden = false;
+  ukaz(location.hash.slice(1), false);
+})();
+</script>
+
+</body>
+</html>

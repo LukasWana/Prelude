@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Nasazení EmailRatoru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Vytížení produkčních (src/vytizeni_stranka.py): hlavička s ořezovými značkami,
+   sekce s kartami a tabulkami. Podrobnosti v rozbalovacích blocích <details>. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eefa;
+  --good: #006300;
+  --bad: #b3261e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --bad: #f07b72;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --bad: #f07b72;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* hlavička s ořezovými značkami */
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card > p, .duvod p { color: var(--ink-2); }
+.duvod { display: grid; gap: 12px; }
+.duvod p:first-child { color: var(--ink); font-size: 18px; }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-variant-numeric: tabular-nums; }
+td { color: var(--ink-2); }
+td:first-child { color: var(--ink); font-weight: 600; }
+th { font: 500 12px var(--font-mono); color: var(--muted); }
+table.cmp th:not(:first-child), table.cmp td:not(:first-child) { min-width: 190px; }
+table.cmp td:first-child { width: 22%; }
+
+/* rozbalovací části */
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > summary .pocet { font: 400 13px var(--font-mono); color: var(--muted); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+details p { color: var(--ink-2); }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+
+.pill { display: inline-block; font: 500 12px/1 var(--font-mono); padding: 4px 8px; border: 1px solid currentColor; border-radius: 999px; white-space: nowrap; }
+.pill.mame { color: var(--good); }
+.pill.chybi { color: var(--bad); }
+.pill.jinde { color: var(--muted); }
+
+.otazky { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--ink-2); max-width: 80ch; }
+.otazky b { color: var(--ink); font-weight: 600; }
+.zdroje { color: var(--ink-2); line-height: 1.6; margin: 0; padding-left: 20px; }
+.zdroje a { overflow-wrap: anywhere; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · podklad na schůzku 5. 10. 2026</div>
+    <h1>Nasazení EmailRatoru</h1>
+    <div class="meta"><span>Ověřeno 2. 10. 2026, maskování 3. 10.</span><span>Podrobnosti a zdroje v rozbalovacích částech</span></div>
+  </header>
+
+  <section id="proc">
+    <div class="sec-head">
+      <div class="eyebrow">Výchozí bod</div>
+      <h2>Proč vlastní backend</h2>
+    </div>
+    <div class="card duvod">
+      <p>Nástroj má z e-mailu s poptávkou vytáhnout jednotné zadání zakázky (produkt, náklad, rozměr, materiál, termín) a u každého údaje ukázat, z které věty e-mailu pochází.</p>
+      <p>Žádný z měřených modelů to nezvládne bez chyb. Deepseek i gemini-3.5-flash mají správně asi 4 z 5 údajů, které vyplní. Když model dostane e-mail, který poptávkou tisku není (třeba objednávku online banneru nebo newsletter), většinou přesto něco vyplní. Proto převedený e-mail posoudí ještě samostatný model Jev, jestli jde o poptávku tisku, a panel jeho verdikt ukáže u výsledku. Výsledek převodu navíc prochází kontrolami: citace z e-mailu u každého údaje, převod rozměrů na mm a brána jistoty.</p>
+      <p>Nástroje Google samy tyto kontroly nemají. Pro vlastní kroky ve Workspace Studiu Google odkazuje na vlastní kód: „using Google Apps Script or your preferred programming language“. Bez vlastního kódu to tedy nejde.</p>
+      <p class="zaver">Kód převodu a kontrol už máme hotový a odzkoušený na zkušební schránce. Rozhoduje se, kde poběží: u Googlu (Google Cloud Run), nebo v kontejneru u dodavatele nového systému. Vlastní server jsme zamítli, ve firmě není nikdo, kdo by se o něj staral při výpadcích.</p>
+      <p><b>Proč zatím deepseek.</b> Výchozím modelem je od 25. 9., kdy vyšel nejlépe z modelů na Ollamě. Gemini jsme změřili až 30. 9. – 2. 10.: gemini-3.5-flash je stejně přesný, ale pomalejší a dražší (<a href="#model">srovnání níže</a>). Gemini má výhodu jinde: na Vertex AI zpracuje data v EU se smlouvou Google Cloudu. Text pro model Jev ale jde do USA i v této variantě.</p>
+      <details>
+        <summary>Co přesně umí nástroje Google <span class="pocet">4 nástroje</span></summary>
+        <div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th>Nástroj</th><th>Co umí</th><th>Proč sám nestačí</th></tr></thead>
+              <tbody>
+                <tr><td>Gemini v Gmailu</td><td>Na Business Starteru psaní a oprava textu, shrnutí vlákna, návrhy odpovědí, hledání v poště.</td><td>Pracuje na požádání člověka nad otevřeným e-mailem, ne sám na každý nový. Jednotný formulář zadání ani kontrolu citací nemá.</td></tr>
+                <tr><td>Workspace Studio</td><td>Na Business Starteru. Tok spuštěný novým e-mailem, AI krok Extract vytáhne údaje z textu, výsledek zapíše do tabulky Sheets.</td><td>Kontroly a číselník jen jako vlastní krok naprogramovaný mimo Studio. Nejvýš 25 toků a 20 kroků v toku, denní počet běhů Google neuvádí. Google radí výstup Gemini před odesláním ven zkontrolovat člověkem.</td></tr>
+                <tr><td>Apps Script</td><td>Kód, který běží u Googlu, psaný v JavaScriptu.</td><td>Náš hotový kód je v Pythonu, šlo by o přepis. Jedno spuštění smí trvat nejvýš 6 minut, spouštěče celkem 6 hodin denně (účty Workspace).</td></tr>
+                <tr><td>Doplněk Gmailu (Workspace)</td><td>Panel vedle e-mailu v Gmailu.</td><td>Smí používat jen karty Googlu („must use card-based interfaces“). Logika běží v Apps Scriptu, nebo na serveru, na který posílá požadavky Google, takže musí být na internetu. Proto jsme 1. 10. zvolili rozšíření do Chrome: má vlastní rozhraní a tehdy nepotřebovalo veřejný server.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="rozhodnuti">
+    <div class="sec-head">
+      <div class="eyebrow">Co se rozhoduje</div>
+      <h2>Kde poběží backend a který model</h2>
+    </div>
+    <div class="card">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Otázka</th><th>Možnosti</th><th>Co víme</th></tr></thead>
+          <tbody>
+            <tr><td>Kde poběží backend</td><td>Google Cloud Run · kontejner u dodavatele nového systému</td><td>Vlastní server zamítnut: nemá se o něj kdo starat při výpadcích. Převod, kontroly a rozhraní pro panel jsou hotové a zatím běží na pracovním počítači.</td></tr>
+            <tr><td>Který model převádí e-mail</td><td>deepseek přes Ollamu · Gemini přes placené Gemini API · Gemini na Vertex AI v EU</td><td>Deepseek a gemini-3.5-flash jsou stejně přesné (rozdíl v šumu měření). Deepseek je rychlejší a levnější. Zpracování v EU se smlouvou dává Vertex AI. Text pro Jev jde do USA v každé variantě.</td></tr>
+            <tr><td>Panel v Gmailu</td><td>rozšíření do Chrome</td><td>Rozhodnuto 1. 10., funguje, s uživatelem odzkoušeno 2. 10.</td></tr>
+            <tr><td>Maskování osobních údajů</td><td>text pro převod i pro Jev</td><td>Zapnuto 3. 10. po měření (<a href="#maskovani">podrobnosti</a>).</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="model">
+    <div class="sec-head">
+      <div class="eyebrow">Model</div>
+      <h2>Deepseek, nebo Gemini</h2>
+    </div>
+    <div class="card">
+      <div class="tablewrap">
+        <table class="cmp">
+          <thead><tr><th></th><th>deepseek-v4.1-flash, Ollama</th><th>gemini-3.5-flash, Gemini API</th><th>gemini-3.5-flash, Vertex AI v EU</th></tr></thead>
+          <tbody>
+            <tr><td>Přesnost na zlaté sadě</td><td>F1 81; na výběru 20 vláken 79,1 a 80,9</td><td>F1 79,2 na výběru 20 vláken</td><td>stejný model jako přes Gemini API</td></tr>
+            <tr><td>Doba převodu vlákna</td><td>1,1–2,3 s</td><td>3,6–12,9 s (bezplatná úroveň, při přetížení až 224 s)</td><td>neměřeno</td></tr>
+            <tr><td>Cena za běžný měsíc</td><td>1,6–3,2 $ z předplatného 20 $</td><td>18 $</td><td>asi 20 $</td></tr>
+            <tr><td>Kde se data zpracují</td><td>hlavně v USA, pro kapacitu i v Evropě a Singapuru</td><td>region nelze zvolit</td><td>v EU</td></tr>
+            <tr><td>Data k trénování</td><td>nepoužije, vstupy neukládá</td><td>nepoužije</td><td>nepoužije bez souhlasu zákazníka</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Ve všech třech variantách dostane model od 3. 10. text e-mailu s <a href="#maskovani">maskovanými osobními údaji</a>: jména lidí z hlaviček e-mailu, e-mailové adresy, telefony, adresy a další údaje jsou nahrazené zástupkami. K tomu ve všech variantách jde do USA text pro model Jev, maskovaný stejně (<a href="#schuzka">podrobnosti u otázky Data zákazníků</a>).</p>
+      <details>
+        <summary>Smlouva, ukládání a co je třeba zřídit</summary>
+        <div>
+          <div class="tablewrap">
+            <table class="cmp">
+              <thead><tr><th></th><th>Ollama</th><th>Gemini API</th><th>Vertex AI v EU</th></tr></thead>
+              <tbody>
+                <tr><td>Smlouva o zpracování</td><td>stránka Ollamy GDPR ani smlouvu nezmiňuje</td><td>Data Processing Addendum Googlu</td><td>Cloud Data Processing Addendum</td></tr>
+                <tr><td>Ukládání</td><td>nezaznamenává</td><td>po omezenou dobu kvůli odhalování zneužití, přechodně v kterékoli zemi</td><td>data uložená v Google Cloudu zůstávají ve zvoleném regionu</td></tr>
+                <tr><td>Co zřídit</td><td>firemní účet Ollama (nový plán Pro: 20 $ měsíčně, kredit 60 $, 3 požadavky najednou, další čekají ve frontě)</td><td>projekt Google Cloud s fakturací pod firmou</td><td>projekt Google Cloud s fakturací, koncový bod v EU</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="maskovani">
+    <div class="sec-head">
+      <div class="eyebrow">Osobní údaje</div>
+      <h2>Maskování osobních údajů</h2>
+    </div>
+    <div class="card">
+      <p>Do 3. 10. šel text e-mailu modelu pro převod celý. V textu pro Jev se skrývaly jen e-mailové adresy, telefony, odkazy, PSČ a hesla. Slovo ze jména odesílatele, zákazníka i našeho člověka, v něm zůstávalo v 71 ze 73 vláken s poptávkou.</p>
+      <p>Od 3. 10. nástroj před odesláním ven nahradí osobní údaje zástupkami, například <span class="num">[OSOBA_1]</span>, <span class="num">[EMAIL_1]</span>, <span class="num">[ADRESA_1]</span>. Platí to pro model převodu i pro Jev. Po odpovědi modelu vrátí nástroj skutečné hodnoty zpět, takže produkční vidí skutečné údaje. Tabulka, která zástupku spojuje s hodnotou, zůstane jen v paměti nástroje po dobu převodu. Nikam se neukládá ani neposílá.</p>
+      <p class="zaver">Rozhodnuto 2. 10.: maskovat text pro převod i pro Jev. Zapnuto 3. 10. po měření: maska nepropustila jména odesílatelů, řádky citací, IČO, DIČ, čísla účtů ani ulice. Přesnost převodu klesla o 1 až 2 body, Jev rozpoznává poptávky stejně dobře.</p>
+      <details>
+        <summary>Co maska skryje a jak se měřila <span class="pocet">6 částí</span></summary>
+        <div>
+          <div class="tablewrap">
+            <table>
+              <tbody>
+                <tr><td>Co dnes zůstává</td><td>Změřeno 2. 10. na 73 vláknech s poptávkou, v textu, který jde do Jevu: slovo ze jména odesílatele v 71 vláknech, řádek citace „napsal(a)“ nebo „wrote:“ v 55, citovaná hlavička „Od:/Komu:/Kopie:“ v 26, číslo ve tvaru adresy (Ulice 12/3) v 17, dvě slova s velkým písmenem na řádku za pozdravem („S pozdravem“, „Děkuji“) v 11, IČO ve 4, DIČ ve 3, číslo účtu v 1.</td></tr>
+                <tr><td>Co maska skryje</td><td>Jména z hlaviček e-mailu i ve skloňovaných tvarech, jména v citovaných hlavičkách, e-mailové adresy (část před zavináčem), cestu v odkazech, telefony, PSČ, IČO, DIČ, čísla účtů, IBAN, rodná čísla, hesla, ulice a města u PSČ. Názvy firem jen z hlaviček e-mailu a s právní formou (s.r.o., a.s., spol.).</td></tr>
+                <tr><td>Co zůstane vidět</td><td>Doména e-mailu a odkazu (například firma.cz), protože podle ní model pozná firmu zákazníka. Když doména obsahuje jméno člověka z hlaviček e-mailu, skryje se celá. Dál zůstanou názvy firem bez právní formy a jméno člověka, který v hlavičkách ani citacích není, například jen v podpisu.</td></tr>
+                <tr><td>Co skrýt nesmí</td><td>Údaje o tisku: formát, barevnost, gramáž, náklad, rozměry, data, kódy EAN, čísla zakázek. Hlídají to testy.</td></tr>
+                <tr><td>Zákazník a naši lidé</td><td>Zástupky odliší našeho zaměstnance od zákazníka (<span class="num">[OSOBA_NASE_1]</span> a <span class="num">[OSOBA_1]</span>). Náš člověk je ten s adresou na doméně firmy nebo na seznamu adres zaměstnanců. Seznam pro ostrý provoz dodá firma. Když zaměstnanec poptávku přepošle, zůstane klient v přeposlané zprávě zákazníkem.</td></tr>
+                <tr><td>Měření před zapnutím</td><td>Maska na 71 vláknech s poptávkou a na 24 přeposlaných poptávkách testovací sady nenechala žádné slovo ze jména odesílatele, řádek citace, IČO, DIČ, číslo účtu, ulici s číslem ani jméno v doméně. Model vrátil všech 1 924 zástupek beze změny. Přesnost převodu na zlaté sadě 68 vláken: bez masky F1 80 a 81, s maskou 78 a 80 (dva běhy, stejný čas). Jev na 131 označených vláknech: všech 90 jistých odpovědí správně.</td></tr>
+                <tr><td>Kontrola údajů s maskou</td><td>U údajů, které prošly všemi kontrolami, klesla správnost s maskou z 94,5 a 94,6 % na 90,1 a 93,0 %. Tyto údaje dnes stejně potvrzuje člověk, automatické přijetí je vypnuté.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="cisla">
+    <div class="sec-head">
+      <div class="eyebrow">Provoz</div>
+      <h2>Objem, cena a tarif Google</h2>
+    </div>
+    <div class="card">
+      <p>Asi 60 e-mailů k zakázkám za pracovní den, asi 1 260 měsíčně. Náklady na model jsou v řádu jednotek až desítek dolarů měsíčně.</p>
+      <details>
+        <summary>Podrobná čísla <span class="pocet">6 údajů</span></summary>
+        <div>
+          <div class="tablewrap">
+            <table>
+              <tbody>
+                <tr><td>Objem</td><td>Ze starého systému asi 217 zakázek měsíčně, ve vlákně průměrně 5,8 zprávy, tedy asi 1 260 e-mailů měsíčně. Spíš spodní odhad: nezahrnuje poptávky, ze kterých zakázka nevznikla, ani ostatní poštu.</td></tr>
+                <tr><td>Jeden převod</td><td>Průměrně 6 011 tokenů vstupu a 575 výstupu.</td></tr>
+                <tr><td>Ceník modelů</td><td>Za milion tokenů vstup / výstup: gemini-3.5-flash přes Gemini API 1,50 $ / 9,00 $, na Vertex AI v regionu 1,65 $ / 9,90 $, gemini-3.5-flash-lite 0,30 $ / 2,50 $ (běžný měsíc 4,1 $).</td></tr>
+                <tr><td>Ollama Pro</td><td>Plán stojí 20 $ měsíčně a obsahuje kredit 60 $ měsíčně na tokeny. Provoz spotřebuje 3–12 % měsíčního kreditu (1,6–7,3 $), platí se tedy jen 20 $ za plán.</td></tr>
+                <tr><td>Gemini zdarma</td><td>Jen na zkoušení. Aplikaci pro uživatele v EU smí podle podmínek Googlu poskytovat jen placená služba.</td></tr>
+                <tr><td>Business Starter</td><td>Gmail API pro interní aplikaci, Google Cloud, Vertex AI i Workspace Studio na Starteru fungují. Uložení dat Workspace jen v EU je až od Business Standard.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="stav">
+    <div class="sec-head">
+      <div class="eyebrow">Stav projektu</div>
+      <h2>Co máme a co chybí</h2>
+    </div>
+    <div class="card">
+      <p>Hotové: čtení pošty, převod e-mailu na zadání, kontroly, posouzení modelem Jev a panel v Gmailu. Chybí: zápis zakázky do nového systému, provoz na serveru a mazání osobních údajů.</p>
+      <details>
+        <summary>Všechny části nástroje <span class="pocet">12 částí</span></summary>
+        <div>
+          <div class="tablewrap">
+            <table>
+              <tbody>
+                <tr><td>Čtení pošty z Gmailu</td><td>Stažení vlákna na vyžádání, nové zprávy přes historii Gmailu. Zatím na zkušební schránce.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Převod e-mailu na zadání</td><td>Výstup podle pevného schématu. Výchozí model deepseek, Gemini je napojené.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Zlatá sada a měření</td><td>68 vláken se správnými výsledky (vyplnil model Claude Opus, část hodnot opravil uživatel). Měření se dá kdykoli zopakovat.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Kontroly výsledku</td><td>Citace z e-mailu u každého údaje, převod rozměrů z cm na mm, brána jistoty. Automatické přijetí je vypnuté, každé pole potvrdí produkční.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Posouzení modelem Jev</td><td>Jestli jde o poptávku tisku, panel verdikt ukáže u výsledku. Přes OpenRouter, jen na endpoint, který data neuchovává. Výpadek Jevu převod nezastaví.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Panel v Gmailu</td><td>Rozšíření do Chrome, odzkoušené 2. 10.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Číselník materiálů a produktů</td><td>Zatím jen zkušební katalog.</td><td><span class="pill chybi">chybí skutečný</span></td></tr>
+                <tr><td>Zápis zakázky do nového systému</td><td>Čeká na rozhraní od dodavatele.</td><td><span class="pill chybi">chybí</span></td></tr>
+                <tr><td>Provoz na serveru</td><td>Nasazení do Google Cloud Run nebo kontejneru dodavatele, zálohy, sledování chyb.</td><td><span class="pill chybi">chybí</span></td></tr>
+                <tr><td>Maskování osobních údajů</td><td>Od 3. 10. pro převod i Jev: jména z hlaviček a citací, e-mailové adresy, telefony, adresy, IČO, DIČ, účty a firmy s právní formou nahrazené zástupkami.</td><td><span class="pill mame">máme</span></td></tr>
+                <tr><td>Mazání osobních údajů</td><td>E-maily smazané v Gmailu u nás zatím zůstávají. Podmínka ostrého nasazení.</td><td><span class="pill chybi">chybí</span></td></tr>
+                <tr><td>Přílohy PDF a skeny</td><td>Text z PDF s textovou vrstvou čteme. Skeny řeší samostatný projekt.</td><td><span class="pill jinde">jiný projekt</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="schuzka">
+    <div class="sec-head">
+      <div class="eyebrow">Na schůzku</div>
+      <h2>Otázky, na které potřebujeme odpověď</h2>
+    </div>
+    <div class="card">
+      <ul class="otazky">
+        <li><b>Kde backend:</b> Google Cloud Run, nebo kontejner u dodavatele nového systému? Dovolí dodavatel vlastní kontejner?</li>
+        <li><b>Zápis zakázky:</b> jaké rozhraní nový systém nabízí (API, webhook), aby nástroj mohl zakázku založit?</li>
+        <li><b>Data zákazníků:</b> smí maskovaný text e-mailů do USA (Ollama), nebo musí zůstat v EU (Vertex AI)? Do USA posílá nástroj i text e-mailu pro model Jev: přes OpenRouter k firmě TypeSafe, která Jev provozuje v USA. Před odesláním nástroj text <a href="#maskovani">maskuje</a>: jména z hlaviček a citací, e-mailové adresy, telefony, adresy, IČO a firmy s právní formou nahradí zástupkami. Názvy firem bez právní formy a domény e-mailů zůstávají. Obě firmy píšou, že na textu netrénují. OpenRouter text neukládá, ukládání je v účtu vypnuté (ověřeno 2. 10.). OpenRouter řadí Jev mezi endpointy, které data neuchovávají, a nástroj jiné endpointy nepovolí. Vlastní zásady TypeSafe přitom uvádějí jen obecně, že data drží, „dokud je to rozumně potřeba“, konkrétní dobu ne. GDPR ani smlouvu o zpracování nezmiňují. Jev potřebujeme v každé variantě, i v té jen s Googlem. Volat ho jde přes OpenRouter, nebo přímo u TypeSafe, v obou případech běží v USA. Endpoint bez uchování dat umíme vynutit jen přes OpenRouter; přímo u TypeSafe platí jen jeho zásady. Maskování platí v textu pro převod i pro Jev. Jména lidí z hlaviček e-mailu skryje i jinde v textu a ve skloňovaných tvarech. Jméno člověka, který v hlavičkách ani citacích není (například jen v podpisu), maska nepozná.</li>
+        <li><b>Účty a platby:</b> kdo založí firemní účet Ollama, nebo projekt Google Cloud s fakturací pod firmou? A firemní účet pro Jev, u OpenRouteru, nebo přímo u TypeSafe? Dnes Jev jede přes účet sdílený s jiným projektem, klíč má limit 3 $ týdně.</li>
+        <li><b>Podmínka spuštění:</b> jakou přesnost chceme, u všech polí, nebo jen u těch, která nástroj vyplní bez výhrady?</li>
+        <li><b>Uchování dat:</b> jak dlouho smí nástroj držet e-maily a výsledky převodu?</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="vysvetleni">
+    <div class="card">
+      <details>
+        <summary>Jak čísla vznikla</summary>
+        <div>
+          <p><b>Přesnost.</b> F1 spojuje dvě věci: kolik vyplněných údajů je správně a kolik správných údajů model našel. Měří se na zlaté sadě 68 vláken, u modelů s denním limitem na výběru 20 z nich. Rozdíl do 2 bodů je v šumu: deepseek dal na stejných 20 vláknech ve dvou bězích 79,1 a 80,9. Čísla modelů jsou změřená bez masky; s maskou, zapnutou 3. 10., dal deepseek na zlaté sadě F1 78 a 80 proti 80 a 81 bez ní ve stejném čase. Zlatou sadu vyplnil model Claude Opus, proto modely Claude do pořadí nepočítáme.</p>
+          <p><b>Chyby modelu.</b> Správně vyplněných údajů: deepseek 80 % na zlaté sadě, gemini-3.5-flash 81 % na výběru 20 vláken. Gemini-3.5-flash-lite má správně 87–88 % toho, co vyplní, ale vyplní méně údajů, takže celkově vychází o 2–5 bodů F1 pod deepseekem. Prázdný výsledek u vláken, která poptávkou nejsou: deepseek u 16 z 63, gemini-3.5-flash-lite u 2 z 54.</p>
+          <p><b>Výběr modelu.</b> Deepseek-v4.1-flash je výchozí od 25. 9. po srovnání modelů na Ollamě (mimo jiné deepseek-v4-pro, gemma, mistral-large-3). Gemini jsme měřili od 30. 9. Gemini-3.5-flash má na bezplatném klíči 20 volání denně, proto je změřený jen na výběru 20 vláken. Potvrzení na celé zlaté sadě (3 běhy a vlákna, která poptávkou nejsou) by na něm trvalo asi 14 dní.</p>
+          <p><b>Doba převodu.</b> Deepseek měřen 2. 10. na výběru 20 vláken, gemini-3.5-flash 1. a 2. 10. na bezplatné úrovni, kde byl model často přetížený.</p>
+          <p><b>Cena.</b> Stejný výpočet jako na stránce <a href="vytizeni-produkcnich.html">Vytížení produkčních</a>: převod po každé nové zprávě, 6 011 tokenů vstupu a 575 výstupu, ceníky z 2. 10. Rozpětí u deepseeku dává cena mimo špičku a ve špičce. Vertex AI: cena úrovně Standard pro regionální koncový bod.</p>
+          <p><b>Brána jistoty.</b> Pole, která pustí bez výhrady, mají přesnost 93,6–95,1 % a jsou to asi polovina polí (měřeno bez masky; s maskou 90,1 a 93,0 %). Automatické přijetí je od 30. 9. vypnuté.</p>
+          <p><b>Vertex AI</b> se v dokumentaci Googlu nově jmenuje Gemini Enterprise Agent Platform. Koncový bod v EU (např. europe-west1) drží zpracování v EU. Deepseek-v4.1-flash, který jsme měřili, v její tabulce zpracování podle regionů není.</p>
+          <p><b>Starter.</b> Podrobně na stránce <a href="google-starter.html">AI v Business Starteru</a>.</p>
+          <p><b>Ověření.</b> Citace ze zdrojů hlídá skript <span class="num">scripts/nasazeni_kontrola.py</span>, ceny modelů <span class="num">scripts/vytizeni_kontrola.py</span>. Měření jsou z databáze projektu EmailRator a z plánu <span class="num">Doc/PLAN-google.md</span>, údaje o maskování z plánu <span class="num">Doc/PLAN-maskovani.md</span> (počty spočítal skript <span class="num">scripts/maskovani_zbytky.py</span>, hodnoty nevypisuje), rozhodnutí o panelu z projektu GEmailRator. Nastavení účtu OpenRouter (ukládání vypnuté, limit klíče) je přečtené v jeho administraci 2. 10. Že Jev jde jen na endpoint bez uchování dat, hlídá test v kódu; že OpenRouter nastavení směrování v požadavku dodržuje, jsme ověřili zkušebními požadavky.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Zdroje <span class="pocet">stažené 2. 10. 2026</span></summary>
+        <div>
+          <ul class="zdroje">
+            <li><a href="https://support.google.com/workspace-studio/answer/16433731?hl=en">https://support.google.com/workspace-studio/answer/16433731?hl=en</a> — Workspace Studio: vlastní kroky</li>
+            <li><a href="https://support.google.com/workspace-studio/answer/16431105?hl=en">https://support.google.com/workspace-studio/answer/16431105?hl=en</a> — Workspace Studio: AI kroky</li>
+            <li><a href="https://support.google.com/workspace-studio/answer/16765942?hl=en">https://support.google.com/workspace-studio/answer/16765942?hl=en</a> — Workspace Studio: limity</li>
+            <li><a href="https://support.google.com/workspace-studio/answer/16782648?hl=en">https://support.google.com/workspace-studio/answer/16782648?hl=en</a> — Workspace Studio: dostupnost podle tarifů</li>
+            <li><a href="https://support.google.com/mail/answer/13952129?hl=en">https://support.google.com/mail/answer/13952129?hl=en</a> — Gemini v Gmailu podle tarifů</li>
+            <li><a href="https://developers.google.com/apps-script/overview">https://developers.google.com/apps-script/overview</a> — Apps Script</li>
+            <li><a href="https://developers.google.com/apps-script/guides/services/quotas">https://developers.google.com/apps-script/guides/services/quotas</a> — Apps Script: limity</li>
+            <li><a href="https://developers.google.com/workspace/add-ons/guides/workspace-restrictions">https://developers.google.com/workspace/add-ons/guides/workspace-restrictions</a> — doplňky Workspace: omezení rozhraní</li>
+            <li><a href="https://developers.google.com/workspace/add-ons/guides/alternate-runtimes">https://developers.google.com/workspace/add-ons/guides/alternate-runtimes</a> — doplňky Workspace s vlastním serverem</li>
+            <li><a href="https://ollama.com/cloud">https://ollama.com/cloud</a> — Ollama cloud: modely, plány, soukromí a umístění serverů</li>
+            <li><a href="https://ollama.com/pricing">https://ollama.com/pricing</a> — ceník Ollama</li>
+            <li><a href="https://ollama.com/blog/transparent-pricing">https://ollama.com/blog/transparent-pricing</a> — nové plány Ollama</li>
+            <li><a href="https://ai.google.dev/gemini-api/terms">https://ai.google.dev/gemini-api/terms</a> — podmínky Gemini API</li>
+            <li><a href="https://ai.google.dev/gemini-api/docs/pricing">https://ai.google.dev/gemini-api/docs/pricing</a> — ceník Gemini API</li>
+            <li><a href="https://cloud.google.com/vertex-ai/generative-ai/pricing">https://cloud.google.com/vertex-ai/generative-ai/pricing</a> — ceník Vertex AI</li>
+            <li><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance">https://docs.cloud.google.com/vertex-ai/generative-ai/docs/data-governance</a> — Vertex AI: data a trénování</li>
+            <li><a href="https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/data-residency">https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/data-residency</a> — Vertex AI: zpracování podle regionů</li>
+            <li><a href="https://support.google.com/a/answer/7630496">https://support.google.com/a/answer/7630496</a> — Google Workspace: data regions podle tarifů</li>
+            <li><a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a> — zásady soukromí OpenRouteru</li>
+            <li><a href="https://openrouter.ai/docs/guides/privacy/data-collection">https://openrouter.ai/docs/guides/privacy/data-collection</a> — OpenRouter: co ukládá</li>
+            <li><a href="https://typesafe.ai/legal/privacy-policy">https://typesafe.ai/legal/privacy-policy</a> — zásady soukromí TypeSafe (Jev)</li>
+            <li><a href="https://docs.typesafe.ai/introduction/quickstart">https://docs.typesafe.ai/introduction/quickstart</a> — TypeSafe: přímé API Jevu</li>
+            <li><a href="https://openrouter.ai/docs/guides/features/zdr">https://openrouter.ai/docs/guides/features/zdr</a> — OpenRouter: endpointy bez uchování dat</li>
+            <li><a href="https://openrouter.ai/api/v1/endpoints/zdr">https://openrouter.ai/api/v1/endpoints/zdr</a> — OpenRouter: seznam endpointů bez uchování dat (je v něm Jev)</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Přechod na nový systém</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Úzká hrdla (Doc/vedeni/): hlavička s ořezovými značkami, karty, rozbalovací části.
+   Navíc: postup jako svislá řada kroků s časovým štítkem. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e4edf9;
+  --bad: #b3261e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d; --bad: #f07b72;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1c2a3d; --bad: #f07b72;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 17px; font-weight: 700; font-stretch: 90%; }
+p { margin: 0; max-width: 72ch; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 72ch; }
+li { color: var(--ink-2); }
+li b, p b { color: var(--ink); }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+.uvod { font-size: 18px; color: var(--ink-2); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); font-size: 18px; }
+.pozor { color: var(--ink-2); font-size: 15px; }
+.pozor b { color: var(--bad); font-weight: 600; }
+
+.soucet { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.dlazdice { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 4px; min-width: 0; background: var(--surface); }
+.dlazdice b { font: 800 clamp(30px, 4vw, 42px)/1 var(--font-display); font-stretch: 80%; }
+.dlazdice small { font-size: 14px; color: var(--ink-2); }
+@media (max-width: 860px) { .soucet { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 460px) { .soucet { grid-template-columns: 1fr; } }
+
+.tab { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; font-variant-numeric: tabular-nums; }
+td { color: var(--ink-2); }
+th { font: 500 12px var(--font-mono); color: var(--muted); }
+td.c, th.c { text-align: right; }
+td:first-child { color: var(--ink); font-weight: 600; }
+.legenda { font-size: 13px; color: var(--muted); }
+
+/* postup: kroky pod sebou, vlevo kdy, vpravo co; čára spojuje kroky */
+.kroky { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; max-width: none; }
+.krok { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 18px; position: relative; padding-bottom: 22px; }
+.krok:last-child { padding-bottom: 0; }
+.krok .kdy { font: 600 14px/1.3 var(--font-mono); color: var(--accent); padding-top: 3px; text-align: right; }
+.krok .co { border-left: 2px solid var(--accent-wash); padding-left: 18px; display: grid; gap: 6px; position: relative; }
+.krok .co::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
+.krok .co p { color: var(--ink-2); }
+@media (max-width: 640px) {
+  .krok { grid-template-columns: 1fr; gap: 6px; }
+  .krok .kdy { text-align: left; padding-left: 20px; }
+}
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+footer { display: grid; gap: 12px; font-size: 14px; color: var(--ink-2); }
+footer code { font: 13px var(--font-mono); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · ze starého systému wall2 do nového</div>
+    <h1>Přechod na nový systém</h1>
+    <div class="meta"><span>337 rozpracovaných zakázek ve wall2</span><span>data stažená 25.–26. 9. 2026</span><span>postup je návrh, zatím nevyzkoušený</span></div>
+  </header>
+
+  <p class="uvod">Jak v jeden pátek zavřít zápis do starého systému wall2 a převést rozpracované zakázky do nového systému tak, aby se v pondělí dalo plynule pokračovat. Počty zakázek jsou z dat wall2, údaje o novém systému z jeho programového rozhraní. Postup je návrh, nikdo ho zatím nevyzkoušel.</p>
+
+  <div class="soucet">
+    <div class="dlazdice"><span class="eyebrow">Rozpracované</span><b class="num">337</b><small>zakázek není uzavřených ani stornovaných</small></div>
+    <div class="dlazdice"><span class="eyebrow">Letošní</span><b class="num">242</b><small>z nich má číslo z roku 2026</small></div>
+    <div class="dlazdice"><span class="eyebrow">Termín běží</span><b class="num">17</b><small>má termín výroby po 25. 9. 2026</small></div>
+    <div class="dlazdice"><span class="eyebrow">Vyrobené, neuzavřené</span><b class="num">157</b><small>je ve stavu vyrobeno nebo nainstalováno</small></div>
+  </div>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Výchozí stav</span><h2>Kolik zakázek je rozpracovaných</h2></div>
+    <div class="card">
+      <ul>
+        <li>Za rozpracovanou se tu počítá každá zakázka, která není ve stavu „dokončeno, vyfakturováno, uzavřeno“ ani „stornováno“. Takových je <b>337</b> z 20 546 zakázek ve wall2.</li>
+        <li>Číslo z roku 2026 má <b>242</b> z nich, z roku 2025 60, ze starších let 35.</li>
+        <li>Termín výroby po 25. 9. 2026 má jen <b>17</b> zakázek. U 191 termín už uplynul, 129 termín nemá.</li>
+        <li><b>157</b> zakázek je ve stavu vyrobeno nebo nainstalováno.</li>
+      </ul>
+      <p class="zaver">Kolik z nich se ještě opravdu dělá, data neřeknou. Rozhodne to produkční u každé své zakázky ještě před přechodem.</p>
+      <details>
+        <summary>Rozpracované podle stavu a roku</summary>
+        <div>
+          <div class="tab"><table>
+            <thead><tr><th>Stav</th><th class="c">Zakázek</th><th class="c">Rok 2026</th><th class="c">Rok 2025</th><th class="c">Starší</th></tr></thead>
+            <tbody>
+              <tr><td>před výrobou</td><td class="c">153</td><td class="c">98</td><td class="c">44</td><td class="c">11</td></tr>
+              <tr><td>ve výrobě</td><td class="c">24</td><td class="c">23</td><td class="c">0</td><td class="c">1</td></tr>
+              <tr><td>vyrobeno nebo nainstalováno</td><td class="c">157</td><td class="c">120</td><td class="c">16</td><td class="c">21</td></tr>
+              <tr><td>reklamace, vícepráce</td><td class="c">3</td><td class="c">1</td><td class="c">0</td><td class="c">2</td></tr>
+            </tbody>
+          </table></div>
+          <p class="legenda">Rok podle čísla zakázky. Před výrobou: stavy od rozpracované objednávky po schváleno.</p>
+          <div class="tab"><table>
+            <thead><tr><th>Stav ve wall2</th><th class="c">Zakázek</th></tr></thead>
+            <tbody>
+              <tr><td>rozpracovaná objednávka</td><td class="c">14</td></tr>
+              <tr><td>zadaná objednávka</td><td class="c">10</td></tr>
+              <tr><td>termín zaměření</td><td class="c">1</td></tr>
+              <tr><td>zaměřeno</td><td class="c">18</td></tr>
+              <tr><td>GN/CN v přípravě</td><td class="c">24</td></tr>
+              <tr><td>CN/GN odeslán</td><td class="c">78</td></tr>
+              <tr><td>schváleno</td><td class="c">8</td></tr>
+              <tr><td>výroba</td><td class="c">24</td></tr>
+              <tr><td>vyrobeno</td><td class="c">118</td></tr>
+              <tr><td>nainstalováno</td><td class="c">39</td></tr>
+              <tr><td>reklamace, vícepráce</td><td class="c">3</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Kdo</span><h2>Kolik rozpracovaných má který produkční</h2></div>
+    <div class="card">
+      <div class="tab"><table>
+        <thead><tr><th>Produkční</th><th class="c">Rozpracovaných</th><th class="c">Z toho z roku 2026</th></tr></thead>
+        <tbody>
+          <tr><td>Osoba H</td><td class="c">91</td><td class="c">55</td></tr>
+          <tr><td>Osoba C</td><td class="c">79</td><td class="c">66</td></tr>
+          <tr><td>Osoba B</td><td class="c">40</td><td class="c">35</td></tr>
+          <tr><td>Osoba A</td><td class="c">38</td><td class="c">26</td></tr>
+          <tr><td>Osoba D</td><td class="c">28</td><td class="c">16</td></tr>
+          <tr><td>Osoba E</td><td class="c">19</td><td class="c">14</td></tr>
+          <tr><td>Osoba F</td><td class="c">14</td><td class="c">14</td></tr>
+          <tr><td>Osoba I</td><td class="c">12</td><td class="c">11</td></tr>
+          <tr><td>Osoba G</td><td class="c">4</td><td class="c">1</td></tr>
+          <tr><td>bez produkčního</td><td class="c">11</td><td class="c">4</td></tr>
+        </tbody>
+      </table></div>
+      <p class="legenda">Navíc 1 zakázka testovacího uživatele.</p>
+      <ul>
+        <li>Rozpracované zakázky mají dohromady <b>1 618</b> položek, obvykle 3 na zakázku, nejvíc 52.</li>
+        <li>Přílohy má <b>111</b> zakázek, dohromady 912 souborů.</li>
+      </ul>
+      <p class="zaver">Nejvíc rozpracovaných mají dva lidé. Kolik času zabere zapsání jedné zakázky, zatím nikdo nezměřil.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Nový systém</span><h2>Co nový systém od wall2 převezme</h2></div>
+    <div class="card">
+      <ul>
+        <li><b>Staré číslo zakázky.</b> Číslo zakázky se do nového systému přes rozhraní zadat nedá. Staré číslo z wall2 jde uložit do pole pro vnější označení zakázky. Tak to dělá i připravený převod.</li>
+        <li><b>Stav.</b> Zakázka v novém systému nemá jedno pole stavu jako ve wall2. Průběh ukazuje po pracovištích: kolik je hotovo, rozpracováno a kolik čeká. Etapu zakázky jde označit jako hotovou.</li>
+        <li><b>Přílohy.</b> Grafický návrh, dokument i fotografii jde k zakázce nahrát.</li>
+        <li><b>Převod.</b> EmailRator má připravený převod zakázek z wall2. Výsledkem je soubor, do nového systému ho nahrává tým nového systému. Převod čeká na ostrý katalog materiálů, v novém systému jsou zatím jen ukázková data.</li>
+      </ul>
+      <p class="zaver">Zakázky, kterým zbývá už jen uzavření, je jednodušší uzavřít ještě ve wall2 než je převádět a v novém systému znovu označovat jako hotové.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Postup · návrh</span><h2>Jak převod naplánovat</h2></div>
+    <div class="card">
+      <p class="zaver">Rozpracované zakázky přepíšou produkční do nového systému ručně. Přepis je zároveň školení: učí se na svých skutečných zakázkách a cestou opraví, co je ve wall2 zapsané jen volným textem. Poprvé to nedělají v den přechodu, ale týden předem nanečisto.</p>
+      <ol class="kroky">
+        <li class="krok"><div class="kdy">Dva týdny předem</div><div class="co">
+          <h3>Úklid seznamu</h3>
+          <p>Každý produkční dostane seznam svých rozpracovaných zakázek a u každé rozhodne: převést, dokončit a uzavřít ve wall2, nebo stornovat. Seznam „převést“ je pak práce na pátek. Čím víc zakázek se uzavře ve wall2, tím méně přepisu.</p>
+        </div></li>
+        <li class="krok"><div class="kdy">Týden předem</div><div class="co">
+          <h3>Školení na vlastních zakázkách</h3>
+          <p>Každý přepíše několik svých zakázek ze seznamu „převést“ do zkušební kopie nového systému. Naučí se systém bez rizika a změří se, jak dlouho jedna zakázka trvá a jestli má systém pole pro všechno, co produkční potřebují. Podle toho se rozhodne, jestli pátek na přepis stačí.</p>
+        </div></li>
+        <li class="krok"><div class="kdy">Čtvrtek</div><div class="co">
+          <h3>Převod jako záloha</h3>
+          <p>Zakázky s mnoha položkami a ty, které by produkční v pátek nestihli, se předvyplní převodem z čerstvého výpisu wall2. Které to budou, se určí podle času změřeného při školení.</p>
+        </div></li>
+        <li class="krok"><div class="kdy">Pátek</div><div class="co">
+          <h3>Zavření wall2 a ruční přepis</h3>
+          <p>Ráno se do wall2 přestane zapisovat, data v něm zůstanou ke čtení. Každá nová zakázka od té chvíle jen do nového systému. Produkční přepíšou své zakázky ze seznamu „převést“, už podruhé a bez zkoušení. Předvyplněné zakázky zkontrolují a doplní. Odpoledne se odsouhlasí, že každá zakázka ze seznamu „převést“ má v novém systému svůj protějšek. Co zbude, má jmenovitě přiděleného člověka.</p>
+        </div></li>
+        <li class="krok"><div class="kdy">Pondělí a dál</div><div class="co">
+          <h3>První dny v novém systému</h3>
+          <p>Jeden člověk je k dispozici pro dotazy a pro zakázky, které se nepřenesly. Do pondělního poledne se rozhodne, jestli se pokračuje, nebo se vrací do wall2. Po několika dnech souběhu je návrat skoro nemožný.</p>
+        </div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Podmínky</span><h2>Co musí platit, než se termín vyhlásí</h2></div>
+    <div class="card">
+      <ul>
+        <li>V novém systému je ostrý katalog materiálů, ne ukázková data. Bez něj nemají z čeho vybírat ani produkční při ručním přepisu.</li>
+        <li>Je rozhodnuté, jak se zapíše zakázka s více výrobky.</li>
+        <li>Každý produkční si týden předem přepsal několik svých zakázek nanečisto a čas na jednu zakázku je změřený.</li>
+        <li>Převod pro zakázky, které se nepřepisují ručně, prošel zkouškou a produkční ho zkontrolovali.</li>
+        <li>Je jasné, jak půjdou faktury do účetního programu Pohoda a kdo zapisuje zakázky z e-mailů. EmailRator zadání z e-mailu připraví, do nového systému ho zatím zapsat neumí.</li>
+        <li>Všichni mají v novém systému účet.</li>
+      </ul>
+      <p class="pozor"><b>Hotové a uzavřené zakázky se ručně nepřevádějí.</b> Zůstávají ve wall2 ke čtení. Historii jde do nového systému doplnit převodem později.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><span class="eyebrow">Co nevíme</span><h2>Neověřené</h2></div>
+    <div class="card">
+      <ul>
+        <li>Kolik zakázek bude rozpracovaných v den přechodu. Počty jsou z dat stažených 25.–26. 9. 2026 a ve wall2 se od té doby dál pracuje.</li>
+        <li>Jak dlouho trvá zapsání jedné zakázky do nového systému.</li>
+        <li>Jestli jde wall2 přepnout jen pro čtení. Když ne, stačí dohoda a v pondělí kontrola, že ve wall2 po pátku nevznikla nová zakázka.</li>
+        <li>Kolik údajů převod doplní sám a kolik zůstane na produkčních. Ukáže to zkouška převodu.</li>
+        <li>Jestli jde nový systém zkopírovat na zkoušku a školení, aby se nanečisto nezapisovalo do ostrých dat. Když ne, musí se zkušební zakázky po školení smazat.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p>Zdroje: data zakázek wall2 stažená 25.–26. 9. 2026, spočítaná skriptem <code>scripts/rozpracovane_wall2.py</code>; programové rozhraní nového systému (<code>Doc/ref/prelude-graphql/schema.graphql</code>); stav převodu podle <code>Doc/PLAN-presny-prevod.md</code>. Čísla na stránce ověřuje <code>scripts/prechod_kontrola.py</code>.</p>
+  </footer>
+</div>
+
+</body>
+</html>

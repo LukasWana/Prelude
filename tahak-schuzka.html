@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Tahák na schůzku 5. 10.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Kde poběží (Doc/vedeni/hosting.html): hlavička s ořezovými značkami, karty, tabulky.
+   Tahák je pro jednoho čtenáře: krátké věty, málo čísel, podrobnosti v rozbalovacích blocích <details>. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eefa;
+  --good: #006300;
+  --bad: #b3261e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --bad: #f07b72;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --bad: #f07b72;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 17px/1.6 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 960px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 56px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(23px, 3.2vw, 30px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 70ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+sup a { text-decoration: none; font: 500 11px var(--font-mono); }
+
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card > p { color: var(--ink-2); }
+.hlavni { background: var(--accent-wash); border-color: transparent; }
+.hlavni p:first-child { color: var(--ink); font-size: 21px; font-weight: 600; line-height: 1.35; }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td { color: var(--ink-2); }
+td:first-child { color: var(--ink); font-weight: 600; width: 32%; }
+th { font: 500 12px var(--font-mono); color: var(--muted); }
+
+.body { margin: 0; padding-left: 22px; display: grid; gap: 10px; color: var(--ink-2); max-width: 74ch; }
+.body b { color: var(--ink); font-weight: 600; }
+.nerikej li::marker { color: var(--bad); }
+.nerikej b { color: var(--bad); }
+.nevime { color: var(--muted); font-style: italic; }
+
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+details p, details li { color: var(--ink-2); }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+.zdroje { color: var(--ink-2); line-height: 1.6; margin: 0; padding-left: 20px; font-size: 15px; }
+.zdroje a { overflow-wrap: anywhere; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · tahák jen pro mě, neposílat dál</div>
+    <h1>Tahák na schůzku 5. 10.</h1>
+    <div class="meta"><span>Ověřeno 4. 10. 2026</span><span>Co nevíme, je napsané jako „nevíme“</span></div>
+  </header>
+
+  <section id="hlavni">
+    <div class="sec-head">
+      <div class="eyebrow">Hlavní věta</div>
+      <h2>Kontejner neznamená dodavatele</h2>
+    </div>
+    <div class="card hlavni">
+      <p>Souhlasím, ať to běží u Googlu. Google Cloud Run je služba Googlu a spouští právě kontejnery.</p>
+      <p>Google o Cloud Run píše: „Cloud Run is a fully managed application platform for running your code, function, or container on top of Google's highly scalable infrastructure.“<sup><a href="#z1">[1]</a></sup></p>
+      <p class="zaver">Spor tedy není „Google, nebo cizí firma“. Spor je „Cloud Run, nebo Apps Script“. Obojí je Google.</p>
+    </div>
+  </section>
+
+  <section id="otazka">
+    <div class="sec-head">
+      <div class="eyebrow">Začni otázkou</div>
+      <h2>„Co přesně vám na kontejneru vadí?“</h2>
+    </div>
+    <div class="card">
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Když odpoví</th><th>Co říct</th></tr></thead>
+          <tbody>
+            <tr><td>Data odejdou mimo Google</td><td>U Cloud Run běží program ve firemním projektu Google Cloud a data mohou ležet v EU, v Berlíně<sup><a href="#z8">[8]</a></sup>. Dnes ale jde text e-mailu pro modely do USA, maskovaný: pro model Jev vždy<sup><a href="#z9">[9]</a></sup>, pro převod přes Ollamu hlavně<sup><a href="#z7">[7]</a></sup>. Jak by to šlo bez USA, je níž ve variantě <a href="#google">Všechno u Googlu</a>.</td></tr>
+            <tr><td>Nechceme dalšího dodavatele serveru</td><td>U Cloud Run žádný není, server dává Google. Účty u modelů ale dnes zůstávají: pro model Jev vždy (OpenRouter, nebo přímo TypeSafe), pro Ollamu, dokud převod nedělá Gemini<sup><a href="#z9">[9]</a></sup>. Bez nich jen ve variantě <a href="#google">Všechno u Googlu</a>.</td></tr>
+            <tr><td>Bude to drahé</td><td>U Googlu celkem asi 770 Kč měsíčně, bez záloh a přenosu dat. Z toho databáze asi 300 Kč<sup><a href="#z8">[8]</a></sup>. Kolik stojí Apps Script, nevíme.</td></tr>
+            <tr><td>Kdo se o to bude starat</td><td>Stejná otázka platí pro Apps Script. Kód v něm taky někdo musí udržovat a opravovat. Vlastní server jsme zamítli právě proto, že se o něj ve firmě nemá kdo starat.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="appsscript">
+    <div class="sec-head">
+      <div class="eyebrow">Když chtějí Apps Script</div>
+      <h2>Proč ne celý program v Apps Scriptu</h2>
+    </div>
+    <div class="card">
+      <ul class="body">
+        <li><b>Přepis.</b> Apps Script je JavaScript<sup><a href="#z3">[3]</a></sup>. Náš hotový program je v Pythonu: 64 souborů, asi 15 900 řádků, přes 1 500 automatických testů. Přepis by byl nový program, který by se musel znovu odzkoušet a změřit.</li>
+        <li><b>Limity.</b> Jedno spuštění smí trvat nejvýš 6 minut. Spouštěče mají u účtů Workspace dohromady 6 hodin denně<sup><a href="#z4">[4]</a></sup>.</li>
+        <li><b>Vlastní kód je potřeba tak jako tak.</b> Pro vlastní kroky ve Workspace Studiu Google píše: „using Google Apps Script or your preferred programming language“<sup><a href="#z5">[5]</a></sup>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pravdu">
+    <div class="sec-head">
+      <div class="eyebrow">Řekni to sám</div>
+      <h2>Kde mají pravdu</h2>
+    </div>
+    <div class="card">
+      <ul class="body">
+        <li><b>Databáze.</b> Apps Script se umí připojit k databázi PostgreSQL<sup><a href="#z6">[6]</a></sup>.</li>
+        <li><b>Cloud Run něco stojí a chce přípravu.</b> Projekt u Googlu s fakturací na firmu a databázi<sup><a href="#z8">[8]</a></sup>.</li>
+        <li><b>Na jednoduché kroky nástroje Googlu stačí.</b> Workspace Studio umí spustit tok novým e-mailem, vytáhnout údaje a zapsat je do tabulky<sup><a href="#z9">[9]</a></sup>. Chybí mu naše kontroly.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="nerikej">
+    <div class="sec-head">
+      <div class="eyebrow">Pozor</div>
+      <h2>Tohle neříkej, není to pravda</h2>
+    </div>
+    <div class="card">
+      <ul class="body nerikej">
+        <li><b>„Žádná další smlouva.“</b> Dnes účty u modelů zůstávají (viz výš).</li>
+        <li><b>„Kontejner půjde na Cloud Run beze změn.“</b> Co program zapíše na disk, u Googlu zmizí, když se program zastaví: „Data written to the file system doesn't persist when the instance stops.“<sup><a href="#z2">[2]</a></sup> Náš program dnes na disk ukládá databázi SQLite, přílohy a uložené odpovědi Jevu (plán <code>Doc/PLAN-google.md</code>). To se musí přesunout jinam.</li>
+        <li><b>„Všechno už teď může zůstat u Googlu.“</b> Dnes ne. Text pro model Jev jde do USA v každé variantě<sup><a href="#z9">[9]</a></sup>. Převod v EU umí u Googlu jen Vertex AI<sup><a href="#z9">[9]</a></sup>, a ten náš kód zatím neumí (volá jen Gemini API). Co by bylo potřeba, je ve variantě <a href="#google">Všechno u Googlu</a>.</li>
+        <li><b>„Apps Script je zdarma.“</b> <span class="nevime">Nevíme.</span> Přehled Apps Scriptu ani stránka jeho limitů cenu neuvádí.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="kompromis">
+    <div class="sec-head">
+      <div class="eyebrow">Návrh, nevyzkoušený</div>
+      <h2>Kompromis, který můžeš nabídnout</h2>
+    </div>
+    <div class="card">
+      <p>Apps Script nebo Workspace Studio jako tenká vrstva: štítky, zápis do tabulky, upozornění. Převod a kontroly zůstanou v Pythonu na Cloud Run ve firemním projektu Google Cloud. Hotový kód se nepřepisuje.</p>
+      <p class="nevime">Nic z toho jsme zatím nezkoušeli. Jestli to jde přesně takhle propojit, nevíme.</p>
+    </div>
+  </section>
+
+  <section id="google">
+    <div class="sec-head">
+      <div class="eyebrow">Varianta, zatím neověřená</div>
+      <h2>Všechno u Googlu a v EU</h2>
+    </div>
+    <div class="card">
+      <p>Šlo by to, kdyby Jeva nahradil model u Googlu a převod dělal Gemini na Vertex AI v EU. Znamená to přeprogramování, ne přepis celého programu.</p>
+      <ul class="body">
+        <li><b>Jev technicky nutný není.</b> Když Jev nefunguje, panel e-mail převede dál, jen chybí jeho posudek (kód panelu). Že Jev zůstává v každé variantě, je naše rozhodnutí z 2. 10., ne technická podmínka.</li>
+        <li><b>Jeho úkol ale zůstává.</b> Model většinou něco vyplní i do e-mailu, který poptávkou tisku není<sup><a href="#z9">[9]</a></sup>. Proto ho posuzuje druhý model. Tu práci by musel převzít jiný model, třeba Gemini.</li>
+        <li><b>Převod.</b> gemini-3.5-flash je stejně přesný jako deepseek<sup><a href="#z9">[9]</a></sup>. Vertex AI v EU náš kód zatím neumí, musí se doprogramovat.</li>
+      </ul>
+      <h3>Co je potřeba</h3>
+      <ul class="body">
+        <li>doprogramovat Vertex AI pro převod i pro posudek,</li>
+        <li>změřit Gemini jako posudek proti Jevu na naší testovací sadě,</li>
+        <li>zaplatit měření: bezplatný klíč Gemini má jen 20 volání denně<sup><a href="#z9">[9]</a></sup>. Placený účet je rozhodnutí.</li>
+      </ul>
+      <p class="nevime">Jak dobře by Gemini posoudil e-mail místo Jevu, nevíme. Neměřili jsme to.</p>
+      <p class="zaver">Co říct: „Všechno u Googlu jde nejspíš udělat. Musí se to doprogramovat a změřit, výsledek zatím nemáme.“</p>
+    </div>
+  </section>
+
+  <section id="vybira">
+    <div class="sec-head">
+      <div class="eyebrow">Třetí možnost</div>
+      <h2>Produkční si e-maily vybírá sám</h2>
+    </div>
+    <div class="card">
+      <p>Nástroj by nic nehledal. Produkční otevře e-mail, který chce zpracovat, a panel ho převede. Jev by nebyl potřeba.</p>
+      <ul class="body">
+        <li><b>Panel už takhle funguje.</b> Převádí na vyžádání. Automatický převod nové pošty je ve výchozím stavu vypnutý.</li>
+        <li><b>Jev v panelu jen upozorňuje.</b> Ukazuje řádek „Tisková poptávka: … — ověř, jestli jde o zakázku“, na místě tří teček ano, spíš ano, spíš ne nebo ne. Když e-mail vybral člověk, na tuhle otázku už odpověděl sám.</li>
+      </ul>
+      <h3>Co se získá</h3>
+      <ul class="body">
+        <li>žádný účet u Jeva a žádný text, který kvůli Jevu jde do USA,</li>
+        <li>pro variantu <a href="#google">Všechno u Googlu</a> stačí doprogramovat Gemini na Vertex AI pro převod. Druhý model ani jeho měření nejsou potřeba.</li>
+      </ul>
+      <h3>Co se ztratí</h3>
+      <ul class="body">
+        <li>nástroj sám nenajde poptávky v poště, třídění do kanbanu stojí na Jevovi. Produkční je hlídají sami, jako dnes,</li>
+        <li>automatické přijetí údajů: brána jistoty ho bez posudku Jeva nepustí. Dnes je vypnuté a každý údaj potvrzuje produkční<sup><a href="#z9">[9]</a></sup>. Kdyby se mělo zapnout, druhý posudek se musí vrátit.</li>
+      </ul>
+      <p class="zaver">Co říct: „Nejjednodušší cesta ke Googlu: nástroj převede e-mail, který produkční vybere. Ztratíme automatické hledání poptávek.“</p>
+    </div>
+  </section>
+
+  <section id="asus">
+    <div class="sec-head">
+      <div class="eyebrow">Kdyby padla otázka</div>
+      <h2>Zkušební provoz na asus-serveru</h2>
+    </div>
+    <div class="card">
+      <ul class="body">
+        <li><b>Je to zkouška, ne firemní nasazení.</b> Připravuje se kontejner pro server asus-server. Ke dni 4. 10. se dodělává, jestli už běží, ověř před schůzkou.</li>
+        <li><b>„Proč to tam nenechat natrvalo?“</b> Vlastní server pro ostrý provoz jsme zamítli, protože se o něj ve firmě nemá kdo starat při výpadcích. To platí dál.</li>
+        <li><b>Co ukáže, až poběží.</b> Že program jde zabalit do kontejneru. Na Cloud Run ale bude potřeba upravit ukládání souborů (viz výš).</li>
+      </ul>
+      <details>
+        <summary>Co dalšího chybí pro provoz na serveru</summary>
+        <div>
+          <p>Podle plánu (<code>Doc/PLAN-google.md</code>, stav k 2. 10., doplněno 4. 10.). Hotové od 4. 10.: klíče si program bere nejdřív z nastavení serveru. Chybí:</p>
+          <ul class="body">
+            <li>klíč k Ollamě, dnes ho program neposílá,</li>
+            <li>přihlášení ke Gmailu bez člověka,</li>
+            <li>přihlášení do panelu, dnes ho panel nemá,</li>
+            <li>adresa serveru v programu i v rozšíření Chrome,</li>
+            <li>soubory mimo disk (u Cloud Run),</li>
+            <li>Gemini na Vertex AI, jen pokud má být převod v EU.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="zdroje">
+    <div class="sec-head">
+      <div class="eyebrow">Odkud to víme</div>
+      <h2>Zdroje</h2>
+    </div>
+    <div class="card">
+      <ol class="zdroje">
+        <li id="z1"><a href="https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run">https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run</a> — co je Cloud Run</li>
+        <li id="z2"><a href="https://docs.cloud.google.com/run/docs/container-contract">https://docs.cloud.google.com/run/docs/container-contract</a> — Cloud Run: soubory na disku po zastavení mizí</li>
+        <li id="z3"><a href="https://developers.google.com/apps-script/overview">https://developers.google.com/apps-script/overview</a> — Apps Script</li>
+        <li id="z4"><a href="https://developers.google.com/apps-script/guides/services/quotas">https://developers.google.com/apps-script/guides/services/quotas</a> — Apps Script: limity</li>
+        <li id="z5"><a href="https://support.google.com/workspace-studio/answer/16433731?hl=en">https://support.google.com/workspace-studio/answer/16433731?hl=en</a> — Workspace Studio: vlastní kroky</li>
+        <li id="z6"><a href="https://developers.google.com/apps-script/guides/jdbc">https://developers.google.com/apps-script/guides/jdbc</a> — Apps Script: připojení k databázím</li>
+        <li id="z7"><a href="https://ollama.com/cloud">https://ollama.com/cloud</a> — Ollama: servery hlavně v USA</li>
+        <li id="z8"><a href="hosting.html">Kde poběží EmailRator</a> — ceny, region Berlín, co je potřeba připravit</li>
+        <li id="z9"><a href="nasazeni.html">Nasazení EmailRatoru</a> — modely, Jev, maskování, nástroje Google</li>
+      </ol>
+      <p class="nevime">Počty souborů, řádků a testů jsou spočítané z projektu 4. 10. Údaje hlídá skript scripts/tahak_kontrola.py.</p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

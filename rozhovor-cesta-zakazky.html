@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Mapujeme cestu zakázky</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Kostra rozhovoru: jeden sloupec, šest kroků schůzky pod sebou; stejné tokeny jako ostatní stránky Doc/vedeni */
+:root {
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --lane: #eff1f3;
+  --chip: #e3e6ea;
+  --ink: #14171c;
+  --ink-2: #454b55;
+  --muted: #6c717a;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e8f0fb;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #9a9fa8;
+    --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1a2738;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --lane: #1f2227; --chip: #2c3037; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #9a9fa8;
+  --line: rgba(255, 255, 255, .10); --accent: #6ea4ee; --accent-wash: #1a2738;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 17px/1.55 var(--font-body); }
+.wrap {
+  max-width: 760px; margin: 0 auto;
+  padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 44px;
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 54px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(23px, 3.4vw, 29px); font-weight: 750; font-stretch: 85%; }
+h3 { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; max-width: 65ch; }
+ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; max-width: 65ch; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+header { display: flex; flex-direction: column; gap: 14px; }
+.lead { font-size: 19px; color: var(--ink-2); }
+
+.priprava { background: var(--lane); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.priprava ul { color: var(--ink-2); font-size: 16px; }
+
+.osnova { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px 20px; }
+.osnova li { display: flex; gap: 10px; align-items: baseline; }
+.osnova .c { font: 500 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+section.krok { display: grid; grid-template-columns: 44px 1fr; gap: 0 14px; padding-top: 26px; border-top: 1px solid var(--line); }
+.krok > .cislo { font: 800 30px/1 var(--font-display); font-stretch: 78%; color: var(--accent); font-variant-numeric: tabular-nums; }
+.krok > .obsah { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.blok { display: flex; flex-direction: column; gap: 8px; }
+
+.odkazy { display: flex; flex-direction: column; gap: 8px; }
+.odkaz { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; text-decoration: none; color: var(--ink); }
+.odkaz:hover { border-color: var(--accent); }
+.odkaz:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.odkaz b { font-weight: 700; color: var(--accent); }
+.odkaz span { font-size: 15px; color: var(--ink-2); }
+
+.otazky li::marker { content: "? "; color: var(--accent); font-weight: 700; }
+.pozor { font-size: 15px; color: var(--ink-2); border-left: 3px solid var(--accent); padding-left: 12px; }
+
+.stavy { display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: center; list-style: none; padding: 0; margin: 0; max-width: none; }
+.stavy li { display: flex; align-items: center; gap: 4px; }
+.stavy li + li::before { content: "→"; color: var(--muted); font-size: 14px; }
+.s { font-size: 14px; padding: 3px 8px; border-radius: 4px; background: var(--chip); color: var(--ink); white-space: nowrap; }
+.s.bok { background: transparent; border: 1px dashed var(--muted); }
+.s.konec { background: var(--accent-wash); color: var(--ink); font-weight: 600; }
+
+.domluva { background: var(--accent-wash); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+footer { font: 13px/1.5 var(--font-mono); color: var(--muted); }
+
+@media (max-width: 480px) {
+  section.krok { grid-template-columns: 1fr; gap: 8px; }
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">EmailRator · kostra rozhovoru · út 20. 10. 2026</div>
+  <h1>Mapujeme cestu zakázky</h1>
+  <p class="lead">Schůzka s kolegyní. Ukážu demo, projdeme, co už víme, a domluvíme se, jak spolu zmapujeme cestu zakázky od poptávky po fakturu.</p>
+</header>
+
+<nav aria-label="Osnova">
+  <ol class="osnova">
+    <li><span class="c">1</span><a href="#k1">Proč jsme tu</a></li>
+    <li><span class="c">2</span><a href="#k2">Demo v Gmailu</a></li>
+    <li><span class="c">3</span><a href="#k3">Stopa jedné zakázky</a></li>
+    <li><span class="c">4</span><a href="#k4">Co víme z dat</a></li>
+    <li><span class="c">5</span><a href="#k5">Kam míří nový systém</a></li>
+    <li><span class="c">6</span><a href="#k6">Co zmapujeme spolu</a></li>
+  </ol>
+</nav>
+
+<section class="krok" id="k1">
+  <div class="cislo">1</div>
+  <div class="obsah">
+    <h2>Proč jsme tu</h2>
+    <div class="blok">
+      <h3>Říct</h3>
+      <ul>
+        <li>Mám nástroj na první krok zakázky: z e-mailu s poptávkou udělá zadání.</li>
+        <li>Chci zmapovat celou cestu zakázky. Vím, že tebe mapování procesů baví taky.</li>
+      </ul>
+    </div>
+    <div class="blok">
+      <h3>Zeptat se</h3>
+      <ul class="otazky">
+        <li>Co tě na mapování procesů ve firmě láká nejvíc?</li>
+        <li>Mapovala jsi už něco podobného jinde? Jak jste to dělali?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="krok" id="k2">
+  <div class="cislo">2</div>
+  <div class="obsah">
+    <h2>Demo: EmailRator v Gmailu</h2>
+    <div class="blok">
+      <h3>Ukázat živě</h3>
+      <ul>
+        <li>Otevřít e-mail s poptávkou, vpravo se ukáže panel.</li>
+        <li>Zadání zakázky: produkt, náklad, rozměr, materiál, termín.</li>
+        <li>Kliknout na údaj, v e-mailu se podbarví věta, ze které pochází.</li>
+        <li>Oddíl Katalog: zatím testovací katalog, ne ostrý Prelude.</li>
+      </ul>
+    </div>
+    <div class="blok">
+      <h3>Říct</h3>
+      <ul>
+        <li>Produkční zadání jen zkontroluje, nemusí ho skládat z e-mailu.</li>
+        <li>Do systému ho zatím zapisuje sám. Zápis zakázky EmailRator ještě neumí.</li>
+      </ul>
+    </div>
+    <div class="odkazy">
+      <a class="odkaz" href="nasazeni.html"><b>Nasazení EmailRatoru</b><span>Podrobnosti o nástroji</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="krok" id="k3">
+  <div class="cislo">3</div>
+  <div class="obsah">
+    <h2>Stopa jedné zakázky</h2>
+    <div class="odkazy">
+      <a class="odkaz" href="stopa-zakazky.html"><b>Stopa jedné zakázky</b><span>Diagram drah, jak zakázka teče dnes. Příklad: polep výlohy, 2 panely</span></a>
+    </div>
+    <div class="blok">
+      <h3>Říct</h3>
+      <ul>
+        <li>Každá dráha je jeden člověk nebo oddělení. Je vidět, kde si práci předávají.</li>
+        <li>Je to mapa současného stavu, 11 kroků. Červené kroužky jsou ztráty: přepis, hledání, ztracený podklad.</li>
+        <li>Na zakázce se pracuje asi 5 hodin, trvá ale 4 dny. Zlepšit tedy znamená zkrátit čekání a zrušit přepisy, ne zrychlit lidi.</li>
+      </ul>
+    </div>
+    <p class="pozor">Časy na stránce jsou ilustrační, nikdo je neměřil. Tohle říct nahlas.</p>
+    <div class="blok">
+      <h3>Zeptat se</h3>
+      <ul class="otazky">
+        <li>Sedí ty kroky na to, co znáš z firmy?</li>
+        <li>Chybí v diagramu někdo, kdo na zakázce pracuje?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="krok" id="k4">
+  <div class="cislo">4</div>
+  <div class="obsah">
+    <h2>Co víme z dat starého systému</h2>
+    <div class="blok">
+      <h3>Říct</h3>
+      <ul>
+        <li>Změřeno na 9 705 zakázkách z wall2, roky 2023–2026.</li>
+        <li>Fotka z instalace je jen u 0,5 % zakázek s montáží.</li>
+        <li>Tři produkční mají 77 % všech zakázek.</li>
+      </ul>
+    </div>
+    <div class="odkazy">
+      <a class="odkaz" href="uzka-hrdla.html"><b>Úzká hrdla zakázek</b><span>Co z textu o úzkých hrdlech sedí na datech</span></a>
+      <a class="odkaz" href="rozbor-zakazek-wall2.html"><b>Rozbor zakázek wall2</b><span>Tvar zakázek, šablony, trend po letech, opravy</span></a>
+      <a class="odkaz" href="vytizeni-produkcnich.html"><b>Vytížení produkčních wall2</b><span>Kolik zakázek má kdo</span></a>
+    </div>
+    <div class="blok">
+      <h3>Kostra mapy: stavy zakázky ve wall2</h3>
+      <ol class="stavy">
+        <li><span class="s">rozpracovaná objednávka</span></li>
+        <li><span class="s">zadaná objednávka</span></li>
+        <li><span class="s">termín zaměření</span></li>
+        <li><span class="s">zaměřeno</span></li>
+        <li><span class="s">GN/CN v přípravě</span></li>
+        <li><span class="s">CN/GN odeslán</span></li>
+        <li><span class="s">schváleno</span></li>
+        <li><span class="s">výroba</span></li>
+        <li><span class="s">vyrobeno</span></li>
+        <li><span class="s">nainstalováno</span></li>
+        <li><span class="s konec">dokončeno, vyfakturováno, uzavřeno</span></li>
+      </ol>
+      <p class="pozor">Před uzavřením může přijít ještě stav <span class="s bok">reklamace, vícepráce</span>, zvlášť stojí stornováno. Wall2 u zakázky drží jen současný stav, ne kdy se měnil. Jak dlouho zakázka v každém stavu čekala, z jeho dat nezjistíme.</p>
+    </div>
+  </div>
+</section>
+
+<section class="krok" id="k5">
+  <div class="cislo">5</div>
+  <div class="obsah">
+    <h2>Kam míří nový systém Prelude</h2>
+    <div class="blok">
+      <h3>Říct</h3>
+      <ul>
+        <li>Nový systém jsme prošli podle jeho programového rozhraní. Co umí uložit, víme. Jestli to lidé budou používat, ne.</li>
+        <li>Ve wall2 je 337 rozpracovaných zakázek. Postup jejich převodu je zatím jen návrh.</li>
+      </ul>
+    </div>
+    <div class="odkazy">
+      <a class="odkaz" href="novy-system.html"><b>Co změní nový systém</b><span>Co se po přechodu na Prelude může změnit a co zůstane jako dnes</span></a>
+      <a class="odkaz" href="prechod.html"><b>Přechod na nový systém</b><span>Rozpracované zakázky a návrh postupu, zatím nevyzkoušený</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="krok" id="k6">
+  <div class="cislo">6</div>
+  <div class="obsah">
+    <h2>Co zmapujeme spolu</h2>
+    <div class="blok">
+      <h3>Co zatím chybí</h3>
+      <ul>
+        <li>Projít kroky Stopy se skutečnými lidmi: sedí kroky a předávky?</li>
+        <li>Změřit skutečné časy práce a čekání. Dnes máme jen příklad.</li>
+        <li>Vyzkoušet dva jednoduché návrhy: fotka z montáže do e-mailového vlákna zakázky a podklady k faktuře.</li>
+        <li>Napsat plán mapování. Zatím žádný není.</li>
+      </ul>
+    </div>
+    <div class="domluva">
+      <h3>Domluvit na konci</h3>
+      <ul class="otazky">
+        <li>Kterou skutečnou zakázku projdeme jako první?</li>
+        <li>S kým mluvit: produkční, grafik, montáž, fakturace?</li>
+        <li>Jak budeme měřit čekání: ze stavů v systému, nebo zápisem u pár zakázek?</li>
+        <li>Kdo co připraví a kdy se sejdeme znovu?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="krok">
+  <div class="cislo" aria-hidden="true">+</div>
+  <div class="obsah">
+    <h2>Kdyby přišla řeč na AI nebo výzkum</h2>
+    <div class="odkazy">
+      <a class="odkaz" href="vyzkum-ai-procesy.html"><b>AI a procesy ve výzkumu</b><span>Výtah z 18 studií: AI v kancelářské práci, zavedení v malé firmě, mapování procesů</span></a>
+      <a class="odkaz" href="ai-transformace.html"><b>AI transformace v praxi</b><span>Co o zavádění AI do firmy jde doložit, jen ověřené zdroje</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>Čísla převzatá ze stránek Stopa, Úzká hrdla a Přechod, stavy zakázky z dat wall2 (stažena 25.–26. 9. 2026). Zdroj: EmailRator Doc/vedeni/rozhovor-cesta-zakazky.html</footer>
+
+</div>
+
+</body>
+</html>

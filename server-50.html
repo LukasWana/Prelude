@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Firemní server pro 50 lidí</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Rozvržení: hlavička, dvě startovací sestavy vedle sebe, rozpis položek, dva pruhové grafy složení ceny,
+   kroky rozšíření a jiné stroje, provoz (doma, datové centrum, Proxmox), dražší cesty okrajově, kde koupit, zdroje.
+   Vzhled převzat z Doc/vedeni/server.html (stránky pro vedení). Na stránce jsou jen údaje přečtené přímo u zdroje. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --grid: #e2e4e7;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eefa;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --grid: #2a2d33; --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1c2940;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --grid: #2a2d33; --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1c2940;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.eyebrow { font: 500 12px/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--ink-2); font-size: 18px; }
+
+/* hlavička s ořezovými značkami */
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+
+section { display: grid; gap: 20px; }
+.sec-head { display: grid; gap: 8px; }
+.note { font-size: 13px; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 18px 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 900px) { .three { grid-template-columns: 1fr; } }
+
+/* sestavy */
+.opt-head { display: grid; gap: 4px; }
+.opt-head h3 { display: flex; align-items: center; gap: 9px; }
+.sw { flex: none; width: 12px; height: 12px; border-radius: 3px; background: var(--c); }
+.opt-head p { color: var(--ink-2); font-size: 14px; }
+.price { font: 800 34px/1 var(--font-display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.price small { display: block; font: 400 14px/1.4 var(--font-body); color: var(--ink-2); margin-top: 6px; }
+.facts { display: grid; margin: 0; }
+.facts div { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.facts dt { font: 500 12px/1.6 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 0; font-size: 15px; }
+.facts dd b { font-weight: 700; }
+.c1 { --c: var(--s1); } .c2 { --c: var(--s2); } .c3 { --c: var(--s3); }
+
+/* pruhové grafy: délka pruhu = cena položky, oba grafy mají stejné měřítko */
+.card-head p { color: var(--ink-2); font-size: 14px; margin-top: 3px; }
+.bars { display: grid; gap: 12px; }
+.bar { display: grid; gap: 5px; }
+.bar-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 14px; }
+.bar-top span:first-child { color: var(--ink-2); }
+.bar-top b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.track { position: relative; height: 14px; border-left: 1px solid var(--axis); }
+.track i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--c); border-radius: 0 4px 4px 0; }
+
+/* tabulky */
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 620px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 12px var(--font-mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+tr.grp td { font: 700 15px var(--font-display); padding-top: 18px; border-bottom-color: var(--axis); }
+.num td:nth-last-child(-n+2), .num th:nth-last-child(-n+2) { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.num td:nth-last-child(2) { color: var(--ink-2); }
+.num tr.grp td { text-align: left; color: var(--ink); }
+.num3 { min-width: 520px; }
+.num3 td:not(:first-child), .num3 th:not(:first-child) { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr.sum td { font-weight: 700; border-top: 1px solid var(--axis); border-bottom-color: var(--axis); }
+
+.points { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.points li { padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+.points li b { font-weight: 700; }
+
+.shop-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.shop-list li { padding: 9px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+.shop-list a { font-weight: 600; }
+.shop-list span { font-size: 14px; color: var(--ink-2); }
+
+footer { color: var(--muted); font-size: 14px; display: grid; gap: 10px; border-top: 1px solid var(--line); padding-top: 18px; }
+footer p { max-width: 95ch; }
+footer b { color: var(--ink-2); }
+.src { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 28px; margin: 0; padding: 0; list-style: none; font-size: 13.5px; }
+@media (max-width: 760px) { .src { grid-template-columns: 1fr; } }
+.src li { padding: 3px 0; overflow-wrap: anywhere; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">Startovací server · repasovaný stroj</div>
+    <h1>Firemní server pro 50 lidí</h1>
+    <p class="lede">Jedna konkrétní sestava repasovaného serveru za 18 513 Kč, která se dá objednat u prodejce Czech-Server, a vedle ní díly, o které ji jde rozšířit. Všechny ceny jsem přečetl přímo v konfigurátoru prodejce. Co se mi ověřit nepodařilo, je vyjmenováno na konci stránky.</p>
+    <div class="meta"><span>Přečteno 30. 9. 2026</span><span>Ceny s DPH i bez DPH</span><span>Odkaz na zdroj u každého údaje</span></div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Nabídka</div>
+      <h2>Sestava Start a čím ji rozšířit</h2>
+    </div>
+    <div class="two">
+      <div class="card c1">
+        <div class="opt-head">
+          <h3><span class="sw"></span>Start</h3>
+          <p>Dell EMC PowerEdge R640 s disky na systém a na data.</p>
+        </div>
+        <div class="price">18 513 Kč<small>s DPH, bez DPH 15 300 Kč</small></div>
+        <dl class="facts">
+          <div><dt>Procesory</dt><dd><b>2× Xeon Silver 4108</b>, dohromady 16 jader.</dd></div>
+          <div><dt>Paměť</dt><dd><b>32 GB</b> DDR4.</dd></div>
+          <div><dt>Systém</dt><dd>Karta BOSS se dvěma disky SSD 240 GB, které se navzájem zrcadlí.</dd></div>
+          <div><dt>Data</dt><dd>2× pevný disk 4 TB. Při zrcadlení <b>4 TB</b> místa, před odečtením režie souborového systému. Další dvě pozice na disky zůstanou volné.</dd></div>
+          <div><dt>Provedení</dt><dd>Do racku, výška 1U. Jeden zdroj 750 W.</dd></div>
+          <div><dt>Spotřeba</dt><dd>Tato sestava změřená není. Stejný model s většími procesory a jedním diskem: <b>55 W</b> v klidu, 232 W při poloviční zátěži.</dd></div>
+          <div><dt>Hluk</dt><dd>Stejný model podle Dellu: <b>35 až 36 dBA</b> v klidu, 37 až 39 dBA při zátěži, při 25 °C.</dd></div>
+          <div><dt>Záruka</dt><dd>2 roky.</dd></div>
+        </dl>
+        <div class="tablewrap">
+          <table class="num" style="min-width:0">
+            <thead><tr><th>Z čeho se cena skládá</th><th>Bez DPH</th><th>S DPH</th></tr></thead>
+            <tbody>
+              <tr><td>Server: 2× Xeon Silver 4108, 32 GB, 4 pozice na disky 3,5", zdroj 750 W</td><td>8 300 Kč</td><td>10 043 Kč</td></tr>
+              <tr><td>Karta BOSS se 2× SSD 240 GB</td><td>5 000 Kč</td><td>6 050 Kč</td></tr>
+              <tr><td>2× pevný disk Dell 4 TB SAS 3,5" včetně rámečků</td><td>2 000 Kč</td><td>2 420 Kč</td></tr>
+              <tr class="sum"><td>Celkem</td><td>15 300 Kč</td><td>18 513 Kč</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card c2">
+        <div class="opt-head">
+          <h3><span class="sw"></span>Rozšíření</h3>
+          <p>Příplatky z konfigurátoru téhož serveru. Každý řádek je samostatná volba.</p>
+        </div>
+        <div class="tablewrap">
+          <table class="num" style="min-width:0">
+            <thead><tr><th>Položka</th><th>Bez DPH</th><th>S DPH</th></tr></thead>
+            <tbody>
+              <tr class="grp"><td colspan="3">Paměť místo 32 GB</td></tr>
+              <tr><td>64 GB</td><td>4 000 Kč</td><td>4 840 Kč</td></tr>
+              <tr><td>128 GB</td><td>12 000 Kč</td><td>14 520 Kč</td></tr>
+              <tr><td>256 GB</td><td>28 000 Kč</td><td>33 880 Kč</td></tr>
+              <tr class="grp"><td colspan="3">Místo na data</td></tr>
+              <tr><td>Další pevný disk 4 TB, za kus</td><td>1 000 Kč</td><td>1 210 Kč</td></tr>
+              <tr><td>Pevný disk 8 TB, za kus</td><td>8 000 Kč</td><td>9 680 Kč</td></tr>
+              <tr class="grp"><td colspan="3">Rychlé disky SSD</td></tr>
+              <tr><td>8 pozic na disky 2,5" místo 4 pozic 3,5"</td><td>999 Kč</td><td>1 209 Kč</td></tr>
+              <tr><td>Disk SSD Dell 960 GB SATA, za kus</td><td>9 000 Kč</td><td>10 890 Kč</td></tr>
+              <tr><td>Disk SSD Dell 3,84 TB SATA, za kus</td><td>20 000 Kč</td><td>24 200 Kč</td></tr>
+              <tr><td>10 pozic 2,5", z toho 8 pro disky NVMe</td><td>4 999 Kč</td><td>6 049 Kč</td></tr>
+              <tr><td>Nový disk NVMe Samsung PM9A3 960 GB, za kus</td><td>6 000 Kč</td><td>7 260 Kč</td></tr>
+              <tr class="grp"><td colspan="3">Spolehlivost, správa a síť</td></tr>
+              <tr><td>Dva zdroje 750 W místo jednoho</td><td>800 Kč</td><td>968 Kč</td></tr>
+              <tr><td>Licence plné vzdálené správy iDRAC 9 Enterprise</td><td>600 Kč</td><td>726 Kč</td></tr>
+              <tr><td>Řadič HBA330 Mini, prodejce ho doporučuje pro ZFS</td><td>1 999 Kč</td><td>2 419 Kč</td></tr>
+              <tr><td>Síť 2× 10 Gb/s (SFP+) a 2× 1 Gb/s</td><td>1 498 Kč</td><td>1 813 Kč</td></tr>
+              <tr><td>Ližiny do racku</td><td>1 499 Kč</td><td>1 814 Kč</td></tr>
+              <tr class="grp"><td colspan="3">Zálohy na druhém stroji</td></tr>
+              <tr><td>HPE ProLiant DL380 Gen9, 2× Xeon E5-2650v4, 32 GB, 12 pozic na disky, v ceně 2× 4 TB</td><td>4 900 Kč</td><td>5 929 Kč</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Jde o příplatky při objednávce serveru. Počet a velikost pozic na disky se volí při objednávce. Za kolik prodejce prodá stejné díly později samostatně, jsem nezjišťoval. Ceny s DPH jsou přepočtené sazbou 21 %.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Grafická karta</div>
+      <h2>Dá se do serveru později přidat grafická karta?</h2>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h3>Ano, ale jen nízkou</h3>
+        <ul class="points">
+          <li><b>Co říká Dell.</b> Servisní příručka k R640 (revize A19, srpen 2026) uvádí grafickou kartu mezi podporovanými rozšiřujícími kartami, a to jen jako kartu s nízkým profilem.</li>
+          <li><b>Kam se vejde.</b> Záleží na tom, jaké díly pro rozšiřující karty (risery) server má. S risery 1A a 2A do pozic 1, 3 a 2. S risery 1B a 2B příručka uvádí kartu NVIDIA v pozici 2.</li>
+          <li><b>Jaké jsou sloty.</b> Podle technického průvodce Dellu jde o sloty PCIe třetí generace s šířkou x16 pro karty s nízkým profilem a poloviční délkou. Riser 2B má slot pro kartu plné výšky a tříčtvrteční délky.</li>
+          <li><b>Proč jen nízkou.</b> Server je vysoký 1U. Jiné než nízké grafické karty příručka mezi podporovanými neuvádí.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Co o kartě nevím</h3>
+        <ul class="points">
+          <li><b>Které risery má nabízený kus.</b> Konfigurátor prodejce to neuvádí. Před koupí karty je potřeba se zeptat prodejce.</li>
+          <li><b>Které konkrétní karty.</b> Seznam modelů ani nejvyšší příkon karty jsem v příručce nenašel.</li>
+          <li><b>Cena.</b> Konfigurátor tohoto serveru žádnou grafickou kartu nenabízí.</li>
+          <li><b>Stroj stavěný na karty.</b> V katalogu téhož prodejce je Dell PowerEdge T640 s popisem „GPU upgrade“, s licencí Windows Server za 70 400 Kč bez DPH (85 184 Kč s DPH).</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Spotřeba a hlučnost</div>
+      <h2>Co změřil výrobce</h2>
+      <p class="note">Přesně sestavu Start nikdo neměřil. Níže jsou měření stejného modelu v jiné výbavě a u každého je napsáno v jaké.</p>
+    </div>
+    <div class="two">
+      <div class="card c1">
+        <h3>Dell R640</h3>
+        <ul class="points">
+          <li><b>Spotřeba: 55 W v klidu, 125 W při desetinové zátěži, 232 W při poloviční, 469 W naplno.</b> Měřil Dell podle metodiky SPEC v srpnu 2017, výsledek zveřejnila organizace SPEC. Stroj měl dva procesory Xeon Platinum 8180, 192 GB paměti, jeden disk SSD a jeden zdroj 750 W.</li>
+          <li><b>Hluk v klidu: 35 až 36 dBA.</b> Měření Dellu při 25 °C. Nižší hodnota je pro nejmenší výbavu (1 procesor, 1 disk, 4 pozice na disky 3,5"), vyšší pro typickou (2 procesory, 8 disků 2,5", 2 zdroje).</li>
+          <li><b>Hluk při zátěži: 37 až 39 dBA</b> pro tytéž dvě výbavy při 25 °C.</li>
+          <li><b>V teple je hlasitější.</b> V klidu při 28 °C 46 až 48 dBA. Při plné zátěži a 35 °C 53 až 69 dBA.</li>
+          <li><b>Co k tomu píše Dell.</b> Nejmenší výbava je dost tichá pro běžnou kancelář, jinak je server určený do datového centra s obsluhou. Ve vzdálené správě jde zapnout omezení hluku (sound cap) za cenu nižšího výkonu.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Roční spotřeba při nepřetržitém běhu</h3>
+        <div class="tablewrap">
+          <table class="num3" style="min-width:0">
+            <thead><tr><th>Stav</th><th>Příkon</th><th>Za rok</th><th>Při 6 Kč za kWh</th></tr></thead>
+            <tbody>
+              <tr><td>V klidu</td><td>55 W</td><td>482 kWh</td><td>2 891 Kč</td></tr>
+              <tr><td>Desetinová zátěž</td><td>125 W</td><td>1 095 kWh</td><td>6 570 Kč</td></tr>
+              <tr><td>Poloviční zátěž</td><td>232 W</td><td>2 032 kWh</td><td>12 194 Kč</td></tr>
+              <tr><td>Plná zátěž</td><td>469 W</td><td>4 108 kWh</td><td>24 651 Kč</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Čísla platí pro výbavu, kterou měřil Dell, ne pro sestavu Start. Ta má jiné procesory, méně paměti a víc disků. Cena 6 Kč za kWh je příklad, skutečnou určuje smlouva s dodavatelem. Spotřebu koupeného stroje ukáže zásuvkový wattmetr.</p>
+        <p class="note">Zálohovací stroj HPE DL380 Gen9 z rozšíření: měření spotřeby jsem nenašel. Hluk podle dokumentu výrobce z 9. 9. 2014 při 23 °C: model Entry LFF 23 dBA v klidu a 25 dBA při provozu, model Base LFF 39 dBA v klidu a 31 dBA při provozu (tak je to v dokumentu uvedeno). Nabízený kus má novější procesory a mezi měřenými modely není.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Provoz</div>
+      <h2>Kde server poběží a co k tomu říká výrobce systému</h2>
+    </div>
+    <div class="three">
+      <div class="card">
+        <h3>Doma nebo ve firmě</h3>
+        <ul class="points">
+          <li><b>Spotřeba a hluk.</b> Měření stejného modelu jsou v oddílu výše. Pro sestavu Start přesná čísla nejsou.</li>
+          <li><b>Přepočet.</b> Každých 100 W trvalého odběru je 876 kWh za rok. Při ceně 6 Kč za kWh to dělá 5 256 Kč ročně.</li>
+          <li><b>Provedení.</b> Server je určený do racku a má výšku 1U.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>V datovém centru</h3>
+        <ul class="shop-list">
+          <li><a href="https://www.czech-server.cz/dell-emc-poweredge-r640-silver-16-core-1-80-ghz-nvme_x314341.html" target="_blank" rel="noopener">DC Vega přes Czech-Server</a><span>Místo 1U za 777 Kč měsíčně, 2U za 1 027 Kč. Elektřina 4,90 Kč za kWh. Volba je přímo v konfigurátoru serveru.</span></li>
+          <li><a href="https://dc6.cz/cenik-server-housingu/" target="_blank" rel="noopener">DC6</a><span>1U za 680 Kč, 2U za 1 280 Kč měsíčně, připojení 1 Gb/s.</span></li>
+          <li><a href="https://www.master.cz/server-housing/" target="_blank" rel="noopener">MasterDC</a><span>Od 1 942 Kč měsíčně s odběrem do 100 W, od 4 348 Kč do 200 W.</span></li>
+          <li><a href="https://coolhousing.net/en/coolhousing-price-list" target="_blank" rel="noopener">Coolhousing</a><span>Od 27,85 EUR měsíčně, elektřina 0,23 EUR za kWh.</span></li>
+        </ul>
+        <p class="note">Ceny bez DPH podle ceníků.</p>
+      </div>
+      <div class="card">
+        <h3>Proxmox: co říká dokumentace</h3>
+        <ul class="points">
+          <li><b>Požadavky.</b> Procesor Intel nebo AMD s podporou virtualizace, nejméně 2 GB paměti pro systém a k tomu paměť pro virtuální stroje.</li>
+          <li><b>Disky.</b> Souborový systém ZFS není slučitelný s hardwarovým řadičem RAID. Proto je mezi rozšířeními řadič HBA330.</li>
+          <li><b>Aktualizace.</b> Zdroj aktualizací bez předplatného je podle dokumentace určený pro testování a neprodukční použití. Předplatné začíná na 120 EUR ročně za jeden procesor, u stroje se dvěma procesory 240 EUR (5 860 Kč kurzem ČNB 24,415 Kč za euro z 29. 9. 2026).</li>
+          <li><b>Zálohy.</b> Zálohovací server má mít 4 GB paměti a další 1 GB na každý TB záloh. Pro pevné disky dokumentace vysoce doporučuje přidat dvojici SSD na metadata. Zálohovací stroj z rozšíření ji v ceně nemá.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Kde koupit</div>
+      <h2>Odkazy na nabídku</h2>
+      <p class="note">Stav k 30. 9. 2026. U repasovaného zboží se nabídka mění, sestavu před objednávkou potvrdí prodejce.</p>
+    </div>
+    <div class="card">
+      <ul class="shop-list">
+        <li><a href="https://www.czech-server.cz/dell-emc-poweredge-r640-silver-16-core-1-80-ghz-nvme_x314341.html" target="_blank" rel="noopener">Czech-Server: Dell EMC PowerEdge R640 Silver 16-Core</a><span>Server sestavy Start s konfigurátorem paměti, disků, řadiče, zdrojů, sítě a umístění v datovém centru.</span></li>
+        <li><a href="https://www.czech-server.cz/hpe-proliant-dl380-gen9-v4-24-core-2-20-ghz-8-tb-sas_x79490.html" target="_blank" rel="noopener">Czech-Server: HPE ProLiant DL380 Gen9 s 2× 4 TB</a><span>Zálohovací stroj z rozšíření.</span></li>
+        <li><a href="https://www.czech-server.cz/servery-a-storage_c8764596.html" target="_blank" rel="noopener">Czech-Server: celý katalog serverů</a><span>Prodejce uvádí u repasovaných serverů záruku 2 roky a servis do dalšího pracovního dne.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>Jak jsem ověřoval.</b> Každé číslo na stránce jsem 30. 9. 2026 přečetl přímo na stránce prodejce, datového centra nebo v dokumentu výrobce. Výsledky vyhledávání ani odhady jsem nepoužil. Moje vlastní jsou jen součty, přepočet DPH sazbou 21 %, přepočet kWh a přepočet eura kurzem ČNB.</p>
+    <p><b>Co ověřené není.</b> Spotřeba a hlučnost přesně této sestavy: měření existují jen pro stejný model v jiné výbavě. Které risery má nabízený kus a které konkrétní grafické karty do něj jdou. Cena dopravy. Kolik kusů má prodejce skladem. V konfigurátoru je zaškrtnutá položka Sleva 6 000 Kč na Dell R640 a R740 a u zálohovacího stroje Sleva 2 000 Kč; nevím, jestli jsou už započtené v uvedených cenách. Jestli jsou disky SSD na kartě BOSS nové, nabídka neříká. Kolik místa na data firma potřebuje, nevím.</p>
+    <p><b>Zdroje.</b></p>
+    <ul class="src">
+      <li><a href="https://www.czech-server.cz/dell-emc-poweredge-r640-silver-16-core-1-80-ghz-nvme_x314341.html" target="_blank" rel="noopener">Czech-Server: konfigurátor R640</a> (ceny serveru, dílů a umístění)</li>
+      <li><a href="https://www.czech-server.cz/hpe-proliant-dl380-gen9-v4-24-core-2-20-ghz-8-tb-sas_x79490.html" target="_blank" rel="noopener">Czech-Server: DL380 Gen9</a> (zálohovací stroj)</li>
+      <li><a href="https://www.czech-server.cz/servery-a-storage_c8764596.html" target="_blank" rel="noopener">Czech-Server: katalog</a> (Dell T640, záruka)</li>
+      <li><a href="https://dl.dell.com/topicspdf/poweredge-r640_owners-manual_en-us.pdf" target="_blank" rel="noopener">Dell: servisní příručka R640, revize A19</a> (grafické karty a sloty)</li>
+      <li><a href="https://coloradosos.gov/pubs/elections/VotingSystems/DVS-DemocracySuite517/documentation/DellPoweredgeR640TechGuide.pdf" target="_blank" rel="noopener">Dell: technický průvodce R640</a> (typy slotů; kopie na webu státu Colorado)</li>
+      <li><a href="https://www.spec.org/power_ssj2008/results/res2017q3/power_ssj2008-20170829-00781.html" target="_blank" rel="noopener">SPEC: měření spotřeby Dell R640</a></li>
+      <li><a href="https://www.spec.org/power_ssj2008/results/power_ssj2008.html" target="_blank" rel="noopener">SPEC: seznam všech výsledků</a> (DL380 Gen9 v něm není)</li>
+      <li><a href="https://downloads.dell.com/manuals/common/dell_emc_poweredge_14g_acoustical_performance_and_dependencies_22nov2018.pdf" target="_blank" rel="noopener">Dell: hlučnost serverů 14. generace</a> (R640, tabulka 6)</li>
+      <li><a href="https://www.uni-bamberg.de/fileadmin/rz/hardware/Quickspec_DL380_G9.pdf" target="_blank" rel="noopener">HP: QuickSpecs DL380 Gen9</a> (hlučnost; kopie dokumentu na webu univerzity v Bamberku)</li>
+      <li><a href="https://pve.proxmox.com/pve-docs/chapter-pve-installation.html" target="_blank" rel="noopener">Proxmox VE: požadavky</a> (procesor, paměť, ZFS a RAID)</li>
+      <li><a href="https://pve.proxmox.com/pve-docs/chapter-sysadmin.html" target="_blank" rel="noopener">Proxmox VE: zdroje aktualizací</a></li>
+      <li><a href="https://www.proxmox.com/en/products/proxmox-virtual-environment/pricing" target="_blank" rel="noopener">Proxmox: ceník předplatného</a></li>
+      <li><a href="https://pbs.proxmox.com/docs/system-requirements.html" target="_blank" rel="noopener">Proxmox Backup Server: požadavky</a></li>
+      <li><a href="https://dc6.cz/cenik-server-housingu/" target="_blank" rel="noopener">DC6: ceník</a></li>
+      <li><a href="https://www.master.cz/server-housing/" target="_blank" rel="noopener">MasterDC: server housing</a></li>
+      <li><a href="https://coolhousing.net/en/coolhousing-price-list" target="_blank" rel="noopener">Coolhousing: ceník</a></li>
+      <li><a href="https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/" target="_blank" rel="noopener">ČNB: kurzy devizového trhu</a></li>
+    </ul>
+  </footer>
+</div>
+
+</body>
+</html>
