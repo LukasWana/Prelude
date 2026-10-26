@@ -120,7 +120,7 @@ tr.celkem td { color: var(--ink); font-weight: 700; border-top: 2px solid var(--
     <div class="crop"></div>
     <div class="eyebrow">EmailRator · jednoduše</div>
     <h1>Služba uvnitř systému, nebo doplněk prohlížeče</h1>
-    <div class="meta"><span>Výklad z projektu, ne ověřený zdroj</span><span>Převod e-mailu na zakázku</span></div>
+    <div class="meta"><span>Zdroje přečteny 26. 10. 2026</span><span>Převod e-mailu na zakázku</span><span>Stupeň ověření je u každého tvrzení</span></div>
   </header>
 
   <section id="moznosti">
@@ -153,14 +153,15 @@ tr.celkem td { color: var(--ink); font-weight: 700; border-top: 2px solid var(--
           <thead><tr><th></th><th>1 · uvnitř systému</th><th>2 · doplněk prohlížeče</th></tr></thead>
           <tbody>
             <tr><td>Výhody</td>
-              <td>Jedno místo pro práci. Nic se neinstaluje na počítače, aktualizace jsou jen na serveru. Práva a data řeší systém sám. Funguje v každém prohlížeči i na telefonu.</td>
-              <td>Panel je hned u otevřeného e-mailu, nejkratší cesta od čtení k zakázce. Vidí jen e-mail, který je otevřený, takže nepotřebuje číst celou schránku. Funguje i dřív, než je nový systém hotový.</td></tr>
+              <td>Jedno místo pro práci. Nic se neinstaluje na počítače, aktualizace jsou jen na serveru. Práva a data řeší systém sám. Funguje v každém prohlížeči.</td>
+              <td>Panel je hned u otevřeného e-mailu, nejkratší cesta od čtení k zakázce. Doplněk umí přečíst stránku, kterou uživatel právě vidí <a class="z" href="#z1">[1]</a>, takže nepotřebuje číst celou schránku. Funguje i dřív, než je nový systém hotový.</td></tr>
             <tr><td>Nevýhody</td>
-              <td>Uživatel přepíná mezi Gmailem a systémem. E-mail se do systému musí dostat, což znamená číst schránku na serveru se souhlasem Googlu. Závisí na tom, kdy bude systém hotový.</td>
-              <td>Instalace a aktualizace na každém počítači. Jen Chrome na počítači, na telefonu nic. Google může změnit podobu Gmailu. Doplněk čte obsah e-mailů, takže se musí hlídat, kam data tečou.</td></tr>
+              <td>Uživatel přepíná mezi Gmailem a systémem. Aby se e-mail dostal do systému, musí se číst schránka na serveru. Google takový přístup (například <span class="num">gmail.readonly</span>) řadí mezi omezené a vyžaduje ověření aplikace a při ukládání dat na serveru i bezpečnostní posouzení <a class="z" href="#z2">[2]</a>. Závisí na tom, kdy bude systém hotový.</td>
+              <td>Každou novou verzi doplňku kontroluje Chrome Web Store, obvykle několik dní, někdy i týdny <a class="z" href="#z3">[3]</a>. Instalace a aktualizace na počítačích uživatelů. Doplněk čte obsah e-mailů, takže se musí hlídat, kam data tečou.</td></tr>
           </tbody>
         </table>
       </div>
+      <p class="vyhrada">Neověřeno, bez zdroje: že doplňky nejdou na telefonu, že Google může změnit podobu Gmailu a že jde doplněk rozeslat správcem najednou všem. Zdroje ke každému z toho ještě chybí.</p>
     </div>
   </section>
 
@@ -170,7 +171,32 @@ tr.celkem td { color: var(--ink); font-weight: 700; border-top: 2px solid var(--
       <h2>Začít variantou 1</h2>
     </div>
     <div class="card duvod">
-      <p>Služba uvnitř systému je základ. Doplněk prohlížeče je pohodlná nástavba nad stejným serverem, ne jeho náhrada.</p>
+      <p>Služba uvnitř systému je základ. Doplněk prohlížeče je pohodlná nástavba nad stejným serverem, ne jeho náhrada. Je to náš výklad z projektu, žádný ze zdrojů o něm nerozhoduje.</p>
+    </div>
+  </section>
+
+  <section id="vysvetleni">
+    <div class="card">
+      <details>
+        <summary>Jak jsou tvrzení ověřená</summary>
+        <div>
+          <p><b>[1] ověřeno 1× (jen jeden zdroj).</b> Dokumentace Chromu: „they are able to read details of the web pages the browser visits, make changes to them, and pass information to their parent extension.“</p>
+          <p><b>[2] ověřeno 1× (jen jeden zdroj, Google).</b> Dokumentace Gmail API uvádí <span class="num">gmail.readonly</span> mezi omezenými rozsahy a píše: „If you store restricted scope data on servers (or transmit), then you must go through a security assessment.“ U nás je aplikace s <span class="num">gmail.readonly</span> od 4. 10. 2026 ve stavu In production a podmínkou Googlu byla veřejná stránka se zásadami (plán EmailRatoru). To je záznam z našeho projektu, do počtu zdrojů se nepočítá.</p>
+          <p><b>[3] ověřeno 1× (jen jeden zdroj, Google).</b> Dokumentace Web Store: „For most extensions, review is completed within a few days, but it can take up to a few weeks.“ Stejný postup platí „whether for a new item or an update to an existing one.“</p>
+          <p><b>Co zdroje neřekly.</b> Stránka o nastavení doplňků pro správce a stránka o zásadě ExtensionInstallForcelist se po stažení načetly bez textu, takže o rozesílání doplňku správcem nic netvrdíme. Pro mobilní Chrome jsme našli jen novinářské články (ne primární zdroj), proto o telefonu také nic netvrdíme.</p>
+          <p><b>Žádné tvrzení není ověřeno 2× nezávislými zdroji.</b> Zdroje [2] a [3] jsou od Googlu, takže i kdyby byly dvě, počítají se jako jeden autor. Na těchto zdrojích proto nestavíme rozhodnutí. Doporučení výše je výklad.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Zdroje <span class="pocet">přečteny 26. 10. 2026</span></summary>
+        <div>
+          <ul class="zdroje" id="zdroje">
+            <li id="z1"><a href="https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts">https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts</a> — Chrome: skripty doplňku na stránce, čtení a úprava stránky</li>
+            <li id="z2"><a href="https://developers.google.com/workspace/gmail/api/auth/scopes">https://developers.google.com/workspace/gmail/api/auth/scopes</a> — Gmail API: rozsahy přístupu, omezené rozsahy, ověření a bezpečnostní posouzení</li>
+            <li id="z3"><a href="https://developer.chrome.com/docs/webstore/review-process">https://developer.chrome.com/docs/webstore/review-process</a> — Chrome Web Store: schvalování nových položek i aktualizací</li>
+          </ul>
+        </div>
+      </details>
     </div>
   </section>
 </div>
