@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Otázky ke katalogu Prelude</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@90,600;90,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f3f5f4; --surface: #ffffff; --ink: #1a1f21; --muted: #5a6569; --line: #d7dddc;
+  --accent: #00747f; --accent-soft: #dff0f1; --accent-ink: #ffffff;
+  --ok: #2d7a3c; --ok-soft: #e3f1e5; --magenta: #b0306e;
+  --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111516; --surface: #1a2022; --ink: #e6ebeb; --muted: #97a3a6; --line: #2b3336;
+    --accent: #4ec2cf; --accent-soft: #143439; --accent-ink: #0b1a1c;
+    --ok: #6cc47c; --ok-soft: #16301b; --magenta: #e07aa9;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111516; --surface: #1a2022; --ink: #e6ebeb; --muted: #97a3a6; --line: #2b3336;
+  --accent: #4ec2cf; --accent-soft: #143439; --accent-ink: #0b1a1c;
+  --ok: #6cc47c; --ok-soft: #16301b; --magenta: #e07aa9;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 900px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 22px; }
+header { display: grid; gap: 12px; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center; }
+.eyebrow i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+h1 { font: 700 clamp(28px, 5vw, 40px)/1.1 var(--display); font-stretch: 90%; margin: 0; text-wrap: balance; }
+.intro { margin: 0; color: var(--muted); max-width: 65ch; }
+.stav { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.stav b { font: 600 22px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.stav span { color: var(--muted); font-size: 13px; }
+.bar { flex: 1 1 200px; height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; }
+.bar > div { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.stav .akce { display: flex; gap: 8px; margin-left: auto; }
+.filtry { display: flex; flex-wrap: wrap; gap: 8px; }
+.filtry button, .btn { font: 500 13px/1 var(--body); padding: 9px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.filtry button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.filtry button small { font-family: var(--mono); opacity: .7; margin-left: 4px; }
+.btn.hl { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); border-radius: 8px; }
+.btn:disabled { opacity: .45; cursor: default; }
+button:focus-visible, textarea:focus-visible, label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.seznam { display: grid; gap: 14px; }
+.karta { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 10px; border-left: 4px solid var(--line); }
+.karta.hotovo { border-left-color: var(--ok); }
+.hlava { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font: 500 12px/1.3 var(--mono); color: var(--muted); }
+.tag { text-transform: uppercase; letter-spacing: .06em; padding: 3px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.dopad { font-variant-numeric: tabular-nums; }
+.dopad strong { color: var(--ink); font-weight: 500; }
+.pill { margin-left: auto; padding: 3px 8px; border-radius: 999px; background: var(--bg); }
+.hotovo .pill { background: var(--ok-soft); color: var(--ok); }
+.karta h2 { font: 600 17px/1.35 var(--body); margin: 0; text-wrap: balance; }
+.data { margin: 0; color: var(--muted); font-size: 14px; }
+.data::before { content: "Z dat: "; font-weight: 600; color: var(--ink); }
+.volby { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0; }
+.volby label { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; font-size: 14px; background: var(--bg); }
+.volby label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.volby input { accent-color: var(--accent); margin: 0; }
+textarea { width: 100%; min-height: 54px; resize: vertical; font: 14px/1.45 var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.pata { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.pata .info { font-size: 13px; color: var(--muted); }
+.pata .info.chyba { color: var(--magenta); }
+.pozn { font-size: 13px; color: var(--muted); margin: 0; }
+@media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><i style="background:#00a3b4"></i><i style="background:#c2186b"></i><i style="background:#e8c21a"></i><i style="background:var(--ink)"></i> EmailRator · převod zakázek wall2 → Prelude</div>
+    <h1>Otázky ke katalogu Prelude</h1>
+    <p class="intro">Při převodu zakázek ze starého systému do číselníků Prelude zůstaly věci, které z dat nejde poznat. U každé otázky vyberte odpověď, nebo ji napište do pole, a uložte. U otázky je vidět, kolika položek starého systému se týká, takže začněte shora. Odpovědi uvidí všichni, kdo stránku otevřou.</p>
+  </header>
+
+  <section class="stav" aria-live="polite">
+    <div><b id="pocet">0 / 0</b><br><span>otázek zodpovězeno</span></div>
+    <div class="bar" role="progressbar" aria-label="Zodpovězeno podle počtu položek"><div id="bar"></div></div>
+    <div><b id="podil">0 %</b><br><span>dotčených položek vyřešeno</span></div>
+    <div class="akce"><button class="btn" id="stahnout" type="button" hidden>Stáhnout CSV</button></div>
+  </section>
+
+  <nav class="filtry" id="filtry" aria-label="Oblast"></nav>
+  <p class="pozn" id="rezim">Načítám uložené odpovědi…</p>
+  <div class="seznam" id="seznam"></div>
+  <div id="odeslat" hidden></div>
+</div>
+
+<script id="otazky" type="application/json">[{"id": "q01", "c": 1, "oblast": "materiál", "otazka": "Dibond „slabší“ = hliník 0,15 mm a „silnější“ = 0,21 mm?", "data": "slabší 5737, silnější 608 položek; demo: 2 mm jen 0,15, 3 mm 0,15 / 0,21 / 0,3", "moznosti": ["ano", "jinak (napište)"], "n": 6345}, {"id": "q02", "c": 2, "oblast": "služby", "otazka": "Jedna položka se dvěma službami („Zaměření a grafika“, „Balné GLS“, „Doprava + instalace“): v Prelude jako jedna položka, nebo rozdělit na dvě?", "data": "wall2 je má v jedné položce s jednou cenou", "moznosti": ["rozdělit na dvě", "jedna položka (hlavní služba)", "nechat neuvedeno"], "n": 5191}, {"id": "q03", "c": 3, "oblast": "služby", "otazka": "Položka jen „Doprava“ bez dopravce: který dopravce to byl?", "data": "dopravce v textu chybí", "moznosti": ["Prelude (vlastní auto)", "Externí dopravce", "nelze říct (nechat neuvedeno)"], "n": 4337}, {"id": "q04", "c": 4, "oblast": "materiál", "otazka": "„Nátěr - lak“ (i penetrace, malba…): zapsat v Prelude jako MATERIÁL položky vedle desky, nebo jen jako OPERACI lakování / nátěr u desky?", "data": "wall2 ho má mezi materiály; typicky obraz = Kapa Tex + rám obrazu + lak; jako materiál dělá z položky 3 materiály", "moznosti": ["jen operace (lakování / nátěr)", "materiál i operace", "jinak (napište)"], "n": 4052}, {"id": "q05", "c": 5, "oblast": "stroj", "otazka": "Kde (na jakém stroji / pracovišti) se dělá „Nátěr - lak“?", "data": "73 % položek s lakem má Rám obrazu (obraz; často s Kapa Tex); pracoviště lakovna jen 0,8 %, UV potisk 4 %", "moznosti": ["ručně (Manuálně / Dílna)", "Lakovna", "UV lak z tiskárny (tisk Lak / UV deskové)"], "n": 3004}, {"id": "q06", "c": 6, "oblast": "služby", "otazka": "Balné, startovné a sleva: kam patří v Prelude?", "data": "demo Prelude pro ně číselník nemá", "moznosti": ["činnost", "doprava (balné)", "jinam (napište)", "nepřevádět"], "n": 2421}, {"id": "q07", "c": 7, "oblast": "varianta", "otazka": "Kterou variantu „polymer tisk bílý“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["Multigrip (z wall2)", "Profit polymer lesk", "Profit polymer lesk kanálkové lepidlo", "Profit polymer mat", "Profit polymer mat kanálkové lepidlo", "Spider (z wall2)"], "n": 1778}, {"id": "q08", "c": 8, "oblast": "služby", "otazka": "Kurýr ve starých zakázkách = „Kurýr Praha“ v Prelude? A „JL Trans“ = „JL Transport“, „osobní odběr“ = „Osobní převzetí“?", "data": "wall2 píše jen „kurýr“, dopravce ani město neuvádí", "moznosti": ["ano, všechny tři", "jinak (napište)"], "n": 1236}, {"id": "q09", "c": 9, "oblast": "varianta", "otazka": "Kterou variantu „imitace pískovaného skla“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["IP 7802", "IP 7802 PA", "IP 7803", "IP 7803 PA", "IP 7805", "IP 7805 PA"], "n": 1219}, {"id": "q10", "c": 10, "oblast": "služby", "otazka": "„Grafika“, „grafická příprava“ = činnost „Grafická práce“, nebo „dtp“?", "data": "„grafické práce“ = Grafická práce (stejné slovo); tyto dva zápisy ne", "moznosti": ["Grafická práce", "dtp", "podle případu (nelze říct)"], "n": 1179}, {"id": "q11", "c": 11, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „Caravan“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 855}, {"id": "q12", "c": 12, "oblast": "varianta", "otazka": "Kterou variantu „folie tisk čirý“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["Aslan loopPET clear", "Mactac PET JT6710", "Neschen easy dot clear", "Neschen easy dot transparent", "Ultra clear", "polymer (z wall2)"], "n": 789}, {"id": "q13", "c": 13, "oblast": "stroj", "otazka": "Kde se dělá MALBA (Nátěr - … malba)?", "data": "pracoviště plotr 88 % (řeže šablonu)", "moznosti": ["Manuálně", "Dílna", "jiné"], "n": 760}, {"id": "q14", "c": 14, "oblast": "služby", "otazka": "Lešení, plošina, režie, produkce: založit jako činnosti?", "data": "demo Prelude je nemá", "moznosti": ["ano, všechny", "jen některé (napište)", "ne"], "n": 652}, {"id": "q15", "c": 15, "oblast": "stroj", "otazka": "Kde se dělá NÁTĚR (penetrace, barva, mořidlo…)?", "data": "pracoviště CNC 97 % (nátěr frézovaných dílů)", "moznosti": ["Manuálně", "Dílna", "Lakovna"], "n": 634}, {"id": "q16", "c": 16, "oblast": "varianta", "otazka": "Kterou variantu „OWV“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["Profit One Way pro dopravní prostř.", "Stickyprint pro solvent i UV", "UV (z wall2)", "polymer (z wall2)"], "n": 536}, {"id": "q17", "c": 17, "oblast": "materiál", "otazka": "„Folie Easy Dott“ = čirá fólie Neschen easy dot, nebo druh lepidla easy dot?", "data": "demo má obojí", "moznosti": ["čirá fólie", "druh lepidla"], "n": 490}, {"id": "q18", "c": 18, "oblast": "varianta", "otazka": "Kterou variantu „laminace polymer“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["IEASY lesk", "IEASY mat"], "n": 406}, {"id": "q19", "c": 19, "oblast": "služby", "otazka": "Aplikace (lepení polepu) a montáž = činnost „Instalace“?", "data": "demo Prelude má jen Instalace", "moznosti": ["ano", "založit zvlášť (napište název)"], "n": 386}, {"id": "q20", "c": 20, "oblast": "služby", "otazka": "Deinstalace, demontáž, deaplikace (odstranění polepu): založit činnost „Deinstalace“, nebo je to „Instalace“?", "data": "demo Prelude má jen Instalace", "moznosti": ["založit Deinstalace", "je to Instalace"], "n": 362}, {"id": "q21", "c": 21, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „OWV“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 245}, {"id": "q22", "c": 22, "oblast": "stroj", "otazka": "Materiál, na který se podle číselníku smí tisknout na Solventu, UV rolovém i UV deskovém: kde se ve skutečnosti tiskne?", "data": "při převodu zatím předpokládáme UV rolové (225 sekcí; dřív se vedlo jako UV deskové 374); předpoklad nemá zdroj z výroby", "moznosti": ["UV rolové", "UV deskové", "Solvent", "záleží na zakázce (napište čím)"], "n": 225}, {"id": "q23", "c": 23, "oblast": "stroj", "otazka": "Kde se dělá OMÍTÁNÍ (Omítka jádrová / štuková)?", "data": "", "moznosti": ["Dílna", "Manuálně", "externí výroba"], "n": 164}, {"id": "q24", "c": 24, "oblast": "stroj", "otazka": "Zpevnění okrajů a oka (po 25 cm, v rozích) = „Manuálně“ jako demo „oka po 30/50 cm“?", "data": "zpevnění okrajů 105, oka po 25 cm 17, oka v rozích 13", "moznosti": ["ano (Manuálně)", "jiný stroj"], "n": 135}, {"id": "q25", "c": 25, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „CLV“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 128}, {"id": "q26", "c": 26, "oblast": "stroj", "otazka": "Tiskne firemní UV rolové bílou (4/0+W, double-strike)?", "data": "obecně ano, konkrétní stroj neověřen", "moznosti": ["ano", "ne (pak UV deskové)"], "n": 124}, {"id": "q27", "c": 27, "oblast": "varianta", "otazka": "Kterou variantu „magnetka“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["+ PVC fólie (z wall2)", "magnetka bílá 0,4", "magnetka bílá 0,6", "magnetka bílá 0,85", "magnetka hnědá 0,6"], "n": 117}, {"id": "q28", "c": 28, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „translucent tisk“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 110}, {"id": "q29", "c": 29, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „backlight“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 85}, {"id": "q30", "c": 30, "oblast": "varianta", "otazka": "Kterou variantu „litá tisk bílá“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["3M IJ180", "Mactac JT10700"], "n": 80}, {"id": "q31", "c": 31, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „folie tisk čirý“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 75}, {"id": "q32", "c": 32, "oblast": "varianta", "otazka": "Kterou variantu „laminace litá“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["3M 8518", "3M 8520", "Mactac LF10700", "Master Guard"], "n": 56}, {"id": "q33", "c": 33, "oblast": "stroj", "otazka": "UV s bílou a v textu 1/0 (nebo 4/4): znamená to černá + bílá? Doplnit „tisk 1/0+W“ (a „4/4+W“)?", "data": "katalog má jen tisk 4/0+W", "moznosti": ["ano, černá + bílá", "ne, je to 4/0+W", "jinak (napište)"], "n": 56}, {"id": "q34", "c": 34, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „reflexní folie tisk“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 47}, {"id": "q35", "c": 35, "oblast": "stroj", "otazka": "Výsek u položek, kde je zapsané jen pracoviště tisk (ne plotr ani chuan): čím se řeže?", "data": "výsek jinak: plotr 115, chuan 49 položek (z pracoviště)", "moznosti": ["plotr", "chuan", "tiskárna s ořezem (print & cut)"], "n": 43}, {"id": "q36", "c": 36, "oblast": "zkratka", "otazka": "„multigrip“ (doplněk, hlavně s Laminace mat) = fólie, nebo laminace?", "data": "volný doplněk za čárkou, nízká jistota", "moznosti": ["fólie (polymer Multigrip)", "laminace"], "n": 42}, {"id": "q37", "c": 37, "oblast": "laminace", "otazka": "Jakým typem laminace se laminuje „mrazuvzdorná tisková“ (když je v zakázce jen Laminace mat/lesk)?", "data": "wall2 uvádí jen povrch mat/lesk, typ laminace ne", "moznosti": ["laminace monomer", "polymer", "litá (demo)"], "n": 40}, {"id": "q38", "c": 38, "oblast": "stroj", "otazka": "UV tisk jen černou (text 1/0 nebo 1/1): doplnit do katalogu operace „tisk 1/0“ a „tisk 1/1“?", "data": "katalog má jen tisk 4/0 a 4/4", "moznosti": ["ano, obě", "jen 1/0", "ne, tiskne se jako 4/0"], "n": 40}, {"id": "q39", "c": 39, "oblast": "zkratka", "otazka": "„05“, „světlost 05/03“, „IP 02“ u pískovačky = kód odstínu? Který (IP 7802…)?", "data": "volný doplněk za čárkou, nízká jistota", "moznosti": ["IP 7802", "IP 7803", "IP 7805", "jiné (napište)"], "n": 37}, {"id": "q40", "c": 40, "oblast": "varianta", "otazka": "Kterou variantu „laminace kapsová“ brát jako výchozí, když zakázka značku neuvádí?", "data": "text položky značku nenese (měřeno, krok 8)", "moznosti": ["laminace A3", "laminace A4"], "n": 26}, {"id": "q41", "c": 41, "oblast": "stroj", "otazka": "Materiál, který číselník povoluje na Coloradu i na UV deskovém: tiskne se na Coloradu, nebo na UV deskovém?", "data": "při převodu zatím bereme UV deskové; týká se 12 sekcí, preference bez zdroje z výroby", "moznosti": ["Colorado", "UV deskové", "záleží na zakázce (napište čím)"], "n": 12}, {"id": "q42", "c": 42, "oblast": "materiál", "otazka": "Magnetka se potiskuje jako role (UV rolové), nebo deska (UV deskové)?", "data": "demo ji vede jako „ostatní netiskový“, wall2 na ni tiskne", "moznosti": ["UV rolové", "UV deskové"], "n": 11}, {"id": "q43", "c": 43, "oblast": "zkratka", "otazka": "„split“ (s DP37/Raflatac) = dělený podklad? Má to být operace, nebo varianta?", "data": "volný doplněk za čárkou, nízká jistota", "moznosti": ["operace", "varianta materiálu", "jen pokyn (nic)"], "n": 11}, {"id": "q44", "c": 44, "oblast": "stroj", "otazka": "Tiskne UV rolové oboustranně (4/4)?", "data": "text 4/4 u položek, kde stroj vychází UV rolové", "moznosti": ["ano", "ne (pak UV deskové)"], "n": 10}, {"id": "q45", "c": 45, "oblast": "zkratka", "otazka": "„lak lesk“ = UV lak z tiskárny (tisk Lak), nebo nátěr?", "data": "volný doplněk za čárkou, nízká jistota", "moznosti": ["UV lak z tiskárny", "nátěr"], "n": 6}, {"id": "q46", "c": 46, "oblast": "tisková data", "otazka": "Zákazník pošle podklad K ÚPRAVĚ (zdrojový PSD, PDF starých vizitek, které se přepíšou): zapsat u zakázky „formát tiskových dat“ (PSD, PDF)?", "data": "z e-mailů (ne z wall2): ve 3 vláknech jednou zapsáno, jindy ne", "moznosti": ["ano, formát podkladu", "ne, formát jen u hotových dat k tisku", "jinak (napište)"], "n": 3}, {"id": "q47", "c": 47, "oblast": "tisková data", "otazka": "Grafik pošle NÁVRH v PDF ke schválení („návrh tiskového PDF posílám“): je to už formát tiskových dat PDF?", "data": "z e-mailů (ne z wall2): 1 vlákno", "moznosti": ["ano", "ne, až schválená finální data", "jinak (napište)"], "n": 1}, {"id": "q48", "c": 48, "oblast": "položky", "otazka": "Zakázka s rozměry v názvu („4 ks: 20 x 250 cm, 4 ks: 20 x 200 cm“) a jednou položkou: jsou to dvě položky vedle sebe, nebo jedna?", "data": "ve wall2 je jedna položka, rozměry jsou jen v názvu (1 z 914 sekcí); zatím převádíme na dvě položky po 4 ks", "moznosti": ["dvě položky (každá 4 ks, svůj rozměr)", "jedna položka", "jinak (napište)"], "n": 1}]</script>
+<script>
+const Q = JSON.parse(document.getElementById("otazky").textContent);
+const OBLAST = { stroj: "Stroj", laminace: "Typ laminace", varianta: "Výchozí varianta", "materiál": "Materiál", zkratka: "Zkratky" };
+const fmt = n => n.toLocaleString("cs-CZ");
+// Odpovědi bez přihlášení do Claude (vkládá `bez_prihlaseni.vloz` na místo značky v šabloně stránky pro produkční).
+// Do db artifactu smí zapisovat jen přihlášený Contributor. Kdo stránku jen otevřel odkazem, odpovídá místně:
+// odpovědi drží prohlížeč (localStorage) a `ukaz` dá tlačítko, které otevře novou zprávu v Gmailu (produkční pracují
+// v Chrome s Gmailem) s řádky „id: volba | upřesnění“ → `bez_prihlaseni.py odpovedi`. Záloha: text ke zkopírování.
+const bezPrihlaseni = (klic, predmet) => {
+  const KAM = "qwanap@gmail.com";  // schránka, kterou čte `gmail_sync.py hist` (adresa na stránce: pokyn uživatele 30. 9.)
+  const MAX_URL = 6000;            // delší adresu Gmail nemusí přijmout → jen kopírování
+  const el = (tag, styl, text) => { const e = document.createElement(tag); e.style.cssText = styl; if (text != null) e.textContent = text; return e; };
+  return {
+    nacti() { try { return JSON.parse(localStorage.getItem(klic)) || {}; } catch (e) { return {}; } },
+    uloz(stav) { try { localStorage.setItem(klic, JSON.stringify(stav)); } catch (e) {} },
+    text(polozky, stav, pole) {
+      return polozky.filter((p) => stav[p.id]).map((p) => {
+        const a = stav[p.id];
+        return `${p.id}: ${a[pole] || ""}${a.text ? " | " + a.text.replace(/\s+/g, " ") : ""}`;
+      }).join("\n") + "\n— konec —";  // poslední řádek: co je v e-mailu pod ním, k odpovědím nepatří
+    },
+    ukaz(kam, text) {
+      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(KAM)}&su=${encodeURIComponent(predmet)}&body=${encodeURIComponent(text)}`;
+      const jde = url.length <= MAX_URL;
+      const a = el("a", "font-size:20px;font-weight:600;padding:14px 22px;border-radius:12px;background:var(--accent);color:var(--accent-ink);text-decoration:none", "Odeslat odpovědi e-mailem");
+      a.href = url; a.target = "_blank"; a.rel = "noopener"; a.id = "bp-mailem";
+      const p = el("p", "margin:0;font-size:17px;color:var(--muted)",
+        (jde ? "Neotevřel se e-mail? " : "") + `Zkopírujte odpovědi a pošlete je na ${KAM}.`);
+      const t = el("textarea", "font:inherit;font-size:16px;padding:14px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);min-height:220px;width:100%;box-sizing:border-box");
+      t.readOnly = true; t.value = text; t.id = "bp-souhrn"; t.setAttribute("aria-label", "Vaše odpovědi");
+      const b = el("button", "font:inherit;font-size:18px;padding:10px 16px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer", "Zkopírovat odpovědi");
+      b.type = "button";
+      const s = el("div", "font-size:17px;color:var(--muted);min-height:1.4em");
+      s.setAttribute("role", "status");
+      b.onclick = async () => {
+        let ok = false;
+        try { await navigator.clipboard.writeText(t.value); ok = true; } catch (e) {
+          t.focus(); t.select();
+          try { ok = document.execCommand("copy"); } catch (e2) {}
+        }
+        s.textContent = ok ? "Zkopírováno. Vložte do e-mailu." : "Text je označený — zkopírujte ho (Ctrl+C) a vložte do e-mailu.";
+      };
+      kam.style.cssText = "display:flex;flex-direction:column;gap:12px;align-items:center;width:100%";
+      kam.replaceChildren(...(jde ? [a] : []), p, t, b, s);
+    },
+  };
+};
+
+// Dva režimy: přihlášený Contributor ukládá do db `odpovedi`; kdo jen otevřel odkaz (bez přihlášení), odpovídá místně.
+const bp = bezPrihlaseni("otazky-odpovedi", "Otázky ke katalogu – odpovědi");
+const MISTNE = "Až odpovíte, odešlete odpovědi tlačítkem dole na stránce.";
+let odpovedi = bp.nacti();    // id → uložená odpověď
+let mistni = true;
+const upravuje = new Set();   // id otázek, které tento divák právě mění (nepřepisovat snapshotem)
+let db = null, user = null, lzeZapisovat = true, filtr = "vse";
+const jmena = {};
+
+function kartaHTML(q) {
+  const volby = q.moznosti.length ? `<fieldset class="volby"><legend class="pozn" style="padding:0;margin-bottom:6px">Návrh:</legend>${
+    q.moznosti.map((m, i) => `<label><input type="radio" name="v-${q.id}" id="v-${q.id}-${i}" value="${esc(m)}"> ${esc(m)}</label>`).join("")}</fieldset>` : "";
+  return `<article class="karta" id="k-${q.id}" data-oblast="${q.oblast}">
+    <div class="hlava"><span class="tag">${OBLAST[q.oblast] || q.oblast}</span><span>č. ${q.c}</span>
+      <span class="dopad">týká se <strong>${fmt(q.n)}</strong> položek</span><span class="pill" id="p-${q.id}">bez odpovědi</span></div>
+    <h2>${esc(q.otazka)}</h2>
+    ${q.data ? `<p class="data">${esc(q.data)}</p>` : ""}
+    ${volby}
+    <textarea id="t-${q.id}" placeholder="${q.moznosti.length ? "Upřesnění, nebo jiná odpověď" : "Odpověď"}" aria-label="Odpověď k otázce ${q.c}"></textarea>
+    <div class="pata"><button class="btn hl" type="button" id="s-${q.id}">Uložit odpověď</button><span class="info" id="i-${q.id}"></span></div>
+  </article>`;
+}
+function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML.replace(/"/g, "&quot;"); }
+
+function vykresli() {
+  document.getElementById("seznam").innerHTML = Q.map(kartaHTML).join("");
+  const oblasti = [...new Set(Q.map(q => q.oblast))];
+  const f = document.getElementById("filtry");
+  f.innerHTML = [["vse", "Vše", Q.length], ...oblasti.map(o => [o, OBLAST[o] || o, Q.filter(q => q.oblast === o).length])]
+    .map(([k, t, n]) => `<button type="button" data-f="${k}" aria-pressed="${k === filtr}">${t}<small>${n}</small></button>`).join("");
+  f.onclick = e => { const b = e.target.closest("button"); if (!b) return; filtr = b.dataset.f;
+    f.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    document.querySelectorAll(".karta").forEach(k => k.hidden = filtr !== "vse" && k.dataset.oblast !== filtr); };
+  for (const q of Q) {
+    const karta = document.getElementById("k-" + q.id);
+    karta.addEventListener("input", () => { upravuje.add(q.id); info(q.id, "Neuloženo", false); });
+    document.getElementById("s-" + q.id).onclick = () => uloz(q);
+  }
+}
+
+function info(id, text, chyba) { const el = document.getElementById("i-" + id); el.textContent = text; el.classList.toggle("chyba", !!chyba); }
+
+function vyplnKartu(q) {
+  const a = odpovedi[q.id], karta = document.getElementById("k-" + q.id);
+  karta.classList.toggle("hotovo", !!a);
+  document.getElementById("p-" + q.id).textContent = a ? "zodpovězeno" : "bez odpovědi";
+  if (upravuje.has(q.id)) return;
+  document.querySelectorAll(`input[name="v-${q.id}"]`).forEach(r => r.checked = !!a && r.value === a.volba);
+  document.getElementById("t-" + q.id).value = a?.text || "";
+  if (a) {
+    const kdy = a.kdy ? new Date(a.kdy).toLocaleString("cs-CZ", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+    info(q.id, `Uloženo ${kdy}${a.kdo && jmena[a.kdo] ? " · " + jmena[a.kdo] : ""}`, false);
+  } else info(q.id, "", false);
+}
+
+function souhrn() {
+  const hotove = Q.filter(q => odpovedi[q.id]);
+  const celkem = Q.reduce((s, q) => s + q.n, 0), vyr = hotove.reduce((s, q) => s + q.n, 0);
+  document.getElementById("pocet").textContent = `${hotove.length} / ${Q.length}`;
+  const pct = celkem ? Math.round(100 * vyr / celkem) : 0;
+  document.getElementById("podil").textContent = pct + " %";
+  document.getElementById("bar").style.width = pct + "%";
+  const o = document.getElementById("odeslat");
+  o.hidden = !(mistni && hotove.length);
+  if (!o.hidden) bp.ukaz(o, bp.text(Q, odpovedi, "volba"));
+}
+
+async function uloz(q) {
+  const volba = document.querySelector(`input[name="v-${q.id}"]:checked`)?.value || "";
+  const text = document.getElementById("t-" + q.id).value.trim();
+  if (!volba && !text) { info(q.id, "Vyberte možnost nebo napište odpověď.", true); return; }
+  if (mistni) {
+    odpovedi[q.id] = { volba, text, kdy: new Date().toISOString() };
+    bp.uloz(odpovedi); upravuje.delete(q.id); vyplnKartu(q); souhrn();
+    return;
+  }
+  const btn = document.getElementById("s-" + q.id); btn.disabled = true; info(q.id, "Ukládám…", false);
+  try {
+    const kdo = user ? await user.id() : null;
+    await db.collection("odpovedi").doc(q.id).set({ cislo: q.c, otazka: q.otazka, volba, text, kdo: kdo || "", kdy: new Date().toISOString() });
+    upravuje.delete(q.id);
+  } catch (e) {  // zápis odmítnut → odpovědi zůstanou v prohlížeči a pošlou se e-mailem
+    mistni = true; btn.disabled = false;
+    document.getElementById("rezim").textContent = MISTNE;
+    return uloz(q);
+  } finally { btn.disabled = !lzeZapisovat; }
+}
+
+async function doplnJmena() {
+  const ids = [...new Set(Object.values(odpovedi).map(a => a.kdo).filter(Boolean))];
+  if (!user || !ids.length) return;
+  try { const ps = await user.profiles(ids); for (const id of ids) jmena[id] = ps?.[id]?.name || ""; } catch (e) {}
+  Q.forEach(vyplnKartu);
+}
+
+function csv() {
+  const r = [["č.", "oblast", "otázka", "položek wall2", "volba", "odpověď / upřesnění", "uloženo"]];
+  for (const q of Q) { const a = odpovedi[q.id] || {}; r.push([q.c, q.oblast, q.otazka, q.n, a.volba || "", a.text || "", a.kdy || ""]); }
+  return "﻿" + r.map(x => x.map(v => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\r\n");
+}
+
+vykresli(); Q.forEach(vyplnKartu); souhrn();
+document.getElementById("rezim").textContent = MISTNE;
+
+(async () => {
+  const c = window.claude;
+  if (!c?.use) return;
+  const [d, u, dl] = await Promise.all([c.use("db"), c.use("user"), c.use("downloads")]);
+  if (dl) { const b = document.getElementById("stahnout"); b.hidden = false;
+    b.onclick = async () => { try { await dl.save({ filename: "otazky-produkcni-odpovedi.csv", data: csv() }); } catch (e) {} }; }
+  if (!d) return;
+  const smi = u ? await u.can("data.write") : null;
+  if (smi === false || Object.keys(odpovedi).length) return;  // bez práva zápisu, nebo už odpovídá místně
+  db = d; user = u; mistni = false;
+  document.getElementById("rezim").textContent = "Odpověď se uloží pro všechny. Když ji někdo změní, přepíše předchozí.";
+  db.collection("odpovedi").onSnapshot(snap => {
+    odpovedi = {};
+    for (const doc of snap.docs) if (doc.exists) odpovedi[doc.id] = doc.data();
+    Q.forEach(vyplnKartu); souhrn(); doplnJmena();
+  }, () => { document.getElementById("rezim").textContent = "Spojení s uloženými odpověďmi se přerušilo. Obnovte stránku."; });
+})();
+</script>
