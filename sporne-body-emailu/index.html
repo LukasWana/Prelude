@@ -37,8 +37,9 @@ header { display: grid; gap: 12px; }
 .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: 10px; align-items: center; }
 .eyebrow i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
 h1 { font: 700 clamp(28px, 5vw, 40px)/1.1 var(--display); font-stretch: 90%; margin: 0; text-wrap: balance; }
+[hidden] { display: none !important; }
 .intro { margin: 0; color: var(--muted); max-width: 65ch; }
-.stav { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.stav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,.08); display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 .stav b { font: 600 22px/1 var(--mono); font-variant-numeric: tabular-nums; }
 .stav span { color: var(--muted); font-size: 13px; }
 .bar { flex: 1 1 200px; height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; }
@@ -79,7 +80,6 @@ textarea { width: 100%; min-height: 54px; resize: vertical; font: 14px/1.45 var(
   <header>
     <div class="eyebrow"><i style="background:#00a3b4"></i><i style="background:#c2186b"></i><i style="background:#e8c21a"></i><i style="background:var(--ink)"></i> EmailRator · převod zakázek wall2 → Prelude</div>
     <h1>Otázky ke katalogu Prelude</h1>
-    <p class="intro">Při převodu zakázek ze starého systému do číselníků Prelude zůstaly věci, které z dat nejde poznat. U každé otázky vyberte odpověď, nebo ji napište do pole, a uložte. U otázky je vidět, kolika položek starého systému se týká, takže začněte shora. Odpovědi uvidí všichni, kdo stránku otevřou.</p>
   </header>
 
   <section class="stav" aria-live="polite">
@@ -89,8 +89,8 @@ textarea { width: 100%; min-height: 54px; resize: vertical; font: 14px/1.45 var(
     <div class="akce"><button class="btn" id="stahnout" type="button" hidden>Stáhnout CSV</button></div>
   </section>
 
-  <nav class="filtry" id="filtry" aria-label="Oblast"></nav>
-  <p class="pozn" id="rezim">Načítám uložené odpovědi…</p>
+  <nav class="filtry" id="filtry" aria-label="Oblast" hidden></nav>
+  <p class="pozn" id="rezim" hidden></p>
   <div class="seznam" id="seznam"></div>
   <div id="odeslat" hidden></div>
 </div>
@@ -146,7 +146,7 @@ const bezPrihlaseni = (klic, predmet) => {
 
 // Dva režimy: přihlášený Contributor ukládá do db `odpovedi`; kdo jen otevřel odkaz (bez přihlášení), odpovídá místně.
 const bp = bezPrihlaseni("otazky-odpovedi", "Otázky ke katalogu – odpovědi");
-const MISTNE = "Až odpovíte, odešlete odpovědi tlačítkem dole na stránce.";
+const MISTNE = "";
 let odpovedi = bp.nacti();    // id → uložená odpověď
 let mistni = true;
 const upravuje = new Set();   // id otázek, které tento divák právě mění (nepřepisovat snapshotem)
