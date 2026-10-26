@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+<title>Kde poběží EmailRator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Styl převzatý ze stránky Vytížení produkčních (src/vytizeni_stranka.py): hlavička s ořezovými značkami,
+   sekce s kartami a tabulkami. Podrobnosti v rozbalovacích blocích <details>. */
+:root {
+  color-scheme: light;
+  --page: #f6f7f8;
+  --surface: #fcfcfb;
+  --ink: #14171c;
+  --ink-2: #4c525c;
+  --muted: #858a93;
+  --axis: #c3c6cc;
+  --line: rgba(20, 23, 28, .10);
+  --accent: #1d5fb8;
+  --accent-wash: #e6eefa;
+  --good: #006300;
+  --bad: #b3261e;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+    --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+    --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --bad: #f07b72;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0f1114; --surface: #181a1e; --ink: #f3f4f6; --ink-2: #c1c5cc; --muted: #8b9099;
+  --axis: #3a3e45; --line: rgba(255, 255, 255, .10);
+  --accent: #6ea4ee; --accent-wash: #1c2940; --good: #2fbf4a; --bad: #f07b72;
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font: 16px/1.55 var(--font-body); }
+a { color: var(--accent); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(34px, 6vw, 58px); font-weight: 800; font-stretch: 78%; letter-spacing: -.01em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 750; font-stretch: 85%; }
+h3 { font-size: 18px; font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 72ch; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+
+/* hlavička s ořezovými značkami */
+header { position: relative; padding: 28px 28px 30px; display: grid; gap: 14px; }
+header::before, header::after, .crop::before, .crop::after {
+  content: ""; position: absolute; width: 18px; height: 18px; border-color: var(--axis); border-style: solid;
+}
+header::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+header::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.crop::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.crop::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 13px/1.4 var(--font-mono); color: var(--muted); }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card > p, .duvod p { color: var(--ink-2); }
+.duvod { display: grid; gap: 12px; }
+.duvod p:first-child { color: var(--ink); font-size: 18px; }
+.zaver { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--ink); }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-variant-numeric: tabular-nums; }
+td { color: var(--ink-2); }
+td:first-child { color: var(--ink); font-weight: 600; }
+th { font: 500 12px var(--font-mono); color: var(--muted); }
+table.cmp th:not(:first-child), table.cmp td:not(:first-child) { min-width: 190px; }
+table.cmp td:first-child { width: 22%; }
+
+/* rozbalovací části */
+details { border-top: 1px solid var(--line); padding-top: 10px; }
+details > summary { cursor: pointer; font: 600 15px var(--font-body); color: var(--accent); list-style: none; display: flex; gap: 8px; align-items: baseline; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; font-size: 13px; transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > summary .pocet { font: 400 13px var(--font-mono); color: var(--muted); }
+details > div { display: grid; gap: 10px; padding-top: 12px; }
+details p { color: var(--ink-2); }
+summary:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+
+.pill { display: inline-block; font: 500 12px/1 var(--font-mono); padding: 4px 8px; border: 1px solid currentColor; border-radius: 999px; white-space: nowrap; }
+.pill.mame { color: var(--good); }
+.pill.chybi { color: var(--bad); }
+.pill.jinde { color: var(--muted); }
+
+.otazky { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--ink-2); max-width: 80ch; }
+.otazky b { color: var(--ink); font-weight: 600; }
+.zdroje { color: var(--ink-2); line-height: 1.6; margin: 0; padding-left: 20px; }
+.zdroje a { overflow-wrap: anywhere; }
+
+/* doplněk stránky Hosting: dvě karty vedle sebe, celkový řádek tabulky */
+.karty { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.karta .eyebrow { color: var(--accent); }
+tr.celkem td { color: var(--ink); font-weight: 700; border-top: 2px solid var(--axis); }
+.vyhrada { font-size: 14px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="crop"></div>
+    <div class="eyebrow">EmailRator · jednoduše</div>
+    <h1>Kde poběží EmailRator</h1>
+    <div class="meta"><span>Ověřeno 2. 10. 2026, doplněno 4. 10.</span><span>Ceny v dolarech, kurz ČNB 2. 10.: 1 $ = 21,795 Kč</span><span>Podrobnosti v rozbalovacích částech</span></div>
+  </header>
+
+  <section id="problem">
+    <div class="sec-head">
+      <div class="eyebrow">O co jde</div>
+      <h2>Nástroj musí běžet nonstop na internetu</h2>
+    </div>
+    <div class="card duvod">
+      <p>Dnes nástroj běží na jednom pracovním počítači. Když se počítač vypne, panel v Gmailu přestane fungovat. Aby ho mohli používat všichni produkční, musí program běžet na serveru, který je zapnutý pořád.</p>
+      <p>Program je v obou možnostech skoro stejný. Liší se hlavně to, kdo mu půjčí server a kolik za to chce. U Googlu se navíc musí upravit ukládání souborů: co program zapíše na disk, tam nezůstane, když se program zastaví.</p>
+    </div>
+  </section>
+
+  <section id="moznosti">
+    <div class="sec-head">
+      <div class="eyebrow">Dvě možnosti</div>
+      <h2>Google, nebo dodavatel nového systému</h2>
+    </div>
+    <div class="karty">
+      <div class="card karta">
+        <div class="eyebrow">Možnost A</div>
+        <h3>Pronajmeme místo u Googlu</h3>
+        <p>Program se u Googlu spustí, jen když přijde e-mail nebo někdo otevře panel. Platí se po sekundách práce. Data mohou ležet v EU, v Berlíně.</p>
+      </div>
+      <div class="card karta">
+        <div class="eyebrow">Možnost B</div>
+        <h3>Kontejner u dodavatele</h3>
+        <p>Program zabalíme do takzvaného kontejneru, tedy krabice, ve které je všechno, co potřebuje. Dodavatel nového systému ji spustí na svém serveru. Cenu, místo a péči o server určuje on.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="penize">
+    <div class="sec-head">
+      <div class="eyebrow">Peníze</div>
+      <h2>Kolik to stojí měsíčně</h2>
+    </div>
+    <div class="card">
+      <div class="tablewrap">
+        <table class="cmp">
+          <thead><tr><th>Položka</th><th>A · Google</th><th>B · dodavatel</th></tr></thead>
+          <tbody>
+            <tr><td>Model, který převádí e-mail (Ollama)</td><td>20 $</td><td>20 $</td></tr>
+            <tr><td>Model Jev, který e-mail posoudí</td><td>pod 1 $</td><td>pod 1 $</td></tr>
+            <tr><td>Běh programu</td><td>0 $, vejde se do bezplatného limitu</td><td rowspan="2">cena dodavatele, zatím ji neznáme</td></tr>
+            <tr><td>Databáze, kde nástroj drží e-maily a výsledky</td><td>asi 14,50 $</td></tr>
+            <tr class="celkem"><td>Celkem</td><td>asi 35 $ (asi 770 Kč)</td><td>asi 21 $ + cena dodavatele</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="vyhrada">Ceny databáze jsou pro Berlín (europe-west10). V USA by databáze stála asi o třetinu méně.</p>
+    </div>
+  </section>
+
+  <section id="drazsi">
+    <div class="sec-head">
+      <div class="eyebrow">Srovnání</div>
+      <h2>Která možnost je dražší a proč</h2>
+    </div>
+    <div class="card duvod">
+      <p>Google stojí navíc asi 14,50 $, tedy asi 300 Kč měsíčně. Celá tato částka je databáze, protože ta musí běžet nonstop.</p>
+      <p>Samotný program u Googlu skoro nic nestojí. Na jeden e-mail pracuje pár sekund a Google účtuje jen tyto sekundy. Při našem objemu, asi 1 260 e-mailů měsíčně, se to vejde do bezplatného limitu.</p>
+      <p class="zaver">Dodavatel je levnější jen tehdy, když si za kontejner včetně databáze řekne méně než asi 300 Kč měsíčně.</p>
+      <p class="vyhrada">Výpočet platí, dokud program běží jen při práci. Kdyby běžel nonstop, například aby stále hlídal novou poštu, bezplatný limit by nestačil a běh by se platil.</p>
+    </div>
+  </section>
+
+  <section id="kromepenez">
+    <div class="sec-head">
+      <div class="eyebrow">Kromě peněz</div>
+      <h2>Na co se dívat dál</h2>
+    </div>
+    <div class="card">
+      <div class="tablewrap">
+        <table class="cmp">
+          <thead><tr><th>Otázka</th><th>A · Google</th><th>B · dodavatel</th></tr></thead>
+          <tbody>
+            <tr><td>Kdo řeší výpadek</td><td>Servery provozuje Google. Nejlevnější databáze ale nemá od Googlu záruku dostupnosti. Chyby programu hlídá někdo od nás.</td><td>Server řeší dodavatel, podle toho, na čem se dohodneme. Chyby programu hlídá i tak někdo od nás.</td></tr>
+            <tr><td>Kde leží data</td><td>V EU, místo vybereme sami (Berlín).</td><td>Nevíme, musíme se zeptat.</td></tr>
+            <tr><td>Co je potřeba připravit</td><td>Program zabalit do kontejneru. Navíc založit u Googlu projekt s fakturací na firmu a databázi. Soubory, které program dnes ukládá na disk (databáze SQLite, přílohy, uložené odpovědi Jevu), přesunout jinam: disk programu u Googlu po zastavení nezůstává.</td><td>Program zabalit do kontejneru. Spuštění zařídí dodavatel. Jestli disk u dodavatele zůstává, nevíme, musíme se zeptat.</td></tr>
+            <tr><td>Na kom jsme závislí</td><td>Na Googlu, jehož poštu firma už používá.</td><td>Na dodavateli nového systému.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="vyhrada">Text e-mailu pro modely (Ollama a Jev) jde v obou možnostech hlavně do USA, podrobně na stránce Nasazení.</p>
+    </div>
+  </section>
+
+  <section id="otazky">
+    <div class="sec-head">
+      <div class="eyebrow">Pro dodavatele</div>
+      <h2>Co se zeptat dodavatele</h2>
+    </div>
+    <div class="card">
+      <ul class="otazky">
+        <li><b>Cena:</b> kolik měsíčně za spuštění našeho kontejneru, včetně databáze PostgreSQL s rozšířením pgvector?</li>
+        <li><b>Místo:</b> kde jsou vaše servery, v EU?</li>
+        <li><b>Výpadky:</b> kdo je řeší a jak rychle?</li>
+        <li><b>Disk:</b> zůstanou soubory, které program zapíše na disk, i po restartu kontejneru?</li>
+        <li><b>Internet:</b> smí program z kontejneru posílat požadavky ven (Gmail, Ollama, OpenRouter) a bude dostupný z prohlížečů našich lidí?</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="vysvetleni">
+    <div class="card">
+      <details>
+        <summary>Výpočet krok za krokem</summary>
+        <div>
+          <p><b>Objem.</b> Asi 1 260 e-mailů měsíčně, stejný odhad jako na stránce Nasazení EmailRatoru (asi 217 zakázek měsíčně ze starého systému, ve vlákně průměrně 5,8 zprávy). Nástroj převádí e-mail po každé nové zprávě. Je to spíš spodní odhad: nezahrnuje poptávky, ze kterých zakázka nevznikla, ani ostatní poštu. I při trojnásobku by se běh vešel do bezplatného limitu (63 %) a Jev by stál 0,88 $.</p>
+          <p><b>Běh u Googlu (Cloud Run).</b> Bezplatně je měsíčně 180 000 vCPU-sekund (sekund práce procesoru), 360 000 GiB-sekund paměti a 2 miliony požadavků. Převod deepseekem trvá 1,1–2,3 s. I kdyby každý trval 30 s, je to 1 260 × 30 = 37 800 vCPU-sekund, tedy 21 % limitu, a při 1 GiB paměti 10,5 % limitu paměti (při cenách první skupiny). Berlín (europe-west10) patří do dražší druhé cenové skupiny (Tier 2), jeho ceny běhu tabulka ceníku bez přepnutí regionu neukáže. Limit je ale sleva v hodnotě 180 000 vCPU-sekund za ceny první skupiny (Tier 1): 180 000 × 0,000024 $ = 4,32 $. Náš běh by ji vyčerpal, jen kdyby byl procesor v Berlíně 4,8× dražší než v Iowě (4,32 $ / 37 800 vCPU-sekund = 0,000114 $). Nezapočtený je přenos dat ven, tedy požadavky na modely: platí se podle ceníku sítě Googlu, bezplatný 1 GiB měsíčně platí jen v Severní Americe.</p>
+          <p><b>Když by program běžel nonstop.</b> Pro trvale běžící program je bezplatně 240 000 vCPU-sekund, to je asi 67 hodin. Měsíc má 730 hodin.</p>
+          <p><b>Databáze (Cloud SQL).</b> Nejmenší databáze db-f1-micro stojí v Berlíně 0,0162 $ za hodinu: 0,0162 × 730 h = 11,83 $. Disk SSD 0,00035863 $ za GiB a hodinu; při disku 10 GiB (naše dnešní data mají 51 MB) 10 × 0,00035863 × 730 = 2,62 $. Součet 14,45 $. Berlínské ceny přečetl v ceníku Googlu uživatel 2. 10. (tabulka, kterou umíme stáhnout, ukazuje jen Iowu). Pro srovnání v Iowě (USA): 0,0105 × 730 h = 7,67 $ a 10 × 0,000232877 × 730 = 1,70 $, součet 9,37 $. Cenu pro Belgii jsme nezjistili. Zálohy databáze a úložiště kontejneru nejsou započtené, platí se zvlášť podle velikosti. Databáze má rozšíření pgvector (od verze PostgreSQL 13), které nástroj potřebuje pro vyhledávání podobných e-mailů. Nejlevnější databáze nemá záruku dostupnosti (SLA).</p>
+          <p><b>Model Jev.</b> Z uložených odpovědí: posouzení e-mailu průměrně 0,000087 $, posouzení údajů 0,000145 $, dohromady 0,000232 $ na e-mail, tedy 0,29 $ měsíčně. I kdyby každý e-mail stál nejvíc, co jsme naměřili (0,000387 $ a 0,000909 $), je to 1,63 $.</p>
+          <p><b>Ollama Pro.</b> Plán stojí 20 $ měsíčně a obsahuje kredit 60 $ na tokeny. Náš provoz spotřebuje 3–12 % kreditu, platí se tedy jen 20 $ za plán (stránka Nasazení).</p>
+          <p><b>Koruny (vlastní přepočet).</b> Kurz ČNB 2. 10. 2026: 1 $ = 21,795 Kč. Databáze 14,45 $ × 21,795 = 315 Kč. Celkem u Googlu s Jevem za 1 $, bez záloh a přenosu dat: (20 + 1 + 14,45) $ = 35,45 $ × 21,795 = 773 Kč.</p>
+          <p><b>Ověření.</b> Věty z ceníků (kromě berlínských cen databáze, ty stažená tabulka neukazuje) a kurz hlídá skript <span class="num">scripts/hosting_kontrola.py</span>, který také přepočítá výpočty a cenu Jevu z dat projektu.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Zdroje <span class="pocet">stažené 2. 10. 2026, Cloud Run: disk 4. 10.</span></summary>
+        <div>
+          <ul class="zdroje">
+            <li><a href="https://cloud.google.com/run/pricing">https://cloud.google.com/run/pricing</a> — ceník Cloud Run: bezplatný limit a cenové skupiny regionů</li>
+            <li><a href="https://docs.cloud.google.com/run/docs/container-contract">https://docs.cloud.google.com/run/docs/container-contract</a> — Cloud Run: soubory na disku po zastavení nezůstávají („Data written to the file system doesn't persist when the instance stops.“)</li>
+            <li><a href="https://cloud.google.com/sql/pricing">https://cloud.google.com/sql/pricing</a> — ceník Cloud SQL: db-f1-micro, disk, SLA</li>
+            <li><a href="https://cloud.google.com/sql/docs/postgres/extensions">https://cloud.google.com/sql/docs/postgres/extensions</a> — Cloud SQL: rozšíření pgvector</li>
+            <li><a href="https://ollama.com/pricing">https://ollama.com/pricing</a> — ceník Ollama</li>
+            <li><a href="https://ollama.com/cloud">https://ollama.com/cloud</a> — Ollama cloud: servery hlavně v USA</li>
+            <li><a href="https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt?date=02.10.2026">https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt?date=02.10.2026</a> — kurz ČNB k 2. 10. 2026</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
